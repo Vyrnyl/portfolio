@@ -18,11 +18,11 @@ Default response to "how do I do X": explain the approach and the pitfalls, show
 
 ## Current state
 
-**No application code exists yet — planning and design only.** The design is approved and documented; the build has not started.
+**Sprint 0 — Foundation.** The Next.js app is scaffolded and runs. No components, content or routes exist yet beyond the scaffold's default page.
 
 Check [ai-context/context/progress.md](ai-context/context/progress.md) at the start of every session. It is the source of truth for what is actually built. Never assume a feature exists.
 
-Next ticket: **PORT-001** (scaffold).
+Next ticket: **PORT-003** (design tokens).
 
 ## Documentation map
 
