@@ -4,7 +4,7 @@
 > Update at the end of every session and whenever a ticket changes status.
 > The plan lives in [build-plan.md](build-plan.md); this file is the record.
 
-**Last updated:** 2026-08-18 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-001 (Ready)
+**Last updated:** 2026-08-19 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-002 (Ready)
 
 ---
 
@@ -18,7 +18,7 @@
 
 | ID | Ticket | Size | Status | Notes |
 |---|---|---|---|---|
-| PORT-001 | Scaffold Next.js app | S | ☐ | **Ready.** App lives at the repo root, beside `ai-context/`. |
+| PORT-001 | Scaffold Next.js app | S | ✔ | Next 16.3.1 at the repo root. `verify` green. Scaffold `.git` + `CLAUDE.md` discarded on the move; `AGENTS.md` kept deliberately (see decisions). |
 | PORT-002 | Repository hygiene | S | ☐ | |
 | PORT-003 | Port design tokens into Tailwind v4 | M | ☐ | ⚠️ Blocks nearly everything. Values already in ui-rules.md §2–3 — this is a port, not an extraction. |
 | PORT-004 | Layout primitives | S | ☐ | |
@@ -67,7 +67,7 @@
 |---|---|---|---|---|
 | PORT-040 | Validation schema | S | ☐ | |
 | PORT-041 | Server Action | M | ☐ | |
-| PORT-042 | Email delivery | M | ☐ | Needs a Resend account + verified domain. |
+| PORT-042 | Email delivery | M | ☐ | Needs a Resend account + verified domain. ⚠️ Scaffold `.gitignore` ignores `.env*`, which also catches `.env.example`; add `!.env.example` when creating it (code-standards §7). |
 | PORT-043 | Spam + rate limiting | M | ☐ | |
 | PORT-044 | Contact UX polish | S | ☐ | |
 
@@ -89,15 +89,15 @@
 
 | Sprint | Tickets | ☐ | ▶ | ⚠ | ✔ |
 |---|---|---|---|---|---|
-| 0 — Foundation | 7 | 7 | 0 | 0 | 0 |
+| 0 — Foundation | 7 | 6 | 0 | 0 | 1 |
 | 1 — Content | 6 | 6 | 0 | 0 | 0 |
 | 2 — Primitives | 6 | 6 | 0 | 0 | 0 |
 | 3 — Pages | 8 | 8 | 0 | 0 | 0 |
 | 4 — Contact | 5 | 5 | 0 | 0 | 0 |
 | 5 — Production | 7 | 7 | 0 | 0 | 0 |
-| **Total** | **39** | **39** | **0** | **0** | **0** |
+| **Total** | **39** | **38** | **0** | **0** | **1** |
 
-**Completion: 0 / 39 (0%)**
+**Completion: 1 / 39 (3%)**
 
 ---
 
@@ -154,6 +154,11 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 2026-08-18 | Mobile menu split from the app shell | Focus trap, scroll lock and resize-close are real work that gets skipped when bundled. Added PORT-007. |
 | 2026-08-18 | Breakpoints are 1000 / 760 / 460 | Set by the design, replacing the assumed 1024 / 768 / 375. |
 | 2026-08-18 | Next.js app lives at the repo root | One repo, docs beside code. Scaffold into a temp dir and move in, so `create-next-app` does not refuse a non-empty directory. |
+| 2026-08-19 | Scaffolded on Next.js **16.3.1**, not 15 | `create-next-app@latest` now ships 16. App Router, Server Components and Promise-based `params` are unchanged, so the docs still hold — but two CLI commands differ (next two rows). |
+| 2026-08-19 | `lint` script is `eslint`, not `next lint` | `next lint` was removed in Next 16. implementation-guide.md §PORT-001 still shows the old form; the scaffold default is correct. |
+| 2026-08-19 | `typecheck` is `next typegen && tsc --noEmit` | Next 16 generates `LayoutProps`/`PageProps` into `.next/types`, which is gitignored. Without `typegen`, `verify` fails on a clean clone because typecheck runs before build. |
+| 2026-08-19 | Scaffold `.git` and `CLAUDE.md` deleted, `AGENTS.md` kept | `--no-git` was ignored and created a repo that would have clobbered ours. The scaffold `CLAUDE.md` is a one-line stub that would have replaced the project contract. `next dev` regenerates these: if `AGENTS.md` is absent it writes its rules block into `CLAUDE.md` instead, so keeping `AGENTS.md` is what protects it. |
+| 2026-08-19 | `.vscode/settings.json` is committed | Formatter config changes the output every developer produces, so it is shared project config, not personal preference. |
 
 ---
 
@@ -175,5 +180,6 @@ Newest first. The **next step** field matters most — write it so you could pic
 
 | Date | Worked on | Outcome | Next step |
 |---|---|---|---|
+| 2026-08-19 | PORT-001 | Repo initialized and baseline commit `8e58a18` made. Next 16.3.1 scaffolded into a temp dir and moved to the repo root; scaffold `.git` and `CLAUDE.md` discarded first. tsconfig hardened with `noUncheckedIndexedAccess`, `verify` script added, Prettier + Tailwind class sorting configured and proven, format-on-save wired. `npm run verify` green; dev server confirmed in the browser. | **PORT-002** — repository hygiene. First action: the moved-in `README.md` is still the Next.js default, and the ESLint `ui/` import-boundary rule from code-standards §8 is not yet added to `eslint.config.mjs`. |
 | 2026-08-18 | Design + content | Design prototype built and approved: 9 pages, both themes, burger nav, 2 full case studies. Real content written from Vernel's resume and background. Tokens recorded in ui-rules.md §2–3; ui-registry.md populated (all `designed`); PORT-007 and PORT-037 added. | Answer open question #1 (app location), then start **PORT-001** — scaffold per [implementation-guide.md](implementation-guide.md) → Sprint 0. |
 | 2026-08-17 | Planning | All context docs rewritten for the Next.js portfolio scope. `database-design.md` replaced by `content-model.md`; `implementation-guide.md` added. | — |
