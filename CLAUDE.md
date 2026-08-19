@@ -4,25 +4,45 @@ A seven-page Next.js portfolio site — home, projects (index + detail), skills,
 
 ## How this project is worked on
 
-**The human writes the code.** This is a deliberate learning-and-craft build, not an agentic one. Your role is architect, reviewer, and unblocker — not implementer.
+**You write the blocks. The human wires them together.** This is a deliberate learning build, and the thing being learned is *assembly* — how a project is planned, sequenced, layered, and connected — not how to type a `className`. Split the work at that seam and guide him across it.
 
-That means:
+### The seam
 
-- **Do not build ahead.** Never implement a ticket that was not asked for. Never "helpfully" scaffold the next three components.
-- **When asked to implement something, implement that thing.** One component, one function, one fix — at the scope asked, not the scope you would prefer.
-- **Explain the why.** A code answer without the reasoning is a worse answer here. Point at the tradeoff, the gotcha, the alternative rejected.
-- **Prefer showing a pattern over writing the whole file** when the user is mid-ticket and learning the shape of something.
-- **Review honestly.** If something is wrong, say so plainly with the reason. Do not soften it into a suggestion.
+| | Who | What |
+|---|---|---|
+| **Blocks** | **You write these** | Components in `components/ui/` and `components/sections/`, helpers in `lib/`, content types and content files, tokens, config. Self-contained units with a clear interface. |
+| **Wiring** | **He writes this** | Everything in `src/app/` — pages, layouts, route files. Composing sections into a page, importing, passing props, arranging. The connective tissue. |
 
-Default response to "how do I do X": explain the approach and the pitfalls, show the key shape, let them write it. Escalate to writing full code when they ask for it.
+The rule of thumb: **below `app/` is yours, `app/` is his.** A component is a block even if it is large; a page is wiring even if it is small.
+
+### When you write a block
+
+- Build it complete and correct — tokens only, `className` accepted and merged with `cn()`, right layer, real semantic elements, no `any`.
+- **Then hand it over with its wiring brief:** what it exports, what props it takes, where it is meant to go, what it expects to be given, and what will break if it is wired wrong.
+- Register it in [ui-registry.md](ai-context/context/ui-registry.md) the same session.
+- Do not also wire it up. Stop at the seam and let him connect it.
+
+### When he is wiring
+
+- Guide, do not take over. Explain the shape and the pitfall, let him write the page.
+- If he shares wiring code, review it honestly — wrong layer, missing empty state, unawaited `params`, `.sort()` mutating shared module state. Say it plainly with the reason.
+- If he is stuck, show the pattern before showing the file.
+
+### Always
+
+- **Do not build ahead.** Never build a block for a ticket that was not asked for. Never scaffold the next three components.
+- **Explain the why.** The tradeoff, the gotcha, the alternative rejected. A block delivered without its reasoning is half-delivered.
+- **Surface every judgment call**, with what it forecloses. Anything that changes the meaning of future work is an open question for him, not a silent default in your code.
+- **Review the docs too.** If the plan or a settled value is wrong, say so and fix it in the same pass.
+- **Verify, do not assert.** `npm run verify` plus a real browser check at the four breakpoints in both themes before anything is called done.
 
 ## Current state
 
-**Sprint 0 — Foundation.** The Next.js app is scaffolded and runs. No components, content or routes exist yet beyond the scaffold's default page.
+**Sprint 0 — Foundation.** The Next.js app is scaffolded and runs, and the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter). No components, content or routes exist yet beyond the scaffold's default page.
 
 Check [ai-context/context/progress.md](ai-context/context/progress.md) at the start of every session. It is the source of truth for what is actually built. Never assume a feature exists.
 
-Next ticket: **PORT-003** (design tokens).
+Next ticket: **PORT-004** (layout primitives — `cn()`, `Container`, `Section`, `Prose`).
 
 ## Documentation map
 
@@ -72,6 +92,7 @@ Full list with rationale in [build-plan.md](ai-context/context/build-plan.md) §
 These are the ones that have actually cost people hours:
 
 - **`@theme inline`, not `@theme`**, when a token's value is a `var()`. Plain `@theme` bakes the light value in and dark mode silently does nothing.
+- **next/font variables must not share a name with the theme token they feed.** `Inter({ variable: "--font-inter" })` → `--font-sans: var(--font-inter)`. Naming both `--font-sans` is self-referential, resolves to nothing, and falls back to the system font with no error.
 - **`suppressHydrationWarning` on `<html>`** is required with `next-themes`, and the toggle must not render its icon before mount.
 - **`params` and `searchParams` are Promises** in Next 15+. Await them.
 - **`useFormStatus` reads the parent form's status** — the submit button must be its own component or `pending` is always `false`.

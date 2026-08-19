@@ -1,13 +1,13 @@
 ---
 name: ticket
-description: Start, guide, or close a ticket from the portfolio build plan. Use when the user names a ticket ("PORT-021", "let's do the button", "start the projects page", "what's next", "next ticket"), or asks to review or close one. Guides the human through building it — does not build it for them unless asked.
+description: Start, guide, or close a ticket from the portfolio build plan. Use when the user names a ticket ("PORT-021", "let's do the button", "start the projects page", "what's next", "next ticket"), or asks to review or close one. Writes the blocks (components, lib, content) and guides the human through wiring them up in app/.
 ---
 
 # Ticket
 
 Work one ticket from [build-plan.md](../../../ai-context/context/build-plan.md).
 
-> **The human writes the code.** You are the architect and reviewer. Do not implement the ticket unless explicitly asked. Explain, unblock, review — then let them build.
+> **Split the ticket at the seam** (CLAUDE.md → How this project is worked on). **You write the blocks** — anything below `src/app/`: components, `lib/`, content, tokens, config. **He writes the wiring** — anything in `src/app/`: pages, layouts, routes. Build your side complete, hand it over with a wiring brief, then guide him across. Never build a ticket that was not asked for.
 
 ## 1. Orient
 
@@ -32,15 +32,21 @@ Before they write code, give them:
 
 If it builds a component, **check [ui-registry.md](../../../ai-context/context/ui-registry.md) first** and say whether something existing should be reused or extended instead.
 
-## 3. Support
+## 3. Build, then hand over
 
-While they build:
+**Your half — the blocks:**
 
-- Answer the question asked, at the scope asked.
-- Explain the *why*, not just the fix.
-- When they share code, review against [code-standards.md](../../../ai-context/context/code-standards.md) and [ui-rules.md](../../../ai-context/context/ui-rules.md) §5 — tokens only, `className` accepted, correct client/server boundary, real semantic elements, no `any`.
+- Build each one complete. Stay at the scope asked; flag anything you had to decide rather than deciding it silently.
+- Hand each over with a **wiring brief**: what it exports, its props, where it goes, what it expects, what breaks if wired wrong.
+- Stop at `src/app/`. Do not wire it up yourself.
+
+**His half — the wiring:**
+
+- Explain the shape and the pitfall, then let him write the page.
+- Review what he shares against [code-standards.md](../../../ai-context/context/code-standards.md) and [ui-rules.md](../../../ai-context/context/ui-rules.md) §5 — tokens only, `className` accepted, correct client/server boundary, real semantic elements, no `any`.
 - Flag scope creep: "that's PORT-0xx, leave it."
-- If they are stuck past ~20 minutes, suggest marking it `⚠` with the symptom and moving to the next `Ready` ticket.
+- Common wiring faults to watch for: unawaited `params`/`searchParams`, `.sort()` mutating the shared imported array, a missing empty state, an optional content field with no rendering branch, `components/ui/` reaching into `content/`.
+- If the ticket is genuinely blocked, mark it `⚠` with the symptom and pull the next `Ready` one rather than half-finishing it.
 
 ## 4. Close
 

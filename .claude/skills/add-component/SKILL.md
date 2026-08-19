@@ -7,7 +7,7 @@ description: Guide building a new UI component for the portfolio without duplica
 
 Enforces the discipline that keeps a component set coherent: **check first, tokens only, register after.**
 
-> The human writes the component. Guide the shape and review the result; write it in full only when asked.
+> A component is a **block**, so you write it. Brief the decisions first — registry hit or miss, which layer it belongs in, which tokens it uses — then build it, register it, and hand it over with a wiring brief (exports, props, where it goes, what breaks if wired wrong). Stop there: placing it in a page is his half.
 
 ## 1. Check the registry — always first
 
