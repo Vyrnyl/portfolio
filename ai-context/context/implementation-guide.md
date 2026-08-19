@@ -112,8 +112,8 @@ Two things go wrong here, and both are silent.
   --color-danger: var(--danger);
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
 
   --radius-btn: 0.5rem;
   --radius-card: 0.75rem;
@@ -143,9 +143,12 @@ Fonts:
 // src/app/layout.tsx
 import { Inter, JetBrains_Mono } from "next/font/google";
 
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+// The next/font variable MUST NOT share a name with the theme token it feeds.
+// `--font-sans: var(--font-sans)` is self-referential and resolves to nothing.
+const sans = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains", display: "swap" });
 // then: <html className={`${sans.variable} ${mono.variable}`}>
+// and in @theme inline:  --font-sans: var(--font-inter);  --font-mono: var(--font-jetbrains);
 ```
 
 ---

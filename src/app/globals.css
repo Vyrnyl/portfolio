@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
+/* Class-based dark mode. Without this, v4 keys off prefers-color-scheme only
+   and the `.dark` toggle does nothing. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Raw palette.
+   Source of truth is the prototype hex in ui-rules.md §3; the values below are
+   exact sRGB -> OKLCH conversions of those hexes, not hand-tuned. Change the
+   hex in §3 first, then re-convert. Never edit these in isolation.
+--------------------------------------------------------------------------- */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ground:        oklch(0.985 0.004  91);
+  --surface:       oklch(1     0       0);
+  --surface-2:     oklch(0.966 0.007 107);
+  --border:        oklch(0.919 0.008 114);
+  --border-strong: oklch(0.866 0.012 117);
+  --ink:           oklch(0.251 0.014 164);
+  --muted:         oklch(0.514 0.020 159);
+  --faint:         oklch(0.661 0.018 157);
+  --fern:          oklch(0.532 0.0931 162.4);
+  --fern-hover:    oklch(0.457 0.080 162);
+  --fern-on:       oklch(1     0       0);
+  --fern-wash:     oklch(0.955 0.013 160);
+  --coral:         oklch(0.6065 0.1649 33.4);
+  --coral-wash:    oklch(0.951 0.019  38);
+  --ring:          var(--fern);
+
+  /* Layout. Not theme-dependent. */
+  --gut: 24px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Re-derived for dark, not inverted: fern lightens to hold contrast on a dark
+   ground, and --fern-on flips from white to near-black. */
+.dark {
+  --ground:        oklch(0.213 0.007 164);
+  --surface:       oklch(0.250 0.009 159);
+  --surface-2:     oklch(0.282 0.011 156);
+  --border:        oklch(0.321 0.012 161);
+  --border-strong: oklch(0.381 0.015 153);
+  --ink:           oklch(0.949 0.007 124);
+  --muted:         oklch(0.714 0.017 160);
+  --faint:         oklch(0.585 0.021 162);
+  --fern:          oklch(0.733 0.116 160);
+  --fern-hover:    oklch(0.788 0.106 160);
+  --fern-on:       oklch(0.227 0.025 168);
+  --fern-wash:     oklch(0.284 0.025 166);
+  --coral:         oklch(0.731 0.134  33);
+  --coral-wash:    oklch(0.271 0.028  37);
+  --ring:          var(--fern);
 }
 
-@media (prefers-color-scheme: dark) {
+/* Page gutter tightens below the 760 breakpoint (ui-rules.md §3). */
+@media (width < 760px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --gut: 18px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------------------------------------------------------------------------
+   Semantic tokens.
+   `inline` is REQUIRED. Plain @theme resolves var() at build time and bakes the
+   light value into every utility class, so dark mode silently does nothing.
+   This one keyword is the whole trick.
+--------------------------------------------------------------------------- */
+
+@theme inline {
+  --color-ground:        var(--ground);
+  --color-surface:       var(--surface);
+  --color-surface-2:     var(--surface-2);
+  --color-border:        var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ink:           var(--ink);
+  --color-muted:         var(--muted);
+  --color-faint:         var(--faint);
+  --color-fern:          var(--fern);
+  --color-fern-hover:    var(--fern-hover);
+  --color-fern-on:       var(--fern-on);
+  --color-fern-wash:     var(--fern-wash);
+  --color-coral:         var(--coral);
+  --color-coral-wash:    var(--coral-wash);
+  --color-ring:          var(--ring);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+
+  /* max-w-shell (page) and max-w-measure (prose). Deliberately not named
+     `max`/`prose` — both collide with Tailwind built-ins. */
+  --container-shell:   1120px;
+  --container-measure:  680px;
+
+  /* px-gut, gap-gut, ... */
+  --spacing-gut: var(--gut);
+}
+
+/* ------------------------------------------------------------------------- */
+
+@layer base {
+  body {
+    @apply bg-ground text-ink font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -4,25 +4,25 @@
 > Update at the end of every session and whenever a ticket changes status.
 > The plan lives in [build-plan.md](build-plan.md); this file is the record.
 
-**Last updated:** 2026-08-19 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-002 (Ready)
+**Last updated:** 2026-08-19 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-004 (Ready)
 
 ---
 
 ## At a glance
 
-**1 / 39 tickets complete · 3%** — one cell per ticket.
+**3 / 39 tickets complete · 8%** — one cell per ticket.
 
-`█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+`███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
 
 | Sprint | Progress | ✔ Done | ▶ | ⚠ | ☐ Left |
 |---|---|---|---|---|---|
-| **0 — Foundation** ◄ current | `█░░░░░░` | 1 / 7 | 0 | 0 | 6 |
+| **0 — Foundation** ◄ current | `███░░░░` | 3 / 7 | 0 | 0 | 4 |
 | 1 — Content layer | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
 | 2 — UI primitives | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
 | 3 — Pages | `░░░░░░░░` | 0 / 8 | 0 | 0 | 8 |
 | 4 — Contact wiring | `░░░░░` | 0 / 5 | 0 | 0 | 5 |
 | 5 — Production | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
-| **Total** | | **1 / 39** | **0** | **0** | **38** |
+| **Total** | | **3 / 39** | **0** | **0** | **36** |
 
 ---
 
@@ -37,8 +37,8 @@
 | ID | Ticket | Size | Status | Notes |
 |---|---|---|---|---|
 | PORT-001 | Scaffold Next.js app | S | ✔ | Next 16.3.1 at the repo root. `verify` green. Scaffold `.git` + `CLAUDE.md` discarded on the move; `AGENTS.md` kept deliberately (see decisions). |
-| PORT-002 | Repository hygiene | S | ☐ | |
-| PORT-003 | Port design tokens into Tailwind v4 | M | ☐ | ⚠️ Blocks nearly everything. Values already in ui-rules.md §2–3 — this is a port, not an extraction. |
+| PORT-002 | Repository hygiene | S | ✔ | ESLint ui/ boundary rule added and proven firing. !.env.example negation added — .gitignore's .env* swallows it otherwise. |
+| PORT-003 | Port design tokens into Tailwind v4 | M | ✔ | Colour, font, radius, container and gutter tokens shipped. §2 oklch was **wrong** as documented — re-derived from the §3 hexes, all 28 now round-trip exactly. Type scale deferred to PORT-004, shadows to PORT-021 (no dark values recorded). |
 | PORT-004 | Layout primitives | S | ☐ | |
 | PORT-005 | App shell | L | ☐ | Nav array hardcoded here; swapped in PORT-011. Mobile menu split out to PORT-007. |
 | PORT-006 | Route stubs + error boundaries | S | ☐ | Seven routes now — Skills was added. |
@@ -85,7 +85,7 @@
 |---|---|---|---|---|
 | PORT-040 | Validation schema | S | ☐ | |
 | PORT-041 | Server Action | M | ☐ | |
-| PORT-042 | Email delivery | M | ☐ | Needs a Resend account + verified domain. ⚠️ Scaffold `.gitignore` ignores `.env*`, which also catches `.env.example`; add `!.env.example` when creating it (code-standards §7). |
+| PORT-042 | Email delivery | M | ☐ | Needs a Resend account + verified domain. `.env.example` and its `!.env.example` negation in `.gitignore` already exist (PORT-002) — only `.env.local` needs creating here. |
 | PORT-043 | Spam + rate limiting | M | ☐ | |
 | PORT-044 | Contact UX polish | S | ☐ | |
 
@@ -161,6 +161,9 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 2026-08-19 | `typecheck` is `next typegen && tsc --noEmit` | Next 16 generates `LayoutProps`/`PageProps` into `.next/types`, which is gitignored. Without `typegen`, `verify` fails on a clean clone because typecheck runs before build. |
 | 2026-08-19 | Scaffold `.git` and `CLAUDE.md` deleted, `AGENTS.md` kept | `--no-git` was ignored and created a repo that would have clobbered ours. The scaffold `CLAUDE.md` is a one-line stub that would have replaced the project contract. `next dev` regenerates these: if `AGENTS.md` is absent it writes its rules block into `CLAUDE.md` instead, so keeping `AGENTS.md` is what protects it. |
 | 2026-08-19 | `.vscode/settings.json` is committed | Formatter config changes the output every developer produces, so it is shared project config, not personal preference. |
+| 2026-08-19 | Prototype **hex** is canonical; the oklch in ui-rules §2 is derived | §2 had been hand-converted and drifted — dark `fern` by L+0.037, light `coral` by L+0.047 and C+0.020, both visible on a large fill. Two sources of truth for one colour means the wrong one eventually wins. Hex is what was approved, so hex is the record and oklch is regenerated from it. |
+| 2026-08-19 | Container tokens named `--container-shell` / `--container-measure`, not `max` / `prose` | `max-w-max` and `max-w-prose` are both Tailwind built-ins. Reusing those names silently shadows them and produces a bug that looks like a typo. |
+| 2026-08-19 | next/font variables (`--font-inter`, `--font-jetbrains`) named separately from the theme tokens (`--font-sans`, `--font-mono`) | implementation-guide.md had them sharing a name, which makes `--font-sans: var(--font-sans)` — self-referential, resolves to nothing, and falls back to the system font with no error. Guide corrected. |
 
 ---
 
@@ -173,6 +176,8 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 3 | Sending domain for Resend? | PORT-042 | — |
 | 4 | Keep the Uses page? | PORT-035 | Recommended: delete. Nothing real to put on it. |
 | 5 | Which case study leads — Grades Repository or Project Gate? | PORT-032 | Both written in the prototype. Project Gate is technically stronger. |
+| 6 | Custom breakpoints (1000 / 760 / 460) as `@theme --breakpoint-*` overrides, or named additions alongside Tailwind defaults? | PORT-004 | Overriding changes what `md:`/`lg:` mean for every future component — decide before the first responsive component, not after. |
+| 7 | `coral` on `ground` measures **3.97:1** in light mode — below AA for the error text it is specified for. Darken coral, or restrict it to icons/borders with a separate error-text colour? | PORT-023, PORT-052 | Dark mode passes at 6.99:1. `faint` is also below AA (2.94 light / 4.23 dark) but is metadata-only. |
 
 ---
 
@@ -182,6 +187,8 @@ Newest first. The **next step** field matters most — write it so you could pic
 
 | Date | Worked on | Outcome | Next step |
 |---|---|---|---|
+| 2026-08-19 | PORT-003 | Tokens shipped in `src/app/globals.css` + `next/font` wiring in `layout.tsx` (Inter → `--font-inter`, JetBrains Mono → `--font-jetbrains`). **The oklch in ui-rules §2 was wrong** — hand-converted and drifting up to L±0.047 on dark `fern` and light `coral`; re-derived from the §3 hexes and verified by round-tripping the compiled CSS hex fallbacks (28/28 exact). `@theme inline` proven in the build output (`.bg-ground{background-color:var(--ground)}`, not a baked literal). Browser-checked in Chrome at 1440/1024/768/375 in both themes: colours flip, no horizontal overflow, gutter 24px→18px below 760, both fonts loading. Contrast measured — the three AC pairs pass; `coral`/`ground` and `faint`/`ground` do not (logged as open question 7). ui-rules §1–3 updated; implementation-guide font example fixed (it told you to self-reference `--font-sans`). `npm run verify` green. | **PORT-004** — layout primitives. First action: `npm i clsx tailwind-merge`, then `src/lib/utils.ts` with `cn()`. `Container` uses `max-w-shell px-gut` and `Prose` uses `max-w-measure` — those tokens already exist, do not re-invent them. Answer open question 6 (breakpoints) before writing the first responsive class. |
+| 2026-08-19 | PORT-002 | README rewritten for the real project. `.env.example` added with a `!.env.example` negation in `.gitignore` — the scaffold's `.env*` glob swallows it otherwise. `.nvmrc` pinned to 22. Folder skeleton from architecture.md §3 created with `.gitkeep`. ESLint `components/ui/` import-boundary rule added **and proven firing** against a throwaway import. Resume moved to `public/resume.pdf` via `git mv`. Pushed to github.com/Vyrnyl/portfolio (public, `main` default). `npm run verify` green. | **PORT-003** — design tokens. Port the `globals.css` block from [ui-rules.md](ui-rules.md) §2: raw vars on `:root`/`.dark`, semantic tokens in **`@theme inline`** (plain `@theme` bakes in the light values and dark mode silently dies). Prove it by toggling `.dark` on `<html>` and watching a `bg-ground text-ink` element change before closing. |
 | 2026-08-19 | PORT-001 | Repo initialized and baseline commit `8e58a18` made. Next 16.3.1 scaffolded into a temp dir and moved to the repo root; scaffold `.git` and `CLAUDE.md` discarded first. tsconfig hardened with `noUncheckedIndexedAccess`, `verify` script added, Prettier + Tailwind class sorting configured and proven, format-on-save wired. `npm run verify` green; dev server confirmed in the browser. | **PORT-002** — repository hygiene. First action: the moved-in `README.md` is still the Next.js default, and the ESLint `ui/` import-boundary rule from code-standards §8 is not yet added to `eslint.config.mjs`. |
 | 2026-08-18 | Design + content | Design prototype built and approved: 9 pages, both themes, burger nav, 2 full case studies. Real content written from Vernel's resume and background. Tokens recorded in ui-rules.md §2–3; ui-registry.md populated (all `designed`); PORT-007 and PORT-037 added. | Answer open question #1 (app location), then start **PORT-001** — scaffold per [implementation-guide.md](implementation-guide.md) → Sprint 0. |
 | 2026-08-17 | Planning | All context docs rewritten for the Next.js portfolio scope. `database-design.md` replaced by `content-model.md`; `implementation-guide.md` added. | — |

@@ -14,7 +14,7 @@ The visual design comes from **Google Stitch**, accessed via its MCP connection.
 
 **Workflow:** extract → record in §3 → build against this file. If a value is missing here, add it here first; do not read it out of the design a second time mid-build. Two lookups produce two greys.
 
-> **Status: tokens extracted and proven in both themes** via the design prototype. §3 below is the record. `PORT-003` is now a port job — convert these hex values to `oklch()` and implement the `@theme inline` pattern in §2.
+> **Status: tokens shipped (PORT-003 ✔).** §2 is the shipped `globals.css` verbatim; §3 is the canonical hex record it derives from.
 
 ---
 
@@ -28,54 +28,75 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
 `@theme inline` (not plain `@theme`) is required when a token's value is a `var()`. Plain `@theme` resolves values at build time, which freezes the light-mode color into the utility class and breaks dark mode. **This is the single most common Tailwind v4 mistake — get it right once here.**
 
 ```css
-/* src/app/globals.css */
+/* src/app/globals.css — this is the shipped file, verbatim. */
 @import "tailwindcss";
 
-/* Class-based dark mode. Without this, v4 keys off prefers-color-scheme
-   only and the theme toggle does nothing. */
+/* Class-based dark mode. Without this, v4 keys off prefers-color-scheme only
+   and the `.dark` toggle does nothing. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ---------------------------------------------------------------------------
+   Raw palette.
+   Source of truth is the prototype hex in ui-rules.md §3; the values below are
+   exact sRGB -> OKLCH conversions of those hexes, not hand-tuned. Change the
+   hex in §3 first, then re-convert. Never edit these in isolation.
+--------------------------------------------------------------------------- */
+
 :root {
-  --ground:        oklch(0.99 0.004 106);
-  --surface:       oklch(1 0 0);
-  --surface-2:     oklch(0.97 0.005 106);
-  --border:        oklch(0.91 0.005 118);
-  --border-strong: oklch(0.85 0.007 118);
-  --ink:           oklch(0.25 0.012 158);
-  --muted:         oklch(0.49 0.018 158);
-  --faint:         oklch(0.64 0.014 152);
-  --fern:          oklch(0.52 0.093 159);
-  --fern-hover:    oklch(0.44 0.088 159);
-  --fern-on:       oklch(1 0 0);
-  --fern-wash:     oklch(0.95 0.021 159);
-  --coral:         oklch(0.56 0.145 33);
-  --coral-wash:    oklch(0.95 0.021 33);
+  --ground:        oklch(0.985 0.004  91);
+  --surface:       oklch(1     0       0);
+  --surface-2:     oklch(0.966 0.007 107);
+  --border:        oklch(0.919 0.008 114);
+  --border-strong: oklch(0.866 0.012 117);
+  --ink:           oklch(0.251 0.014 164);
+  --muted:         oklch(0.514 0.020 159);
+  --faint:         oklch(0.661 0.018 157);
+  --fern:          oklch(0.532 0.0931 162.4);
+  --fern-hover:    oklch(0.457 0.080 162);
+  --fern-on:       oklch(1     0       0);
+  --fern-wash:     oklch(0.955 0.013 160);
+  --coral:         oklch(0.6065 0.1649 33.4);
+  --coral-wash:    oklch(0.951 0.019  38);
   --ring:          var(--fern);
+
+  /* Layout. Not theme-dependent. */
+  --gut: 24px;
 }
 
-/* Re-derived for dark, not inverted: fern lightens to hold contrast,
-   and the on-brand text colour flips to near-black. */
+/* Re-derived for dark, not inverted: fern lightens to hold contrast on a dark
+   ground, and --fern-on flips from white to near-black. */
 .dark {
-  --ground:        oklch(0.20 0.008 158);
-  --surface:       oklch(0.25 0.009 158);
-  --surface-2:     oklch(0.29 0.009 158);
-  --border:        oklch(0.33 0.010 158);
-  --border-strong: oklch(0.40 0.011 158);
-  --ink:           oklch(0.94 0.005 106);
-  --muted:         oklch(0.71 0.014 152);
-  --faint:         oklch(0.56 0.016 152);
-  --fern:          oklch(0.77 0.115 159);
-  --fern-hover:    oklch(0.83 0.105 159);
-  --fern-on:       oklch(0.19 0.028 159);
-  --fern-wash:     oklch(0.29 0.028 159);
-  --coral:         oklch(0.73 0.115 33);
-  --coral-wash:    oklch(0.28 0.032 33);
+  --ground:        oklch(0.213 0.007 164);
+  --surface:       oklch(0.250 0.009 159);
+  --surface-2:     oklch(0.282 0.011 156);
+  --border:        oklch(0.321 0.012 161);
+  --border-strong: oklch(0.381 0.015 153);
+  --ink:           oklch(0.949 0.007 124);
+  --muted:         oklch(0.714 0.017 160);
+  --faint:         oklch(0.585 0.021 162);
+  --fern:          oklch(0.733 0.116 160);
+  --fern-hover:    oklch(0.788 0.106 160);
+  --fern-on:       oklch(0.227 0.025 168);
+  --fern-wash:     oklch(0.284 0.025 166);
+  --coral:         oklch(0.731 0.134  33);
+  --coral-wash:    oklch(0.271 0.028  37);
   --ring:          var(--fern);
 }
 
-/* `inline` is REQUIRED — plain @theme resolves var() at build time and
-   bakes the light value into every utility class, so dark mode silently
-   does nothing. This one keyword is the whole trick. */
+/* Page gutter tightens below the 760 breakpoint (ui-rules.md §3). */
+@media (width < 760px) {
+  :root {
+    --gut: 18px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Semantic tokens.
+   `inline` is REQUIRED. Plain @theme resolves var() at build time and bakes the
+   light value into every utility class, so dark mode silently does nothing.
+   This one keyword is the whole trick.
+--------------------------------------------------------------------------- */
+
 @theme inline {
   --color-ground:        var(--ground);
   --color-surface:       var(--surface);
@@ -96,22 +117,61 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains);
 
-  --radius-sm:   10px;
-  --radius-md:   14px;
-  --radius-lg:   22px;
-  --radius-xl:   28px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+
+  /* max-w-shell (page) and max-w-measure (prose). Deliberately not named
+     `max`/`prose` — both collide with Tailwind built-ins. */
+  --container-shell:   1120px;
+  --container-measure:  680px;
+
+  /* px-gut, gap-gut, ... */
+  --spacing-gut: var(--gut);
+}
+
+/* ------------------------------------------------------------------------- */
+
+@layer base {
+  body {
+    @apply bg-ground text-ink font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 ```
 
 Components then write `bg-ground`, `text-muted`, `border-border`, `bg-fern text-fern-on`, `rounded-lg` — and dark mode works with **no `dark:` variants on colour at all**.
 
-The oklch values above are converted from the prototype hexes in §3. Verify each against the prototype before trusting it — a conversion that drifts on the fern is immediately visible.
+**Verified (PORT-003).** Every oklch value above is an exact sRGB→OKLCH conversion of its §3 hex — confirmed by round-tripping the compiled CSS hex fallbacks: all 28 values match to the byte. `fern` and `coral` in light mode need 4 decimal places to round-trip exactly; 3 leaves them one 8-bit unit off.
+
+Ported here beyond colour: `--container-shell` / `--container-measure` (deliberately not named `max` / `prose` — both collide with Tailwind built-ins), `--spacing-gut` (24px, 18px below 760), and the `prefers-reduced-motion` block.
+
+**Deliberately not ported yet:** the type scale (§3) belongs with `Prose` in PORT-004; the shadow tokens (§3) have no dark-theme values recorded, so they land with `Card` in PORT-021; the custom breakpoints (1000 / 760 / 460) are not in `@theme` — see open question 6 in progress.md.
 
 ---
 
 ## 3. Tokens
 
-**Extracted and validated in the design prototype (PORT-003 substantially complete).** Hex values below are the prototype's; convert to `oklch()` when implementing — Tailwind v4's native space gives perceptually even hover/active steps.
+**Ported and shipped (PORT-003 ✔).** The hex values below are **canonical** — they are the approved prototype. The `oklch()` in §2 is a derived artifact converted from them. To change a colour: edit the hex here first, re-convert, then update §2. Never edit §2 in isolation.
 
 ### Design direction
 
