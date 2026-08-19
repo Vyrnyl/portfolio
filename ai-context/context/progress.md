@@ -8,6 +8,24 @@
 
 ---
 
+## At a glance
+
+**1 / 39 tickets complete · 3%** — one cell per ticket.
+
+`█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+
+| Sprint | Progress | ✔ Done | ▶ | ⚠ | ☐ Left |
+|---|---|---|---|---|---|
+| **0 — Foundation** ◄ current | `█░░░░░░` | 1 / 7 | 0 | 0 | 6 |
+| 1 — Content layer | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
+| 2 — UI primitives | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
+| 3 — Pages | `░░░░░░░░` | 0 / 8 | 0 | 0 | 8 |
+| 4 — Contact wiring | `░░░░░` | 0 / 5 | 0 | 0 | 5 |
+| 5 — Production | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
+| **Total** | | **1 / 39** | **0** | **0** | **38** |
+
+---
+
 ## Board
 
 `☐` Backlog · `▶` In Progress · `⚠` Blocked · `✔` Done
@@ -85,28 +103,12 @@
 
 ---
 
-## Summary
-
-| Sprint | Tickets | ☐ | ▶ | ⚠ | ✔ |
-|---|---|---|---|---|---|
-| 0 — Foundation | 7 | 6 | 0 | 0 | 1 |
-| 1 — Content | 6 | 6 | 0 | 0 | 0 |
-| 2 — Primitives | 6 | 6 | 0 | 0 | 0 |
-| 3 — Pages | 8 | 8 | 0 | 0 | 0 |
-| 4 — Contact | 5 | 5 | 0 | 0 | 0 |
-| 5 — Production | 7 | 7 | 0 | 0 | 0 |
-| **Total** | **39** | **38** | **0** | **0** | **1** |
-
-**Completion: 1 / 39 (3%)**
-
----
-
 ## How to update this file
 
 When a ticket's status changes:
 
 1. Update its row's **Status** and add a note if anything is non-obvious.
-2. Recount the Summary table.
+2. Recount the **At a glance** table at the top — the counts and the bars. It is the only place totals live; there is no second summary to sync.
 3. Add a Session Log row at the top.
 4. If a component was built → update [ui-registry.md](ui-registry.md) the same session.
 5. If a token or styling pattern was added → update [ui-rules.md](ui-rules.md).
