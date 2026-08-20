@@ -161,8 +161,8 @@ Three small components that prevent a large problem: spacing decided independent
 // src/components/layout/container.tsx
 import { cn } from "@/lib/utils";
 
-export function Container({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={cn("mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8", className)}>{children}</div>;
+export function Container({ children, className }: Props) {
+  return <div className={cn("mx-auto w-full max-w-shell px-gut", className)}>{children}</div>;
 }
 ```
 
@@ -183,6 +183,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 ```
+
+`max-w-shell` (1120px) and `px-gut` (24px, 18px below `md`) are tokens that already
+exist — do not re-invent them as `max-w-5xl px-4 sm:px-6`, which is a different
+number in a different place.
+
+`Section` wraps its children in a `Container` itself, which is why the page example
+below has no layout wrapper of its own. A section whose background must reach the
+viewport edge opts out with `bleed` and places its own `Container` inside.
 
 **Rule from here on:** no page file contains `max-w-*` or `px-*`. If one does, `Container` is being bypassed.
 

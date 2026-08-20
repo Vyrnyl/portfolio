@@ -11,7 +11,7 @@ A seven-page Next.js portfolio site — home, projects (index + detail), skills,
 | | Who | What |
 |---|---|---|
 | **Blocks** | **You write these** | Components in `components/ui/` and `components/sections/`, helpers in `lib/`, content types and content files, tokens, config. Self-contained units with a clear interface. |
-| **Wiring** | **He writes this** | Everything in `src/app/` — pages, layouts, route files. Composing sections into a page, importing, passing props, arranging. The connective tissue. |
+| **Wiring** | **He owns this** — you supply the code, he places and assembles it | Everything in `src/app/` — pages, layouts, route files. Composing sections into a page, importing, passing props, arranging. The connective tissue. |
 
 The rule of thumb: **below `app/` is yours, `app/` is his.** A component is a block even if it is large; a page is wiring even if it is small.
 
@@ -24,9 +24,10 @@ The rule of thumb: **below `app/` is yours, `app/` is his.** A component is a bl
 
 ### When he is wiring
 
-- Guide, do not take over. Explain the shape and the pitfall, let him write the page.
-- If he shares wiring code, review it honestly — wrong layer, missing empty state, unawaited `params`, `.sort()` mutating shared module state. Say it plainly with the reason.
-- If he is stuck, show the pattern before showing the file.
+- **Write the wiring code and hand it over paste-ready** — the complete file contents, in the reply, not a skeleton with holes to fill. He pastes it into `src/app/` himself; you never write there.
+- **Explain what it is for and what each part does.** The code is the easy half; the assembly is the thing being learned, so name the props, the alias, the composition and the reason each piece is where it is.
+- Still stop at the seam: you supply the code, he places it, reads it, and owns the file.
+- If he shares wiring code back, review it honestly — wrong layer, missing empty state, unawaited `params`, `.sort()` mutating shared module state. Say it plainly with the reason.
 
 ### Always
 

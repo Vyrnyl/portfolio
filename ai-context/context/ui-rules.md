@@ -165,7 +165,9 @@ Components then write `bg-ground`, `text-muted`, `border-border`, `bg-fern text-
 
 Ported here beyond colour: `--container-shell` / `--container-measure` (deliberately not named `max` / `prose` — both collide with Tailwind built-ins), `--spacing-gut` (24px, 18px below 760), and the `prefers-reduced-motion` block.
 
-**Deliberately not ported yet:** the type scale (§3) belongs with `Prose` in PORT-004; the shadow tokens (§3) have no dark-theme values recorded, so they land with `Card` in PORT-021; the custom breakpoints (1000 / 760 / 460) are not in `@theme` — see open question 6 in progress.md.
+Added in PORT-004: the **type scale** as `--text-*` tokens (each step carries its own line-height, weight and tracking, so `text-h-lg` is a whole heading style), the **section rhythm** as `--spacing-section` / `--spacing-section-tight`, and the **breakpoints** as an outright replacement of Tailwind's scale (open question 6, answered — see §4).
+
+**Deliberately not ported yet:** the shadow tokens (§3) have no dark-theme values recorded, so they land with `Card` in PORT-021.
 
 ---
 
@@ -283,8 +285,8 @@ A hand-drawn coral underline strokes itself beneath the accent word in the hero 
 │   logo/name        nav      theme·CTA  │
 ├────────────────────────────────────────┤
 │ <main id="main">                       │
-│   Section → Container → content        │
-│   Section → Container → content        │
+│   Section (rhythm + Container)         │
+│   Section (rhythm + Container)         │
 ├────────────────────────────────────────┤
 │ Footer — socials, copyright            │
 └────────────────────────────────────────┘
@@ -294,20 +296,28 @@ Three layout components own all spacing. **Individual pages set no page-level pa
 
 | Component | Responsibility |
 |---|---|
-| `Container` | `mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8` |
-| `Section` | Vertical rhythm `py-16 sm:py-24`, optional heading slot |
+| `Container` | `mx-auto w-full max-w-shell px-gut` — 1120px, 24px gutter (18px below `md`) |
+| `Section` | Vertical rhythm `py-section`, wraps its children in a `Container`, optional heading slot |
 | `Prose` | Long-form text width and child element styling (`/about`, project narrative) |
 
 ### Breakpoints
 
-Tailwind defaults. Verified at four widths at every visual gate — not retrofitted:
+**The design's scale replaces Tailwind's defaults outright.** `globals.css` clears
+the built-in scale with `--breakpoint-*: initial` and redefines three steps, so
+`sm:` / `md:` / `lg:` mean the design's numbers everywhere. Keeping both scales
+would leave `md:` at 768px sitting eight pixels from the real 760px gate — near
+enough that the wrong one gets typed from habit and nobody sees it.
 
-| Width | What changes |
-|---|---|
-| **1440** | Full layout, max container width reached |
-| **1024** (`lg`) | Project grid 3 → 2 columns |
-| **768** (`md`) | Nav collapses to a mobile menu; grids → 1 column; resume timeline stacks |
-| **375** | Single column throughout; nothing overflows horizontally |
+| Variant | Width | What changes |
+|---|---|---|
+| — | **1440** | Full layout, max container width reached |
+| `lg:` | **1000** | Project grid 3 → 2 columns |
+| `md:` | **760** | Nav collapses to a mobile menu; grids → 1 column; resume timeline stacks; page gutter 24px → 18px |
+| `sm:` | **460** | Last step before the narrowest layout |
+| — | **375** | Single column throughout; nothing overflows horizontally |
+
+There is no `xl:` or `2xl:` — the design specifies nothing above 1000, so those
+variants are cleared rather than left pointing at an undesigned width.
 
 Mobile-first: write the base style for 375, add `sm:`/`md:`/`lg:` upward. Never `max-` variants.
 

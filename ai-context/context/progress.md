@@ -4,25 +4,25 @@
 > Update at the end of every session and whenever a ticket changes status.
 > The plan lives in [build-plan.md](build-plan.md); this file is the record.
 
-**Last updated:** 2026-08-19 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-004 (Ready)
+**Last updated:** 2026-08-20 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-005 (Ready)
 
 ---
 
 ## At a glance
 
-**3 / 39 tickets complete · 8%** — one cell per ticket.
+**4 / 39 tickets complete · 10%** — one cell per ticket.
 
-`███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+`████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
 
 | Sprint | Progress | ✔ Done | ▶ | ⚠ | ☐ Left |
 |---|---|---|---|---|---|
-| **0 — Foundation** ◄ current | `███░░░░` | 3 / 7 | 0 | 0 | 4 |
+| **0 — Foundation** ◄ current | `████░░░` | 4 / 7 | 0 | 0 | 3 |
 | 1 — Content layer | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
 | 2 — UI primitives | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
 | 3 — Pages | `░░░░░░░░` | 0 / 8 | 0 | 0 | 8 |
 | 4 — Contact wiring | `░░░░░` | 0 / 5 | 0 | 0 | 5 |
 | 5 — Production | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
-| **Total** | | **3 / 39** | **0** | **0** | **36** |
+| **Total** | | **4 / 39** | **0** | **0** | **35** |
 
 ---
 
@@ -39,7 +39,7 @@
 | PORT-001 | Scaffold Next.js app | S | ✔ | Next 16.3.1 at the repo root. `verify` green. Scaffold `.git` + `CLAUDE.md` discarded on the move; `AGENTS.md` kept deliberately (see decisions). |
 | PORT-002 | Repository hygiene | S | ✔ | ESLint ui/ boundary rule added and proven firing. !.env.example negation added — .gitignore's .env* swallows it otherwise. |
 | PORT-003 | Port design tokens into Tailwind v4 | M | ✔ | Colour, font, radius, container and gutter tokens shipped. §2 oklch was **wrong** as documented — re-derived from the §3 hexes, all 28 now round-trip exactly. Type scale deferred to PORT-004, shadows to PORT-021 (no dark values recorded). |
-| PORT-004 | Layout primitives | S | ☐ | |
+| PORT-004 | Layout primitives | S | ✔ | `cn()`, `Container`, `Section`, `Prose`. Type scale, section rhythm and the breakpoint override ported alongside. `Section` wraps its own `Container` — see decisions. Two values are provisional, never recorded in ui-rules §3: `--spacing-section-tight` and the heading line-heights. |
 | PORT-005 | App shell | L | ☐ | Nav array hardcoded here; swapped in PORT-011. Mobile menu split out to PORT-007. |
 | PORT-006 | Route stubs + error boundaries | S | ☐ | Seven routes now — Skills was added. |
 | PORT-007 | Mobile menu | M | ☐ | Focus trap + scroll lock + resize close. Design proven in prototype. |
@@ -163,6 +163,10 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 2026-08-19 | `.vscode/settings.json` is committed | Formatter config changes the output every developer produces, so it is shared project config, not personal preference. |
 | 2026-08-19 | Prototype **hex** is canonical; the oklch in ui-rules §2 is derived | §2 had been hand-converted and drifted — dark `fern` by L+0.037, light `coral` by L+0.047 and C+0.020, both visible on a large fill. Two sources of truth for one colour means the wrong one eventually wins. Hex is what was approved, so hex is the record and oklch is regenerated from it. |
 | 2026-08-19 | Container tokens named `--container-shell` / `--container-measure`, not `max` / `prose` | `max-w-max` and `max-w-prose` are both Tailwind built-ins. Reusing those names silently shadows them and produces a bug that looks like a typo. |
+| 2026-08-19 | Breakpoints **replace** Tailwind's scale rather than sitting beside it | Two scales means `md:` is 768px and the design's gate is 760px — eight pixels apart, indistinguishable in a browser, and the wrong one gets typed from habit. `xl`/`2xl` cleared too, so no variant points at a width the design never specified. |
+| 2026-08-19 | `Section` wraps its children in a `Container`, with a `bleed` opt-out | Two sources disagreed: ui-rules §4's diagram nested them by hand, but implementation-guide's canonical page example (`<Section heading="Selected work">` with no wrapper) and build-plan's "optional heading slot" both assume Section owns the container — a heading slot outside the container would be misaligned against its own content. Followed the two that agree; corrected §4. |
+| 2026-08-19 | Type scale tokens carry line-height, weight and tracking together | `--text-h-lg` plus its `--line-height`/`--font-weight`/`--letter-spacing` modifiers makes `text-h-lg` the whole heading style. The alternative — size only — means every heading re-types three more classes and they drift. |
+| 2026-08-19 | `Prose` hand-rolled, not `@tailwindcss/typography` | The plugin ships its own grey ramp and would need re-tokenising rule by rule to respect the theme. That is more work than the dozen descendant selectors it replaces, and it adds a dependency that can override tokens silently. |
 | 2026-08-19 | next/font variables (`--font-inter`, `--font-jetbrains`) named separately from the theme tokens (`--font-sans`, `--font-mono`) | implementation-guide.md had them sharing a name, which makes `--font-sans: var(--font-sans)` — self-referential, resolves to nothing, and falls back to the system font with no error. Guide corrected. |
 
 ---
@@ -176,7 +180,7 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 3 | Sending domain for Resend? | PORT-042 | — |
 | 4 | Keep the Uses page? | PORT-035 | Recommended: delete. Nothing real to put on it. |
 | 5 | Which case study leads — Grades Repository or Project Gate? | PORT-032 | Both written in the prototype. Project Gate is technically stronger. |
-| 6 | Custom breakpoints (1000 / 760 / 460) as `@theme --breakpoint-*` overrides, or named additions alongside Tailwind defaults? | PORT-004 | Overriding changes what `md:`/`lg:` mean for every future component — decide before the first responsive component, not after. |
+| 6 | Custom breakpoints (1000 / 760 / 460) as `@theme --breakpoint-*` overrides, or named additions alongside Tailwind defaults? | PORT-004 | **Answered 2026-08-19: outright override.** `--breakpoint-*: initial` clears Tailwind's scale, then `sm: 460 / md: 760 / lg: 1000`. `xl`/`2xl` stay cleared. Verified in the compiled CSS. |
 | 7 | `coral` on `ground` measures **3.97:1** in light mode — below AA for the error text it is specified for. Darken coral, or restrict it to icons/borders with a separate error-text colour? | PORT-023, PORT-052 | Dark mode passes at 6.99:1. `faint` is also below AA (2.94 light / 4.23 dark) but is metadata-only. |
 
 ---
@@ -187,6 +191,8 @@ Newest first. The **next step** field matters most — write it so you could pic
 
 | Date | Worked on | Outcome | Next step |
 |---|---|---|---|
+| 2026-08-20 | PORT-004 · closed | Browser-checked at 1440/1024/768/375 in both themes and passed: no horizontal scrollbar at 375 (the long URL wraps — `break-words` was added to `Prose` for exactly that), gutter visibly steps 24px → 18px across 761/759, the `dark` class flips ground, text and link together, and the focus ring on a `Prose` link is visible in both themes. `npm run verify` green. Working agreement amended mid-ticket and recorded in CLAUDE.md: **wiring is now handed over as complete paste-ready files with an explanation**, not a skeleton to fill in — he places and assembles it, Claude still never writes into `src/app/`. | **PORT-005** — app shell. Header (sticky, backdrop-blur, bottom border), Footer, SkipLink, ThemeToggle, and the `<main id="main">` wrapper in `src/app/layout.tsx`. Needs `next-themes` and `lucide-react` installed. Nav array is hardcoded here and swapped for site config in PORT-011. The mobile menu is **not** in this ticket — that is PORT-007. Watch `suppressHydrationWarning` on `<html>` and the toggle rendering no icon before mount. |
+| 2026-08-19 | PORT-004 | `cn()` in `src/lib/utils.ts` (`clsx` + `tailwind-merge` installed), `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/`. Three token groups ported alongside them in a plain `@theme` block (no var() indirection, so `inline` is not needed): the **type scale** with line-height/weight/tracking bundled per step, **`--spacing-section`** rhythm, and the **breakpoint override**. Open question 6 answered — Tailwind's scale is cleared outright and replaced with 460/760/1000; proven in the compiled CSS via a throwaway probe file (`@media (min-width:760px)` for `md:`, `xl:` emitting nothing), probe deleted. Utilities confirmed emitting: `.max-w-shell{max-width:1120px}`, `.px-gut{padding-inline:var(--gut)}`, `.py-section`, `.text-h-md`. Docs corrected in the same pass: ui-rules §4 still specified `max-w-5xl px-4 sm:px-6 lg:px-8` and "Tailwind defaults" for breakpoints, both pre-token leftovers contradicting §3; implementation-guide's Container snippet had the same stale classes. `npm run verify` green. **Not yet browser-checked** — nothing renders these components until a page does. | **Wire a throwaway page** into `src/app/page.tsx`: a `Section` with a heading, a `Prose` block with h2/p/ul/a/code inside it, and a second `Section spacing="tight"`. Check 1440/1024/768/375 in both themes — gutter must step 24px → 18px as you cross 760, and nothing may scroll horizontally. Then PORT-004 closes and **PORT-005** (app shell) starts. Provisional values to eyeball against the prototype while you are there: `--spacing-section-tight` (`clamp(36px, 5.5vw, 64px)`) and the heading line-heights, neither of which was recorded in ui-rules §3. |
 | 2026-08-19 | PORT-003 | Tokens shipped in `src/app/globals.css` + `next/font` wiring in `layout.tsx` (Inter → `--font-inter`, JetBrains Mono → `--font-jetbrains`). **The oklch in ui-rules §2 was wrong** — hand-converted and drifting up to L±0.047 on dark `fern` and light `coral`; re-derived from the §3 hexes and verified by round-tripping the compiled CSS hex fallbacks (28/28 exact). `@theme inline` proven in the build output (`.bg-ground{background-color:var(--ground)}`, not a baked literal). Browser-checked in Chrome at 1440/1024/768/375 in both themes: colours flip, no horizontal overflow, gutter 24px→18px below 760, both fonts loading. Contrast measured — the three AC pairs pass; `coral`/`ground` and `faint`/`ground` do not (logged as open question 7). ui-rules §1–3 updated; implementation-guide font example fixed (it told you to self-reference `--font-sans`). `npm run verify` green. | **PORT-004** — layout primitives. First action: `npm i clsx tailwind-merge`, then `src/lib/utils.ts` with `cn()`. `Container` uses `max-w-shell px-gut` and `Prose` uses `max-w-measure` — those tokens already exist, do not re-invent them. Answer open question 6 (breakpoints) before writing the first responsive class. |
 | 2026-08-19 | PORT-002 | README rewritten for the real project. `.env.example` added with a `!.env.example` negation in `.gitignore` — the scaffold's `.env*` glob swallows it otherwise. `.nvmrc` pinned to 22. Folder skeleton from architecture.md §3 created with `.gitkeep`. ESLint `components/ui/` import-boundary rule added **and proven firing** against a throwaway import. Resume moved to `public/resume.pdf` via `git mv`. Pushed to github.com/Vyrnyl/portfolio (public, `main` default). `npm run verify` green. | **PORT-003** — design tokens. Port the `globals.css` block from [ui-rules.md](ui-rules.md) §2: raw vars on `:root`/`.dark`, semantic tokens in **`@theme inline`** (plain `@theme` bakes in the light values and dark mode silently dies). Prove it by toggling `.dark` on `<html>` and watching a `bg-ground text-ink` element change before closing. |
 | 2026-08-19 | PORT-001 | Repo initialized and baseline commit `8e58a18` made. Next 16.3.1 scaffolded into a temp dir and moved to the repo root; scaffold `.git` and `CLAUDE.md` discarded first. tsconfig hardened with `noUncheckedIndexedAccess`, `verify` script added, Prettier + Tailwind class sorting configured and proven, format-on-save wired. `npm run verify` green; dev server confirmed in the browser. | **PORT-002** — repository hygiene. First action: the moved-in `README.md` is still the Next.js default, and the ESLint `ui/` import-boundary rule from code-standards §8 is not yet added to `eslint.config.mjs`. |

@@ -1,6 +1,6 @@
 # UI Registry
 
-> **Living document. Every component is `designed` — proven in the design prototype, none built in React yet.**
+> **Living document.** `designed` = proven in the design prototype, not yet built in React. `built` = shipped, and its classes below are the real ones.
 > Read before building any component. Flip a row to `built` the moment it lands, in the same session.
 
 Catalogs every component, where it lives, and the classes it uses. The styling contract and tokens live in [ui-rules.md](ui-rules.md).
@@ -59,7 +59,7 @@ All `designed` — they exist and are proven in the design prototype, not yet bu
 | `Textarea` | designed | `ui/textarea.tsx` | native props, vertical resize only | `.textarea` |
 | `Field` | designed | `ui/field.tsx` | `label`, `error`, `hint`, `required` — render-prop wiring | `.field` |
 | `Note` | designed | `ui/note.tsx` | `tone: neutral|ok|bad` — inline feedback banner | `.note`, `.note--ok`, `.note--bad` |
-| `Prose` | designed | `ui/prose.tsx` | `children` | `.narrow`, `.measure` |
+| `Prose` | **built** | `src/components/ui/prose.tsx` | `children`, `className` | `max-w-measure text-base text-muted break-words` + descendant rules: `[&>*+*]:mt-5` · `[&_h2]:text-h-md [&_h2]:text-ink [&_h2]:mt-12` · `[&_h3]:text-h-sm [&_h3]:text-ink [&_h3]:mt-8` · `[&>h2:first-child]:mt-0 [&>h3:first-child]:mt-0` · `[&_strong]:text-ink [&_strong]:font-semibold` · `[&_em]:italic` · `[&_a]:text-fern [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-4 [&_a]:transition-colors [&_a:hover]:text-fern-hover` · `[&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5` · `[&_li]:mt-2 [&_li]:marker:text-faint` · `[&_code]:bg-surface-2 [&_code]:text-ink [&_code]:rounded-sm [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm` · `[&_blockquote]:border-border-strong [&_blockquote]:border-l-2 [&_blockquote]:pl-4` · `[&_hr]:border-border [&_hr]:my-10` |
 
 ---
 
@@ -67,8 +67,8 @@ All `designed` — they exist and are proven in the design prototype, not yet bu
 
 | Component | Status | File | Client? | Prototype class |
 |---|---|---|---|---|
-| `Container` | designed | `layout/container.tsx` | no | `.container` |
-| `Section` | designed | `layout/section.tsx` | no | `.section`, `.section--tight` |
+| `Container` | **built** | `src/components/layout/container.tsx` | no | `mx-auto w-full max-w-shell px-gut` |
+| `Section` | **built** | `src/components/layout/section.tsx` | no | `py-section` / `py-section-tight`; heading is `text-h-md text-ink mb-6`. Props: `heading?`, `id?`, `spacing?: "default" | "tight"`, `bleed?`, `className?`. Wraps children in `Container` unless `bleed`. |
 | `SectionHead` | designed | `layout/section-head.tsx` | no | `.sec-head` + `.rule` — eyebrow, heading, gradient rule |
 | `Header` | designed | `layout/header.tsx` | no | `.site-head` — sticky, backdrop blur |
 | `NavLinks` | designed | `layout/nav-links.tsx` | **yes** — `usePathname` | `.nav a[aria-current]` |
@@ -123,5 +123,6 @@ Every one of these must exist somewhere visible before the site ships. Tracked h
 
 | Date | Component(s) | Change |
 |---|---|---|
+| 2026-08-19 | `Container`, `Section`, `Prose` | Built (PORT-004). Prototype classes replaced with the real token utilities. **`Section` now wraps its children in a `Container`** — the impl-guide page example (`<Section heading="Selected work">` with no wrapper) already assumed this; ui-rules §4's diagram did not, and was corrected. `SectionHead` stays `designed` — Section's plain heading slot covers the common case, and the eyebrow + gradient rule treatment lands when a page needs it. |
 | 2026-08-18 | All | Populated from the approved design prototype. Every row `designed` — proven visually, not yet built in React. |
 | 2026-08-17 | — | Registry rewritten for the Next.js portfolio scope. |
