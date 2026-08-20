@@ -28,7 +28,15 @@ If it builds a component, **check [ui-registry.md](../../../ai-context/context/u
 
 ## 3. Hand over the files
 
-One file at a time, each as **path → complete fenced block → what it does**.
+One file at a time, each as **create command → path → complete fenced block → what it does**.
+
+Always give the PowerShell command that creates the file. He never types a path by hand:
+
+```powershell
+New-Item -ItemType File src/components/ui/button.tsx; code src/components/ui/button.tsx
+```
+
+Prefix `New-Item -ItemType Directory -Force <dir>` when the folder is new. No `-Force` on the file — it must refuse to overwrite. For an existing file, `code <path>` alone. Never redirect content into a file with `>` / `Out-File` / bare `Set-Content`: PowerShell writes UTF-16 + BOM and it will not parse. One command for a batch, then the blocks in dependency order.
 
 **Complete** means complete. No `// ...rest unchanged`, no `{/* fill this in */}`, no diffs. He copies the block whole.
 

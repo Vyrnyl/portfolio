@@ -18,11 +18,23 @@ You **may** write directly to the `ai-context/` docs, `CLAUDE.md` and `.claude/`
 
 ### How to hand over a file
 
-Every handover is the same three parts, in this order:
+Every handover is the same four parts, in this order:
 
-1. **The path**, on its own — `src/components/layout/header.tsx`.
-2. **The complete file** in one fenced block. Not a fragment, not a diff, not `// ...rest unchanged`. He copies the block whole and saves it.
-3. **What it does** — see below.
+1. **The command that creates the file**, ready to run. Never ask him to type a path by hand or click through New File — a mistyped path is a wasted debugging session, and the shell cannot misspell it.
+
+   ```powershell
+   New-Item -ItemType File src/components/layout/header.tsx; code src/components/layout/header.tsx
+   ```
+
+   Prefix a `New-Item -ItemType Directory -Force <dir>` when the folder does not exist yet. Use plain `New-Item -ItemType File` with **no `-Force`** — without it the command refuses to touch an existing file, which is exactly the safety you want. For a file that already exists, hand over `code <path>` on its own.
+
+   **Never** create a file by redirecting content into it (`>`, `Out-File`, or `Set-Content` without `-Encoding utf8`). PowerShell writes UTF-16 with a BOM and the file will not parse. The shell makes the file empty; the editor puts the content in.
+
+   When a step creates several files at once, give one command that creates them all, then the blocks in dependency order.
+
+2. **The path**, named in the prose so he knows which file he is looking at.
+3. **The complete file** in one fenced block. Not a fragment, not a diff, not `// ...rest unchanged`. He copies the block whole and saves it.
+4. **What it does** — see below.
 
 ### Explaining a component
 
