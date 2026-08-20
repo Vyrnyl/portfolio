@@ -1,13 +1,8 @@
----
-name: ticket
-description: Start, guide, or close a ticket from the portfolio build plan. Use when the user names a ticket ("PORT-021", "let's do the button", "start the projects page", "what's next", "next ticket"), or asks to review or close one. Writes the blocks (components, lib, content) and guides the human through wiring them up in app/.
----
-
 # Ticket
 
 Work one ticket from [build-plan.md](../../../ai-context/context/build-plan.md).
 
-> **Split the ticket at the seam** (CLAUDE.md → How this project is worked on). **You write the blocks** — anything below `src/app/`: components, `lib/`, content, tokens, config. **He writes the wiring** — anything in `src/app/`: pages, layouts, routes. Build your side complete, hand it over with a wiring brief, then guide him across. Never build a ticket that was not asked for.
+> **You author every file. He places every one of them.** (CLAUDE.md → How this project is worked on.) Nothing you write in this skill goes to disk under `src/` — components, `lib/`, content and the `src/app/` wiring alike are handed over as complete paste-ready files. The `ai-context/` docs are the exception: those are the record, and you write them yourself.
 
 ## 1. Orient
 
@@ -22,33 +17,53 @@ Work one ticket from [build-plan.md](../../../ai-context/context/build-plan.md).
 
 ## 2. Brief
 
-Before they write code, give them:
+Before handing over any file, give him:
 
 - **What this ticket produces** — in one sentence.
-- **Where the files go** — exact paths per [architecture.md](../../../ai-context/context/architecture.md) §3.
-- **The shape** — the key pattern, type signature, or structural decision. Point at [implementation-guide.md](../../../ai-context/context/implementation-guide.md) if it covers this ticket.
+- **The files it takes**, as a short table: path, what each one is, and whether it is a Client Component and why.
 - **The trap** — the specific thing that goes wrong here (the ticket's "watch for", plus the gotchas in `CLAUDE.md`).
 - **What is out of scope** — what belongs to a later ticket and must not creep in.
 
 If it builds a component, **check [ui-registry.md](../../../ai-context/context/ui-registry.md) first** and say whether something existing should be reused or extended instead.
 
-## 3. Build, then hand over
+## 3. Hand over the files
 
-**Your half — the blocks:**
+One file at a time, each as **path → complete fenced block → what it does**.
 
-- Build each one complete. Stay at the scope asked; flag anything you had to decide rather than deciding it silently.
-- Hand each over with a **wiring brief**: what it exports, its props, where it goes, what it expects, what breaks if wired wrong.
-- Stop at `src/app/`. Do not wire it up yourself.
+**Complete** means complete. No `// ...rest unchanged`, no `{/* fill this in */}`, no diffs. He copies the block whole.
 
-**His half — the wiring:**
+**What it does** describes the piece's role, not its stylesheet:
 
-- Explain the shape and the pitfall, then let him write the page.
-- Review what he shares against [code-standards.md](../../../ai-context/context/code-standards.md) and [ui-rules.md](../../../ai-context/context/ui-rules.md) §5 — tokens only, `className` accepted, correct client/server boundary, real semantic elements, no `any`.
-- Flag scope creep: "that's PORT-0xx, leave it."
-- Common wiring faults to watch for: unawaited `params`/`searchParams`, `.sort()` mutating the shared imported array, a missing empty state, an optional content field with no rendering branch, `components/ui/` reaching into `content/`.
-- If the ticket is genuinely blocked, mark it `⚠` with the symptom and pull the next `Ready` one rather than half-finishing it.
+- What it is and what job it does on the page.
+- What it exports, its props, and what each prop is *for*.
+- Where it belongs and what it expects to be given.
+- What visibly breaks if it is wired wrong or left out.
+- Any real trap — a hydration rule, an ordering requirement, a dependency on something else existing.
 
-## 4. Close
+Do **not** narrate class names or token mappings. That is what [ui-rules.md](../../../ai-context/context/ui-rules.md) and [ui-registry.md](../../../ai-context/context/ui-registry.md) are for, and you update both at close. Mention a class only when it is a genuine gotcha.
+
+> The altitude test: if the explanation would still be useful to someone who never opens the CSS, it is right.
+
+## 4. Guide the wiring
+
+Anything in `src/app/` gets **numbered steps**, not prose:
+
+- One action per step.
+- Name the exact file to create or open, and the exact command to run.
+- Write the click path where there is one — which DevTools panel, which tab, which button.
+- Prefer the command that cannot go wrong. A one-line Console snippet beats hunting for a UI control. PowerShell is the shell here, so `Select-String`, not `grep`.
+- End each step with **what he should see** — the observable result that means it worked.
+- Never assume a step is trivial.
+
+Then review what he reports back against [code-standards.md](../../../ai-context/context/code-standards.md) and [ui-rules.md](../../../ai-context/context/ui-rules.md) §5 — tokens only, `className` accepted, correct client/server boundary, real semantic elements, no `any`.
+
+Common wiring faults: unawaited `params`/`searchParams`, `.sort()` mutating the shared imported array, a missing empty state, an optional content field with no rendering branch, `components/ui/` reaching into `content/`, a `dark:` variant used for colour.
+
+Flag scope creep: "that's PORT-0xx, leave it."
+
+If the ticket is genuinely blocked, mark it `⚠` with the symptom and pull the next `Ready` one rather than half-finishing it.
+
+## 5. Close
 
 A ticket is `✔` only when the full Definition of Done ([build-plan.md](../../../ai-context/context/build-plan.md) §1) is met. Walk it explicitly:
 
@@ -59,16 +74,19 @@ A ticket is `✔` only when the full Definition of Done ([build-plan.md](../../.
 - [ ] Tokens only; no `any`, no `@ts-ignore`, no stray `console.log`
 - [ ] `npm run verify` green
 
-Then update:
+Give him the browser checks as a **numbered list with the expected result on each**, and wait for his answers. Do not accept "done" as evidence.
 
-- [progress.md](../../../ai-context/context/progress.md) — status, notes, recount the Summary, add a Session Log row with a concrete **next step**
+Then update, yourself:
+
+- [progress.md](../../../ai-context/context/progress.md) — status, notes, recount the At-a-glance table, add a Session Log row with a concrete **next step**
 - [ui-registry.md](../../../ai-context/context/ui-registry.md) — any component built: real path, exact classes, status `built`, change-log entry
 - [ui-rules.md](../../../ai-context/context/ui-rules.md) — any new token or styling pattern
 
-**Never mark `✔` on the user's say-so alone if a criterion is visibly unmet.** Say which one, and leave it `▶`.
+Finish with the git commands for him to run. Do not run them.
 
 ## Hard rules
 
+- Never write a file to disk under `src/`. Hand it over.
 - Never implement a ticket that was not asked for.
 - Never mark a ticket done with an unmet acceptance criterion.
 - Never build a component without checking the registry.

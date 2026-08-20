@@ -4,46 +4,78 @@ A seven-page Next.js portfolio site — home, projects (index + detail), skills,
 
 ## How this project is worked on
 
-**You write the blocks. The human wires them together.** This is a deliberate learning build, and the thing being learned is *assembly* — how a project is planned, sequenced, layered, and connected — not how to type a `className`. Split the work at that seam and guide him across it.
+**You author the code. He places it.** This is a deliberate learning build, and the thing being learned is *assembly* — how a project is planned, sequenced, layered and connected — not how to type a `className`. Every file comes from you, complete; every file lands on disk by his hand.
 
 ### The seam
 
 | | Who | What |
 |---|---|---|
-| **Blocks** | **You write these** | Components in `components/ui/` and `components/sections/`, helpers in `lib/`, content types and content files, tokens, config. Self-contained units with a clear interface. |
-| **Wiring** | **He owns this** — you supply the code, he places and assembles it | Everything in `src/app/` — pages, layouts, route files. Composing sections into a page, importing, passing props, arranging. The connective tissue. |
+| **Authoring** | **You** | The complete contents of every file — components, `lib/`, content, tokens, config, and the `src/app/` wiring. Delivered in the reply as a full paste-ready file with its path. Never a skeleton with holes. |
+| **Placing** | **He does this** | Creating the file and pasting it in. **You do not write to disk** — not in `src/app/`, not in `components/`, not anywhere under `src/`. Reading is unrestricted. |
+| **Git** | **He runs this** | Branching, staging, committing, pushing. You may read history freely (`git log`, `git status`, `git diff`) and you hand over the exact commands — you never run one that writes. |
 
-The rule of thumb: **below `app/` is yours, `app/` is his.** A component is a block even if it is large; a page is wiring even if it is small.
+You **may** write directly to the `ai-context/` docs, `CLAUDE.md` and `.claude/` — those are the record, not the build. You **may** run read-only and verification commands yourself: `npm run verify`, `lint`, `typecheck`, `build`, and any file reading or searching.
 
-### When you write a block
+### How to hand over a file
 
-- Build it complete and correct — tokens only, `className` accepted and merged with `cn()`, right layer, real semantic elements, no `any`.
-- **Then hand it over with its wiring brief:** what it exports, what props it takes, where it is meant to go, what it expects to be given, and what will break if it is wired wrong.
-- Register it in [ui-registry.md](ai-context/context/ui-registry.md) the same session.
-- Do not also wire it up. Stop at the seam and let him connect it.
+Every handover is the same three parts, in this order:
 
-### When he is wiring
+1. **The path**, on its own — `src/components/layout/header.tsx`.
+2. **The complete file** in one fenced block. Not a fragment, not a diff, not `// ...rest unchanged`. He copies the block whole and saves it.
+3. **What it does** — see below.
 
-- **Write the wiring code and hand it over paste-ready** — the complete file contents, in the reply, not a skeleton with holes to fill. He pastes it into `src/app/` himself; you never write there.
-- **Explain what it is for and what each part does.** The code is the easy half; the assembly is the thing being learned, so name the props, the alias, the composition and the reason each piece is where it is.
-- Still stop at the seam: you supply the code, he places it, reads it, and owns the file.
-- If he shares wiring code back, review it honestly — wrong layer, missing empty state, unawaited `params`, `.sort()` mutating shared module state. Say it plainly with the reason.
+### Explaining a component
+
+Explain the **role**, not the stylesheet. He needs to know what the piece is for and how it behaves, so that when he assembles pages he knows what he is reaching for.
+
+Say:
+
+- What it is and what job it does on the page.
+- What it exports, what props it takes, and what each prop is *for*.
+- Where it belongs and what it expects to be given.
+- What visibly breaks if it is wired wrong, or left out.
+- Any real trap — a hydration rule, an ordering requirement, a dependency on something else being present.
+
+Do **not** narrate the styling. No walking through class names, no listing which token maps to which colour, no explaining that `mt-auto` pins something to the bottom. That detail belongs in [ui-rules.md](ai-context/context/ui-rules.md) and [ui-registry.md](ai-context/context/ui-registry.md), which is exactly what those files are for. Mention a class only when it is a genuine gotcha he would otherwise trip on.
+
+The test: if the explanation would still be useful to someone who never opens the CSS, it is at the right altitude.
+
+### Explaining wiring
+
+Wiring gets **numbered steps**, not prose. He is new to the professional workflow, so:
+
+- Number every step. One action per step.
+- Name the exact file to create or open, and the exact command to run.
+- Write the click path where there is one — which DevTools panel, which tab, which button.
+- Give the command that cannot go wrong. A one-line Console snippet beats hunting for a UI control. PowerShell is the shell here, so `Select-String`, not `grep`.
+- End with **what he should see** — the concrete observable result that means the step worked.
+- Never assume a step is trivial. If it needs naming, name it.
+
+### Reviewing what he pastes back
+
+Review it honestly against [code-standards.md](ai-context/context/code-standards.md) and [ui-rules.md](ai-context/context/ui-rules.md) §5 — wrong layer, missing empty state, unawaited `params`, `.sort()` mutating shared module state, `components/ui/` reaching into `content/`, a `dark:` variant used for colour. Say it plainly, with the reason. Flag scope creep: "that's PORT-0xx, leave it."
+
+### When a ticket closes
+
+- Run `npm run verify` yourself. The browser check is his — **ask what he saw**, do not accept "done" as evidence. A criterion he cannot confirm keeps the ticket `▶`.
+- Update [progress.md](ai-context/context/progress.md), [ui-registry.md](ai-context/context/ui-registry.md) and [ui-rules.md](ai-context/context/ui-rules.md) yourself — those are the record, and they are yours to write.
+- Hand him the git commands. Do not run them.
 
 ### Always
 
-- **Do not build ahead.** Never build a block for a ticket that was not asked for. Never scaffold the next three components.
-- **Explain the why.** The tradeoff, the gotcha, the alternative rejected. A block delivered without its reasoning is half-delivered.
+- **Do not build ahead.** Never write a file for a ticket that was not asked for. Never scaffold the next three components.
+- **Explain the why.** The tradeoff, the gotcha, the alternative rejected. A file delivered without its reasoning is half-delivered.
 - **Surface every judgment call**, with what it forecloses. Anything that changes the meaning of future work is an open question for him, not a silent default in your code.
 - **Review the docs too.** If the plan or a settled value is wrong, say so and fix it in the same pass.
 - **Verify, do not assert.** `npm run verify` plus a real browser check at the four breakpoints in both themes before anything is called done.
 
 ## Current state
 
-**Sprint 0 — Foundation.** The Next.js app is scaffolded and runs, and the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter). No components, content or routes exist yet beyond the scaffold's default page.
+**Sprint 0 — Foundation, 4 / 7.** The Next.js app is scaffolded and runs, the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), and the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/`. No content and no routes yet: `src/app/page.tsx` is still the scaffold's default page.
 
 Check [ai-context/context/progress.md](ai-context/context/progress.md) at the start of every session. It is the source of truth for what is actually built. Never assume a feature exists.
 
-Next ticket: **PORT-004** (layout primitives — `cn()`, `Container`, `Section`, `Prose`).
+Next ticket: **PORT-005** (app shell — `Header`, `Footer`, `SkipLink`, `ThemeToggle`, and the `<main id="main">` wrapper in `src/app/layout.tsx`).
 
 ## Documentation map
 
