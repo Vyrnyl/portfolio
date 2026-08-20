@@ -4,25 +4,25 @@
 > Update at the end of every session and whenever a ticket changes status.
 > The plan lives in [build-plan.md](build-plan.md); this file is the record.
 
-**Last updated:** 2026-08-20 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-005 (Ready)
+**Last updated:** 2026-08-20 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-006 (Ready)
 
 ---
 
 ## At a glance
 
-**4 / 39 tickets complete · 10%** — one cell per ticket.
+**5 / 39 tickets complete · 13%** — one cell per ticket.
 
-`████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+`█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
 
 | Sprint | Progress | ✔ Done | ▶ | ⚠ | ☐ Left |
 |---|---|---|---|---|---|
-| **0 — Foundation** ◄ current | `████░░░` | 4 / 7 | 0 | 0 | 3 |
+| **0 — Foundation** ◄ current | `█████░░` | 5 / 7 | 0 | 0 | 2 |
 | 1 — Content layer | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
 | 2 — UI primitives | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
 | 3 — Pages | `░░░░░░░░` | 0 / 8 | 0 | 0 | 8 |
 | 4 — Contact wiring | `░░░░░` | 0 / 5 | 0 | 0 | 5 |
 | 5 — Production | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
-| **Total** | | **4 / 39** | **0** | **0** | **35** |
+| **Total** | | **5 / 39** | **0** | **0** | **34** |
 
 ---
 
@@ -40,7 +40,7 @@
 | PORT-002 | Repository hygiene | S | ✔ | ESLint ui/ boundary rule added and proven firing. !.env.example negation added — .gitignore's .env* swallows it otherwise. |
 | PORT-003 | Port design tokens into Tailwind v4 | M | ✔ | Colour, font, radius, container and gutter tokens shipped. §2 oklch was **wrong** as documented — re-derived from the §3 hexes, all 28 now round-trip exactly. Type scale deferred to PORT-004, shadows to PORT-021 (no dark values recorded). |
 | PORT-004 | Layout primitives | S | ✔ | `cn()`, `Container`, `Section`, `Prose`. Type scale, section rhythm and the breakpoint override ported alongside. `Section` wraps its own `Container` — see decisions. Two values are provisional, never recorded in ui-rules §3: `--spacing-section-tight` and the heading line-heights. |
-| PORT-005 | App shell | L | ☐ | Nav array hardcoded here; swapped in PORT-011. Mobile menu split out to PORT-007. |
+| PORT-005 | App shell | L | ✔ | `Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` + root layout wiring. Nav array and footer socials hardcoded here; swapped in PORT-011. **Nav collapses at `lg:` 1000**, not 760 — see decisions. Active-pill logic verified for Home only, because `/` is still the sole route; the `/projects/foo → Projects` case gets its real test in PORT-006. |
 | PORT-006 | Route stubs + error boundaries | S | ☐ | Seven routes now — Skills was added. |
 | PORT-007 | Mobile menu | M | ☐ | Focus trap + scroll lock + resize close. Design proven in prototype. |
 
@@ -167,6 +167,7 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 2026-08-19 | `Section` wraps its children in a `Container`, with a `bleed` opt-out | Two sources disagreed: ui-rules §4's diagram nested them by hand, but implementation-guide's canonical page example (`<Section heading="Selected work">` with no wrapper) and build-plan's "optional heading slot" both assume Section owns the container — a heading slot outside the container would be misaligned against its own content. Followed the two that agree; corrected §4. |
 | 2026-08-19 | Type scale tokens carry line-height, weight and tracking together | `--text-h-lg` plus its `--line-height`/`--font-weight`/`--letter-spacing` modifiers makes `text-h-lg` the whole heading style. The alternative — size only — means every heading re-types three more classes and they drift. |
 | 2026-08-19 | `Prose` hand-rolled, not `@tailwindcss/typography` | The plugin ships its own grey ramp and would need re-tokenising rule by rule to respect the theme. That is more work than the dozen descendant selectors it replaces, and it adds a dependency that can override tokens silently. |
+| 2026-08-20 | Nav collapses at **1000** (`lg:`), not 760 | ui-rules §4 said 760, build-plan PORT-007 said 1000. Seven nav items plus the name and toggle measure ~720px against a 760px header — roughly 40px of slack, inside the margin of error on text metrics. §4's own layout diagram also reserves an unbuilt header CTA slot, and PORT-011 makes adding a nav item a one-line change with no warning. Collapsing early is free; collapsing late breaks on a real device. ui-rules §4 corrected. |
 | 2026-08-19 | next/font variables (`--font-inter`, `--font-jetbrains`) named separately from the theme tokens (`--font-sans`, `--font-mono`) | implementation-guide.md had them sharing a name, which makes `--font-sans: var(--font-sans)` — self-referential, resolves to nothing, and falls back to the system font with no error. Guide corrected. |
 
 ---
@@ -191,6 +192,7 @@ Newest first. The **next step** field matters most — write it so you could pic
 
 | Date | Worked on | Outcome | Next step |
 |---|---|---|---|
+| 2026-08-20 | PORT-005 · closed | App shell shipped: `Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` in `components/layout/`, wired into `src/app/layout.tsx` with `ThemeProvider`, `suppressHydrationWarning` and `<main id="main" tabIndex={-1}>`. Browser-checked in both themes at 1440/1024/768/375 and confirmed: no theme flash on hard reload, choice survives a reload, skip link appears on first Tab and moves focus into the page, sticky blurred header does not overlap, no horizontal scrollbar. `npm run verify` green. Three things resolved along the way: the **nav collapse breakpoint** was contradicted across two docs and is now settled at `lg:` 1000 with ui-rules §4 corrected; `ThemeToggle` had to use `useSyncExternalStore` because Next 16's React Compiler lint rejects the `useState`+`useEffect` mount gate the impl-guide prescribes; and **`lucide-react` v1 has no brand icons**, so footer socials are text links. ui-rules §6 rewritten — it still listed pre-token names (`rounded-btn`, `bg-bg`, `bg-brand`, `border-danger`) that do not exist in `globals.css`. Working agreement changed again mid-session: **Claude now writes nothing to disk under `src/`** — every file is handed over paste-ready and Vernel places it; explanations describe a component's role, not its class names; wiring gets numbered steps. Recorded in CLAUDE.md and the `ticket` / `add-component` skills. | **PORT-006** — route stubs and error boundaries. Create the seven routes from project-overview.md §3 as stub pages, plus a designed `app/not-found.tsx` and a Client Component `app/error.tsx` with a working reset button. Each page needs a placeholder `metadata` with a unique title. First real chance to verify the nav active-pill on a non-root route and that all seven links navigate. `src/app/page.tsx` is still the Next.js scaffold default and is full of non-token classes — PORT-030 replaces it, but PORT-006 may want a stub in the meantime. |
 | 2026-08-20 | PORT-004 · closed | Browser-checked at 1440/1024/768/375 in both themes and passed: no horizontal scrollbar at 375 (the long URL wraps — `break-words` was added to `Prose` for exactly that), gutter visibly steps 24px → 18px across 761/759, the `dark` class flips ground, text and link together, and the focus ring on a `Prose` link is visible in both themes. `npm run verify` green. Working agreement amended mid-ticket and recorded in CLAUDE.md: **wiring is now handed over as complete paste-ready files with an explanation**, not a skeleton to fill in — he places and assembles it, Claude still never writes into `src/app/`. | **PORT-005** — app shell. Header (sticky, backdrop-blur, bottom border), Footer, SkipLink, ThemeToggle, and the `<main id="main">` wrapper in `src/app/layout.tsx`. Needs `next-themes` and `lucide-react` installed. Nav array is hardcoded here and swapped for site config in PORT-011. The mobile menu is **not** in this ticket — that is PORT-007. Watch `suppressHydrationWarning` on `<html>` and the toggle rendering no icon before mount. |
 | 2026-08-19 | PORT-004 | `cn()` in `src/lib/utils.ts` (`clsx` + `tailwind-merge` installed), `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/`. Three token groups ported alongside them in a plain `@theme` block (no var() indirection, so `inline` is not needed): the **type scale** with line-height/weight/tracking bundled per step, **`--spacing-section`** rhythm, and the **breakpoint override**. Open question 6 answered — Tailwind's scale is cleared outright and replaced with 460/760/1000; proven in the compiled CSS via a throwaway probe file (`@media (min-width:760px)` for `md:`, `xl:` emitting nothing), probe deleted. Utilities confirmed emitting: `.max-w-shell{max-width:1120px}`, `.px-gut{padding-inline:var(--gut)}`, `.py-section`, `.text-h-md`. Docs corrected in the same pass: ui-rules §4 still specified `max-w-5xl px-4 sm:px-6 lg:px-8` and "Tailwind defaults" for breakpoints, both pre-token leftovers contradicting §3; implementation-guide's Container snippet had the same stale classes. `npm run verify` green. **Not yet browser-checked** — nothing renders these components until a page does. | **Wire a throwaway page** into `src/app/page.tsx`: a `Section` with a heading, a `Prose` block with h2/p/ul/a/code inside it, and a second `Section spacing="tight"`. Check 1440/1024/768/375 in both themes — gutter must step 24px → 18px as you cross 760, and nothing may scroll horizontally. Then PORT-004 closes and **PORT-005** (app shell) starts. Provisional values to eyeball against the prototype while you are there: `--spacing-section-tight` (`clamp(36px, 5.5vw, 64px)`) and the heading line-heights, neither of which was recorded in ui-rules §3. |
 | 2026-08-19 | PORT-003 | Tokens shipped in `src/app/globals.css` + `next/font` wiring in `layout.tsx` (Inter → `--font-inter`, JetBrains Mono → `--font-jetbrains`). **The oklch in ui-rules §2 was wrong** — hand-converted and drifting up to L±0.047 on dark `fern` and light `coral`; re-derived from the §3 hexes and verified by round-tripping the compiled CSS hex fallbacks (28/28 exact). `@theme inline` proven in the build output (`.bg-ground{background-color:var(--ground)}`, not a baked literal). Browser-checked in Chrome at 1440/1024/768/375 in both themes: colours flip, no horizontal overflow, gutter 24px→18px below 760, both fonts loading. Contrast measured — the three AC pairs pass; `coral`/`ground` and `faint`/`ground` do not (logged as open question 7). ui-rules §1–3 updated; implementation-guide font example fixed (it told you to self-reference `--font-sans`). `npm run verify` green. | **PORT-004** — layout primitives. First action: `npm i clsx tailwind-merge`, then `src/lib/utils.ts` with `cn()`. `Container` uses `max-w-shell px-gut` and `Prose` uses `max-w-measure` — those tokens already exist, do not re-invent them. Answer open question 6 (breakpoints) before writing the first responsive class. |

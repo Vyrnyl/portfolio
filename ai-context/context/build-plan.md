@@ -168,7 +168,6 @@ Root layout with skip link, sticky header, nav with active state, theme toggle, 
 - [ ] Root layout: fonts, `ThemeProvider`, `SkipLink`, `Header`, `<main id="main">`, `Footer`
 - [ ] Header is sticky with a backdrop blur and bottom border; does not overlap content
 - [ ] Active nav item is visually distinct — via `usePathname`, in the smallest possible client component
-- [ ] Below 768px the nav becomes a mobile menu that traps focus, closes on `Escape`, and closes on navigation
 - [ ] Theme toggle persists across reloads with **no flash of the wrong theme** (`suppressHydrationWarning` on `<html>`)
 - [ ] Skip link is invisible until focused, then visible, and moves focus to `#main`
 - [ ] Tab through the whole shell — order is logical, focus always visible

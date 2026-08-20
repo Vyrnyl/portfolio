@@ -70,12 +70,12 @@ All `designed` — they exist and are proven in the design prototype, not yet bu
 | `Container` | **built** | `src/components/layout/container.tsx` | no | `mx-auto w-full max-w-shell px-gut` |
 | `Section` | **built** | `src/components/layout/section.tsx` | no | `py-section` / `py-section-tight`; heading is `text-h-md text-ink mb-6`. Props: `heading?`, `id?`, `spacing?: "default" | "tight"`, `bleed?`, `className?`. Wraps children in `Container` unless `bleed`. |
 | `SectionHead` | designed | `layout/section-head.tsx` | no | `.sec-head` + `.rule` — eyebrow, heading, gradient rule |
-| `Header` | designed | `layout/header.tsx` | no | `.site-head` — sticky, backdrop blur |
-| `NavLinks` | designed | `layout/nav-links.tsx` | **yes** — `usePathname` | `.nav a[aria-current]` |
+| `Header` | **built** | `src/components/layout/header.tsx` | no | `bg-ground/80 border-border sticky top-0 z-40 border-b backdrop-blur-md`; inner `Container` is `flex h-16 items-center justify-between gap-4`; wordmark `text-h-sm text-ink -mx-2 rounded-md px-2 py-1 transition-colors hover:text-fern` + focus ring. Nav wrapper `hidden lg:block`. Props: `className?`. Holds the hardcoded `NAV` array until PORT-011. |
+| `NavLinks` | **built** | `src/components/layout/nav-links.tsx` | **yes** — `usePathname` | `ul` is `flex items-center gap-1`; link `block rounded-full px-3 py-1.5 text-sm transition-colors` + focus ring; active `bg-fern-wash text-fern font-medium`, idle `text-muted hover:text-ink hover:bg-surface-2`. Props: `items: readonly NavItem[]`, `className?`. Exports the `NavItem` type. |
 | `MobileMenu` | designed | `layout/mobile-menu.tsx` | **yes** — focus trap, Escape, scroll lock | `.burger`, `.scrim`, `.msheet` |
-| `Footer` | designed | `layout/footer.tsx` | no | `.site-foot`, `.foot-links` |
-| `SkipLink` | designed | `layout/skip-link.tsx` | no | `.skip` |
-| `ThemeToggle` | designed | `layout/theme-toggle.tsx` | **yes** — `next-themes`, no icon before mount | `.icon-btn` |
+| `Footer` | **built** | `src/components/layout/footer.tsx` | no | `border-border mt-auto border-t`; inner `Container` is `flex flex-col gap-4 py-8 md:flex-row md:items-center md:justify-between`; copyright `text-faint text-badge font-mono`; links `text-muted hover:text-fern inline-flex items-center gap-1 rounded-md text-sm transition-colors` + focus ring, each with an `ArrowUpRight` at 14. Props: `className?`. Needs `<body>` to be `flex min-h-full flex-col` for `mt-auto`. |
+| `SkipLink` | **built** | `src/components/layout/skip-link.tsx` | no | `sr-only` + `focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50` + `focus:bg-fern focus:text-fern-on focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-medium` + `focus:ring-*`. Props: `className?`. Targets `#main`; must be the first child of `<body>`. |
+| `ThemeToggle` | **built** | `src/components/layout/theme-toggle.tsx` | **yes** — `next-themes`, nothing rendered before hydration | `inline-flex size-9 shrink-0 items-center justify-center rounded-full` + `border-border text-muted cursor-pointer border transition-colors hover:bg-surface-2 hover:text-ink` + focus ring. Props: `className?`. Pre-hydration it renders the same-sized empty `div`, gated by `useSyncExternalStore`, **not** `useState`+`useEffect` — React Compiler lint rejects setState in an effect. |
 
 ---
 
@@ -123,6 +123,7 @@ Every one of these must exist somewhere visible before the site ships. Tracked h
 
 | Date | Component(s) | Change |
 |---|---|---|
+| 2026-08-20 | `Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` | Built (PORT-005). Nav array and footer socials are hardcoded in `Header`/`Footer` until PORT-011. **Nav collapses at `lg:` (1000), not `md:` (760)** — seven items measure ~720px against a 760px header, inside the margin of error, and ui-rules §4 reserves an unbuilt header CTA slot; §4 corrected. `ThemeToggle` uses `useSyncExternalStore` for the hydration gate because Next 16 lint rejects the `useState`+`useEffect` pattern the impl-guide prescribes. Footer socials are text links, not brand icons — `lucide-react` v1 removed `Github`/`Linkedin` entirely. `MobileMenu` stays `designed` (PORT-007). |
 | 2026-08-19 | `Container`, `Section`, `Prose` | Built (PORT-004). Prototype classes replaced with the real token utilities. **`Section` now wraps its children in a `Container`** — the impl-guide page example (`<Section heading="Selected work">` with no wrapper) already assumed this; ui-rules §4's diagram did not, and was corrected. `SectionHead` stays `designed` — Section's plain heading slot covers the common case, and the eyebrow + gradient rule treatment lands when a page needs it. |
 | 2026-08-18 | All | Populated from the approved design prototype. Every row `designed` — proven visually, not yet built in React. |
 | 2026-08-17 | — | Registry rewritten for the Next.js portfolio scope. |

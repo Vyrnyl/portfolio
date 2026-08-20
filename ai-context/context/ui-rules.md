@@ -311,8 +311,8 @@ enough that the wrong one gets typed from habit and nobody sees it.
 | Variant | Width | What changes |
 |---|---|---|
 | — | **1440** | Full layout, max container width reached |
-| `lg:` | **1000** | Project grid 3 → 2 columns |
-| `md:` | **760** | Nav collapses to a mobile menu; grids → 1 column; resume timeline stacks; page gutter 24px → 18px |
+| `lg:` | **1000** | **Nav collapses to the mobile menu**; project grid 3 → 2 columns |
+| `md:` | **760** | Grids → 1 column; resume timeline stacks; page gutter 24px → 18px |
 | `sm:` | **460** | Last step before the narrowest layout |
 | — | **375** | Single column throughout; nothing overflows horizontally |
 
@@ -345,15 +345,23 @@ Filled in as components are built. Keep in lockstep with [ui-registry.md](ui-reg
 
 | Component | Base classes | Notes |
 |---|---|---|
-| `Button` | `inline-flex items-center justify-center gap-2 rounded-btn text-sm font-medium transition-colors focus-visible:ring-2 …` | Variants: `primary` `outline` `ghost`. Sizes: `sm` `md`. |
-| `Card` | `rounded-card border border-border bg-surface` | Elevation via border, not shadow |
-| `Badge` | `inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-mono text-fg-muted` | Stack/tag chips |
-| `Input` / `Textarea` | `w-full rounded-btn border border-border bg-bg px-3 py-2 text-base placeholder:text-fg-muted focus-visible:ring-2 …` | `aria-invalid` → `border-danger` |
-| `Field` | `space-y-1.5` | Wraps label + control + error; owns the `id`/`htmlFor`/`aria-describedby` wiring |
-| `Container` | `mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8` | |
-| `Section` | `py-16 sm:py-24` | |
-| `ProjectCard` | `group` + `Card` + `hover:border-brand transition-colors` | Whole card is one link; title carries the accessible name |
+| `Container` | `mx-auto w-full max-w-shell px-gut` | Built. The only owner of page width and gutter. |
+| `Section` | `py-section`, or `py-section-tight` with `spacing="tight"` | Built. Wraps children in a `Container` unless `bleed`. Heading slot is `text-h-md text-ink mb-6`. |
+| `Prose` | `max-w-measure text-base text-muted break-words` | Built. Styles its descendants; see the registry for the full descendant rule list. |
+| `Header` | `bg-ground/80 border-border sticky top-0 z-40 border-b backdrop-blur-md` | Built. Inner `Container` is `flex h-16 items-center justify-between gap-4`. Nav is `hidden lg:block`. |
+| `NavLinks` | `block rounded-full px-3 py-1.5 text-sm transition-colors` | Built. Active: `bg-fern-wash text-fern font-medium`. Idle: `text-muted hover:text-ink hover:bg-surface-2`. |
+| `Footer` | `border-border mt-auto border-t` | Built. `mt-auto` requires `<body>` to be `flex min-h-full flex-col`. |
+| `SkipLink` | `sr-only` → `focus:not-sr-only focus:fixed focus:bg-fern focus:text-fern-on focus:rounded-md` | Built. Targets `#main`. |
+| `ThemeToggle` | `inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border` | Built. Renders an empty same-sized `div` until hydrated. |
+| `Button` | `inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors` + focus ring | Planned. Variants: `primary` (`bg-fern text-fern-on`) `outline` `ghost`. Sizes: `sm` `md`. |
+| `Card` | `rounded-lg border border-border bg-surface` | Planned. Elevation via border, not shadow. |
+| `Badge` | `inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-badge font-mono text-muted` | Planned. Stack/tag chips. |
+| `Input` / `Textarea` | `w-full rounded-md border border-border-strong bg-ground px-3 py-2 text-base placeholder:text-faint` + focus ring | Planned. `aria-invalid` → `border-coral`. |
+| `Field` | `space-y-1.5` | Planned. Wraps label + control + error; owns the `id`/`htmlFor`/`aria-describedby` wiring. |
+| `ProjectCard` | `group` + `Card` + `hover:border-fern transition-colors` | Planned. Whole card is one link; title carries the accessible name. |
 | *(add rows as built)* | | |
+
+**The focus ring**, everywhere: `focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none`. `SkipLink` uses the `focus:` variant instead, because it must appear for any focus, not only keyboard focus.
 
 ---
 
