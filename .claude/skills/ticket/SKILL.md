@@ -82,7 +82,9 @@ A ticket is `✔` only when the full Definition of Done ([build-plan.md](../../.
 - [ ] Tokens only; no `any`, no `@ts-ignore`, no stray `console.log`
 - [ ] `npm run verify` green
 
-Give him the browser checks as a **numbered list with the expected result on each**, and wait for his answers. Do not accept "done" as evidence.
+**Run the browser checks yourself.** Playwright is available via `npx playwright` with Chromium already downloaded — drive `next dev`, exercise every acceptance criterion at 1440 / 1024 / 768 / 375 in both themes, and report what you observed. Screenshots go in the scratchpad, not the repo.
+
+Escalate to him only what a script cannot settle: a real phone or touch device, whether something *looks* right against the prototype, or a major flow he asks to feel for himself. Give those as a **numbered list with the expected result on each** and wait for his answers. Do not accept "done" as evidence for them.
 
 Then update, yourself:
 

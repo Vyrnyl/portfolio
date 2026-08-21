@@ -261,7 +261,12 @@ Elevation is **border-first**. Shadows appear only on the primary button, card h
 | Card hover | `translateY(-3px)` + `--shadow-lift` |
 | Status dot | 2.4s `ping` scale-and-fade |
 | Hero underline | 0.9s `stroke-dashoffset` draw, 0.5s delay, once |
-| Mobile sheet | 0.26s `cubic-bezier(.32,.72,0,1)` slide |
+| Mobile sheet | 0.26s `cubic-bezier(.32,.72,0,1)` slide — `animate-sheet-in` |
+| Mobile scrim | 0.26s `ease-out` opacity fade — `animate-scrim-in` |
+
+The two sheet animations are **tokens**, not arbitrary values: `--animate-sheet-in` / `--animate-scrim-in` in the static `@theme` block, with their `@keyframes` **inside the same block**. Tailwind will happily emit an `--animate-*` variable whose keyframes were declared outside `@theme` and the animation silently does nothing — check the compiled CSS for both halves, not just the variable.
+
+The sheet slides `translateY(-100%) → 0` and is clipped by an `overflow-hidden` wrapper starting at the header's bottom edge, so it reads as coming out from under the header rather than fading in place.
 
 `prefers-reduced-motion` disables all of it, and pins the hero underline to its drawn state.
 
@@ -336,6 +341,7 @@ Rules for anything in `components/`:
 - **Interactive elements are real elements.** `<button>` and `<a>`, never a `<div onClick>`.
 - **Images go through `next/image`** with explicit `width`/`height` (or `fill` + a sized parent) and meaningful `alt`.
 - **Every list has a designed empty state.** A filter that matches nothing must say so, not render blank.
+- **A portal breaks document order.** Anything rendered through `createPortal` appears in one place and lives somewhere else in the DOM, so tab sequence, focus wrapping and plain-DOM event bubbling no longer follow what the eye sees. Drive those explicitly rather than deferring to the browser — a focus trap that only intercepts the two ends of its cycle passes the checks people actually perform and leaks in between (found in PORT-007, both themes).
 
 ---
 
@@ -349,7 +355,8 @@ Filled in as components are built. Keep in lockstep with [ui-registry.md](ui-reg
 | `Section` | `py-section`, or `py-section-tight` with `spacing="tight"` | Built. Wraps children in a `Container` unless `bleed`. Heading slot is `text-h-md text-ink mb-6`. |
 | `Prose` | `max-w-measure text-base text-muted break-words` | Built. Styles its descendants; see the registry for the full descendant rule list. |
 | `Header` | `bg-ground/80 border-border sticky top-0 z-40 border-b backdrop-blur-md` | Built. Inner `Container` is `flex h-16 items-center justify-between gap-4`. Nav is `hidden lg:block`. |
-| `NavLinks` | `block rounded-full px-3 py-1.5 text-sm transition-colors` | Built. Active: `bg-fern-wash text-fern font-medium`. Idle: `text-muted hover:text-ink hover:bg-surface-2`. |
+| `NavLinks` | `block rounded-full transition-colors` + per-orientation sizing | Built. `horizontal` (default) `px-3 py-1.5 text-sm`; `vertical` `px-4 py-3 text-base` for the sheet's tap targets. List is `flex items-center gap-1` / `flex flex-col items-stretch gap-1`. Active: `bg-fern-wash text-fern font-medium`. Idle: `text-muted hover:text-ink hover:bg-surface-2`. |
+| `MobileMenu` | burger `inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border`; sheet `bg-surface border-border animate-sheet-in max-h-full overflow-y-auto overscroll-contain border-b`; scrim `bg-ground/60 animate-scrim-in flex-1 backdrop-blur-sm` | Built (PORT-007). Burger deliberately matches `ThemeToggle`'s shape so the pair reads as one control group — PORT-020 lifts both into a shared icon button. Portal wrapper is `fixed inset-x-0 top-16 bottom-0 z-50 flex flex-col overflow-hidden`; `top-16` is coupled to the header's `h-16`. |
 | `Footer` | `border-border mt-auto border-t` | Built. `mt-auto` requires `<body>` to be `flex min-h-full flex-col`. |
 | `SkipLink` | `sr-only` → `focus:not-sr-only focus:fixed focus:bg-fern focus:text-fern-on focus:rounded-md` | Built. Targets `#main`. |
 | `ThemeToggle` | `inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border` | Built. Renders an empty same-sized `div` until hydrated. |

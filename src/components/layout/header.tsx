@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
+import { MobileMenu } from "@/components/layout/mobile-menu";
 import { NavLinks, type NavItem } from "@/components/layout/nav-links";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { cn } from "@/lib/utils";
@@ -28,11 +29,12 @@ type Props = {
  * Stays pinned to the top as you scroll, and is translucent so content reads
  * as passing underneath it rather than colliding with it.
  *
- * This is a Server Component. Only NavLinks and ThemeToggle run in the
- * browser, so the nav array and everything around it stay on the server.
+ * This is a Server Component. Only NavLinks, ThemeToggle and MobileMenu run in
+ * the browser, so the nav array and everything around it stay on the server.
  *
- * Below 1000px the navigation is simply absent. The menu that replaces it is
- * PORT-007, deliberately not this ticket.
+ * Above 1000px the links sit in a row; below it the row is hidden and
+ * MobileMenu's burger takes over. Both are handed the same NAV array, so the
+ * two lists cannot drift apart.
  */
 export function Header({ className }: Props) {
   return (
@@ -59,6 +61,7 @@ export function Header({ className }: Props) {
             <NavLinks items={NAV} />
           </nav>
           <ThemeToggle />
+          <MobileMenu items={NAV} className="lg:hidden" />
         </div>
       </Container>
     </header>

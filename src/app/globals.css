@@ -161,6 +161,31 @@
   /* Body copy is 1rem/1.65 (§3), looser than Tailwind's stock 1.5. */
   --text-base: 1rem;
   --text-base--line-height: 1.65;
+
+  /* Motion (ui-rules.md §3). The mobile sheet's 0.26s decelerate slide, plus
+     the scrim fade that accompanies it. Keyframes must live inside @theme or
+     Tailwind emits the --animate-* variable without the animation it names.
+     The prefers-reduced-motion block below collapses both to ~0ms. */
+  --animate-sheet-in: sheet-in 260ms cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-scrim-in: scrim-in 260ms ease-out;
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scrim-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 /* ------------------------------------------------------------------------- */

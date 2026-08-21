@@ -69,7 +69,8 @@ Review it honestly against [code-standards.md](ai-context/context/code-standards
 
 ### When a ticket closes
 
-- Run `npm run verify` yourself. The browser check is his — **ask what he saw**, do not accept "done" as evidence. A criterion he cannot confirm keeps the ticket `▶`.
+- Run `npm run verify` **and the browser checks** yourself. Drive the real page with Playwright at the four breakpoints in both themes and report what you *observed*, never what the code implies. A criterion nothing has actually confirmed keeps the ticket `▶`.
+- Hand him only the checks a script genuinely cannot make: a real phone or touch device, a judgment call on whether something *looks* right against the prototype, or a major flow he wants to feel for himself. Ask for those explicitly and wait — do not accept "done" as evidence for them.
 - Update [progress.md](ai-context/context/progress.md), [ui-registry.md](ai-context/context/ui-registry.md) and [ui-rules.md](ai-context/context/ui-rules.md) yourself — those are the record, and they are yours to write.
 - Hand him the git commands. Do not run them.
 
@@ -83,11 +84,11 @@ Review it honestly against [code-standards.md](ai-context/context/code-standards
 
 ## Current state
 
-**Sprint 0 — Foundation, 5 / 7.** The Next.js app is scaffolded and deployed (<https://vernel-portfolio.vercel.app>, auto-deploys on push to `main`), the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/` — and the app shell is wired: `Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` around a `<main id="main">` in `src/app/layout.tsx`. No content and **no routes**: `src/app/page.tsx` is still the scaffold's default page, and it references `bg-foreground`/`text-background`, which PORT-003 deleted — so the home page renders partly unstyled on the live preview right now.
+**Sprint 0 — Foundation, complete (7 / 7). Sprint 1 — Content layer is next.** The Next.js app is scaffolded and deployed (<https://vernel-portfolio.vercel.app>, auto-deploys on push to `main`), the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/` — the app shell is wired (`Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` around a `<main id="main">` in `src/app/layout.tsx`), all six routes exist as stubs (`/`, `/projects`, `/skills`, `/about`, `/resume`, `/contact`) alongside a designed `not-found.tsx` and a Client Component `error.tsx`, and the mobile menu is built — a burger below `lg:` opening a portaled sheet with a real focus trap. The site is navigable end to end at every breakpoint in both themes. Still **no content**, and two gaps carried deliberately: `/projects/[slug]` (PORT-032) and `global-error.tsx`, which means a root-layout failure is uncaught.
 
 Check [ai-context/context/progress.md](ai-context/context/progress.md) at the start of every session. It is the source of truth for what is actually built. Never assume a feature exists.
 
-Next ticket: **PORT-006** (route stubs and error boundaries — the seven routes from project-overview.md §3, a designed `not-found.tsx`, and a Client Component `error.tsx` with a working reset).
+Next ticket: **PORT-010** (content types — `src/content/types.ts` per content-model.md, validated by `satisfies`, not Zod. ⚠️ It blocks all content and every page.)
 
 ## Documentation map
 
