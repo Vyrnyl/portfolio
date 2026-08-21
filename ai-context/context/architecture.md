@@ -71,9 +71,9 @@ portfolio/
     │   │   └── [slug]/
     │   │       ├── page.tsx
     │   │       └── not-found.tsx
+    │   ├── skills/page.tsx
     │   ├── about/page.tsx
     │   ├── resume/page.tsx
-    │   ├── uses/page.tsx
     │   └── contact/page.tsx
     │
     ├── components/
@@ -108,8 +108,7 @@ portfolio/
     │   ├── site.ts
     │   ├── projects.ts
     │   ├── experience.ts
-    │   ├── skills.ts
-    │   └── uses.ts
+    │   └── skills.ts
     │
     └── lib/
         ├── content.ts             # accessors: getAllProjects, getProjectBySlug…
@@ -203,7 +202,7 @@ Rules for this path:
 
 | Route | Strategy | Notes |
 |---|---|---|
-| `/`, `/about`, `/resume`, `/uses` | Static | Fully pre-rendered, zero client JS beyond the theme toggle |
+| `/`, `/skills`, `/about`, `/resume` | Static | Fully pre-rendered, zero client JS beyond the theme toggle |
 | `/projects` | Static | Filter is client-side over pre-rendered cards; tag reflected in the URL via `?tag=` |
 | `/projects/[slug]` | Static per slug | `generateStaticParams` from `getAllProjects()`; `generateMetadata` per project; unknown slug → `notFound()` |
 | `/contact` | Static shell | Only the `<form>` subtree is a Client Component |

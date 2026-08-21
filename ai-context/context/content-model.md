@@ -150,19 +150,6 @@ export interface Practice {
   title: string;
   body: string;
 }
-
-// ---------- uses ----------
-
-export interface UsesItem {
-  name: string;
-  note: string;
-  href?: string;
-}
-
-export interface UsesGroup {
-  category: string;
-  items: UsesItem[];
-}
 ```
 
 ---
@@ -175,7 +162,6 @@ export interface UsesGroup {
 | `projects.ts` | `projects` (satisfies `Project[]`) | `/`, `/projects`, `/projects/[slug]`, sitemap |
 | `experience.ts` | `jobs`, `education` | `/resume`, `/about` |
 | `skills.ts` | `skillGroups`, `practices` | `/skills`, `/about`, `/resume` |
-| `uses.ts` | `usesGroups` | `/uses` |
 
 ---
 

@@ -1,6 +1,6 @@
 # Personal Portfolio
 
-A seven-page Next.js portfolio site — home, projects (index + detail), skills, about, resume, uses, contact. Static-first, no database, no auth. Full scope in [ai-context/context/project-overview.md](ai-context/context/project-overview.md).
+A six-page Next.js portfolio site — home, projects (index + detail), skills, about, resume, contact. Static-first, no database, no auth. Full scope in [ai-context/context/project-overview.md](ai-context/context/project-overview.md).
 
 ## How this project is worked on
 
@@ -83,11 +83,11 @@ Review it honestly against [code-standards.md](ai-context/context/code-standards
 
 ## Current state
 
-**Sprint 0 — Foundation, 4 / 7.** The Next.js app is scaffolded and runs, the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), and the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/`. No content and no routes yet: `src/app/page.tsx` is still the scaffold's default page.
+**Sprint 0 — Foundation, 5 / 7.** The Next.js app is scaffolded and deployed (<https://vernel-portfolio.vercel.app>, auto-deploys on push to `main`), the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/` — and the app shell is wired: `Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` around a `<main id="main">` in `src/app/layout.tsx`. No content and **no routes**: `src/app/page.tsx` is still the scaffold's default page, and it references `bg-foreground`/`text-background`, which PORT-003 deleted — so the home page renders partly unstyled on the live preview right now.
 
 Check [ai-context/context/progress.md](ai-context/context/progress.md) at the start of every session. It is the source of truth for what is actually built. Never assume a feature exists.
 
-Next ticket: **PORT-005** (app shell — `Header`, `Footer`, `SkipLink`, `ThemeToggle`, and the `<main id="main">` wrapper in `src/app/layout.tsx`).
+Next ticket: **PORT-006** (route stubs and error boundaries — the seven routes from project-overview.md §3, a designed `not-found.tsx`, and a Client Component `error.tsx` with a working reset).
 
 ## Documentation map
 
@@ -99,7 +99,7 @@ Next ticket: **PORT-005** (app shell — `Header`, `Footer`, `SkipLink`, `ThemeT
 | [ui-rules.md](ai-context/context/ui-rules.md) | Design tokens, Tailwind v4 token strategy, component contract, a11y floor |
 | [ui-registry.md](ai-context/context/ui-registry.md) | Every component, where it lives, its exact classes. **Check before building any component** |
 | [code-standards.md](ai-context/context/code-standards.md) | Naming, TypeScript, React/Next rules, git conventions |
-| [build-plan.md](ai-context/context/build-plan.md) | **The ticket board** — 39 tickets, 6 sprints, acceptance criteria |
+| [build-plan.md](ai-context/context/build-plan.md) | **The ticket board** — 37 tickets, 6 sprints, acceptance criteria |
 | [implementation-guide.md](ai-context/context/implementation-guide.md) | Step-by-step how-to with commands and code shapes |
 | [progress.md](ai-context/context/progress.md) | **What is done.** Update every session |
 

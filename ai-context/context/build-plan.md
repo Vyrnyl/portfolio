@@ -62,14 +62,14 @@ Six sprints. A "sprint" here is a coherent chunk of work, not a fixed calendar b
 
 | Sprint | Theme | Tickets | Size | Exit criterion |
 |---|---|---|---|---|
-| **0** | Foundation | PORT-001 → 007 | ~9h | App runs, tokens applied, all seven routes reachable through a real header, mobile menu and footer |
-| **1** | Content layer | PORT-010 → 015 | ~6h | Real content typed and compiling; accessors return correct data |
+| **0** | Foundation | PORT-001 → 007 | ~9h | App runs, tokens applied, all six routes reachable through a real header, mobile menu and footer |
+| **1** | Content layer | PORT-010 → 015 | ~5h | Real content typed and compiling; accessors return correct data |
 | **2** | UI primitives | PORT-020 → 025 | ~7h | Gallery page renders every primitive in every variant and state |
-| **3** | Pages | PORT-030 → 037 | ~18h | All seven pages render real content and are navigable |
+| **3** | Pages | PORT-030 → 037 | ~17h | All six pages render real content and are navigable |
 | **4** | Contact wiring | PORT-040 → 044 | ~7h | A real message lands in your inbox |
 | **5** | Production | PORT-050 → 056 | ~11h | Deployed to a custom domain, targets met, CI green |
 
-**Total: ~58h of focused work**, 39 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
+**Total: ~56h of focused work**, 37 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
 
 ### Build order rationale
 
@@ -203,7 +203,7 @@ The burger sheet below 1000px. Split out of PORT-005 because the accessibility w
 Every route from [project-overview.md](project-overview.md) §3 as a stub page, plus real 404 and error pages.
 
 **Acceptance criteria**
-- [ ] All seven routes render a heading inside the shell without a 404
+- [ ] All six routes render a heading inside the shell without a 404
 - [ ] `app/not-found.tsx` is a designed page with a route back home — not default Next.js output
 - [ ] `app/error.tsx` is a Client Component with a working reset button
 - [ ] Every nav link navigates correctly
@@ -275,13 +275,9 @@ Write real content for 3–6 projects, with images. This is a **writing** ticket
 
 ---
 
-### PORT-014 · Uses content `S`
-**Depends on:** 010
+### PORT-014 · Uses content `S` — ~~CUT 2026-08-21~~
 
-**Acceptance criteria**
-- [ ] `usesGroups` satisfies `UsesGroup[]`, 3–5 categories
-- [ ] Each item has a note explaining *why*, not just the name
-- [ ] External links are real and resolve
+**Will not build.** The `/uses` page was cut before it was started; see the decisions log in [progress.md](progress.md). The ID is retired, not reused.
 
 ---
 
@@ -471,13 +467,9 @@ Hero, featured projects, CTA.
 
 ---
 
-### PORT-035 · Uses `S`
-**Depends on:** 015
+### PORT-035 · Uses `S` — ~~CUT 2026-08-21~~
 
-**Acceptance criteria**
-- [ ] Grouped by category from `usesGroups`
-- [ ] External links have `target="_blank"` and `rel="noopener noreferrer"`
-- [ ] Real metadata
+**Will not build.** The `/uses` page was cut before it was started; see the decisions log in [progress.md](progress.md). The ID is retired, not reused.
 
 ---
 

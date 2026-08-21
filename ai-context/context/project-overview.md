@@ -8,7 +8,7 @@ This document defines *scope*: what the site is, who reads it, and — just as i
 
 ## 1. What this is
 
-A seven-page portfolio site. Its job is to make a visitor conclude, within about thirty seconds, that the owner is worth contacting. Everything else is subordinate to that.
+A six-page portfolio site. Its job is to make a visitor conclude, within about thirty seconds, that the owner is worth contacting. Everything else is subordinate to that.
 
 The site is **content-driven, not data-driven**. There is no database, no login, no user accounts, no admin panel, and no user-generated content. Content is authored as typed TypeScript in the repo, so publishing an update means editing a file and pushing a commit.
 
@@ -28,7 +28,7 @@ Design consequence: **the resume and the project detail pages carry the weight**
 
 ## 3. Pages
 
-Seven routes. This list is the scope boundary — anything not on it needs an explicit decision to add.
+Six pages, seven routes — `/projects` and `/projects/[slug]` are one page in two forms. This list is the scope boundary — anything not on it needs an explicit decision to add.
 
 | Route | Purpose | Rendering |
 |---|---|---|
@@ -38,7 +38,6 @@ Seven routes. This list is the scope boundary — anything not on it needs an ex
 | `/skills` | Three honest depth tiers + four "how I work" principles | Static |
 | `/about` | Bio, photo, story, strengths and weaknesses | Static |
 | `/resume` | Structured experience, education, and a PDF download | Static |
-| `/uses` | Hardware, editor, tooling | Static |
 | `/contact` | Contact form + direct links | Static shell + Server Action |
 
 Plus `not-found.tsx`, `error.tsx`, `sitemap.ts`, `robots.ts`, and an OG image route.
