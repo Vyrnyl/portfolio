@@ -353,12 +353,13 @@ Filled in as components are built. Keep in lockstep with [ui-registry.md](ui-reg
 | `Footer` | `border-border mt-auto border-t` | Built. `mt-auto` requires `<body>` to be `flex min-h-full flex-col`. |
 | `SkipLink` | `sr-only` → `focus:not-sr-only focus:fixed focus:bg-fern focus:text-fern-on focus:rounded-md` | Built. Targets `#main`. |
 | `ThemeToggle` | `inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border` | Built. Renders an empty same-sized `div` until hydrated. |
-| `Button` | `inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors` + focus ring | Planned. Variants: `primary` (`bg-fern text-fern-on`) `outline` `ghost`. Sizes: `sm` `md`. |
+| `Button` | `inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors` + focus ring | Planned (PORT-020). Variants: `primary` (`bg-fern text-fern-on hover:bg-fern-hover`) `outline` (`border border-border text-ink hover:bg-surface-2`) `ghost`. Sizes: `sm` `md` (`h-10 px-4`). ⚠️ **Already inlined twice** — `src/app/not-found.tsx` and `src/app/error.tsx` (PORT-006). PORT-020 must replace both; grep for `PORT-020 replaces this`. |
 | `Card` | `rounded-lg border border-border bg-surface` | Planned. Elevation via border, not shadow. |
 | `Badge` | `inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-badge font-mono text-muted` | Planned. Stack/tag chips. |
 | `Input` / `Textarea` | `w-full rounded-md border border-border-strong bg-ground px-3 py-2 text-base placeholder:text-faint` + focus ring | Planned. `aria-invalid` → `border-coral`. |
 | `Field` | `space-y-1.5` | Planned. Wraps label + control + error; owns the `id`/`htmlFor`/`aria-describedby` wiring. |
 | `ProjectCard` | `group` + `Card` + `hover:border-fern transition-colors` | Planned. Whole card is one link; title carries the accessible name. |
+| Route stub | `text-eyebrow text-faint font-mono uppercase` eyebrow + `text-h-lg text-ink` heading + `Prose` | Built (PORT-006). Six of them. The eyebrow names the ticket that replaces the page. Home uses `text-h-xl` — it is the only heading that is a hero. |
 | *(add rows as built)* | | |
 
 **The focus ring**, everywhere: `focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none`. `SkipLink` uses the `focus:` variant instead, because it must appear for any focus, not only keyboard focus.

@@ -4,7 +4,7 @@
 > Update at the end of every session and whenever a ticket changes status.
 > The plan lives in [build-plan.md](build-plan.md); this file is the record.
 
-**Last updated:** 2026-08-20 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-006 (Ready)
+**Last updated:** 2026-08-21 · **Current sprint:** 0 — Foundation · **In progress:** none · **Next ticket:** PORT-007 (Ready)
 
 **Live (preview):** <https://vernel-portfolio.vercel.app> — auto-deploys on every push to `main`. Not the production domain; PORT-055 replaces it. This is the value PORT-011 needs for `site.url`.
 
@@ -12,19 +12,19 @@
 
 ## At a glance
 
-**5 / 39 tickets complete · 13%** — one cell per ticket.
+**6 / 37 tickets complete · 16%** — one cell per ticket.
 
-`█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+`██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
 
 | Sprint | Progress | ✔ Done | ▶ | ⚠ | ☐ Left |
 |---|---|---|---|---|---|
-| **0 — Foundation** ◄ current | `█████░░` | 5 / 7 | 0 | 0 | 2 |
-| 1 — Content layer | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
+| **0 — Foundation** ◄ current | `██████░` | 6 / 7 | 0 | 0 | 1 |
+| 1 — Content layer | `░░░░░` | 0 / 5 | 0 | 0 | 5 |
 | 2 — UI primitives | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
-| 3 — Pages | `░░░░░░░░` | 0 / 8 | 0 | 0 | 8 |
+| 3 — Pages | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
 | 4 — Contact wiring | `░░░░░` | 0 / 5 | 0 | 0 | 5 |
 | 5 — Production | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
-| **Total** | | **5 / 39** | **0** | **0** | **34** |
+| **Total** | | **6 / 37** | **0** | **0** | **31** |
 
 ---
 
@@ -43,7 +43,7 @@
 | PORT-003 | Port design tokens into Tailwind v4 | M | ✔ | Colour, font, radius, container and gutter tokens shipped. §2 oklch was **wrong** as documented — re-derived from the §3 hexes, all 28 now round-trip exactly. Type scale deferred to PORT-004, shadows to PORT-021 (no dark values recorded). |
 | PORT-004 | Layout primitives | S | ✔ | `cn()`, `Container`, `Section`, `Prose`. Type scale, section rhythm and the breakpoint override ported alongside. `Section` wraps its own `Container` — see decisions. Two values are provisional, never recorded in ui-rules §3: `--spacing-section-tight` and the heading line-heights. |
 | PORT-005 | App shell | L | ✔ | `Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` + root layout wiring. Nav array and footer socials hardcoded here; swapped in PORT-011. **Nav collapses at `lg:` 1000**, not 760 — see decisions. Active-pill logic verified for Home only, because `/` is still the sole route; the `/projects/foo → Projects` case gets its real test in PORT-006. |
-| PORT-006 | Route stubs + error boundaries | S | ☐ | Seven routes now — Skills was added. |
+| PORT-006 | Route stubs + error boundaries | S | ✔ | Six routes + `not-found.tsx` + `error.tsx`. Scaffold `page.tsx` replaced — it had been shipping dead `bg-foreground`/`text-background` classes to the live preview. `Button` classes inlined twice pending PORT-020. Nested active-pill (`/projects/foo` → Projects) verified for the first time. |
 | PORT-007 | Mobile menu | M | ☐ | Focus trap + scroll lock + resize close. Design proven in prototype. |
 
 ### Sprint 1 — Content layer
@@ -54,7 +54,6 @@
 | PORT-011 | Site config + nav swap | S | ☐ | Completes the PORT-005 hardcode. |
 | PORT-012 | Project content | L | ☐ | Writing-heavy. Real copy, no placeholders. |
 | PORT-013 | Experience, education, skills | M | ☐ | |
-| PORT-014 | Uses content | S | ☐ | |
 | PORT-015 | Content accessors | S | ☐ | |
 
 ### Sprint 2 — UI primitives
@@ -77,7 +76,6 @@
 | PORT-032 | Project detail | L | ☐ | Test an unknown slug. |
 | PORT-033 | About | M | ☐ | |
 | PORT-034 | Resume | L | ☐ | Timeline responsive is the risky part. |
-| PORT-035 | Uses | S | ☐ | |
 | PORT-036 | Contact page UI | M | ☐ | UI only — no submission logic. |
 | PORT-037 | Skills page | M | ☐ | Added after design review. Needs a `tier` field on SkillGroup. |
 
@@ -170,6 +168,7 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 2026-08-19 | Type scale tokens carry line-height, weight and tracking together | `--text-h-lg` plus its `--line-height`/`--font-weight`/`--letter-spacing` modifiers makes `text-h-lg` the whole heading style. The alternative — size only — means every heading re-types three more classes and they drift. |
 | 2026-08-19 | `Prose` hand-rolled, not `@tailwindcss/typography` | The plugin ships its own grey ramp and would need re-tokenising rule by rule to respect the theme. That is more work than the dozen descendant selectors it replaces, and it adds a dependency that can override tokens silently. |
 | 2026-08-20 | Nav collapses at **1000** (`lg:`), not 760 | ui-rules §4 said 760, build-plan PORT-007 said 1000. Seven nav items plus the name and toggle measure ~720px against a 760px header — roughly 40px of slack, inside the margin of error on text metrics. §4's own layout diagram also reserves an unbuilt header CTA slot, and PORT-011 makes adding a nav item a one-line change with no warning. Collapsing early is free; collapsing late breaks on a real device. ui-rules §4 corrected. |
+| 2026-08-21 | **`/uses` page cut** before it was built | The page only works when each entry carries a real reason for the choice; without that it is a list of defaults that advertises having no opinions. Nothing was written yet, so the cheapest moment to cut is now. Drops the nav to six items, which also eases the 1000px collapse point. PORT-014 and PORT-035 retired — IDs not reused. |
 | 2026-08-19 | next/font variables (`--font-inter`, `--font-jetbrains`) named separately from the theme tokens (`--font-sans`, `--font-mono`) | implementation-guide.md had them sharing a name, which makes `--font-sans: var(--font-sans)` — self-referential, resolves to nothing, and falls back to the system font with no error. Guide corrected. |
 
 ---
@@ -181,7 +180,7 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 1 | App at repo root or in an `app/` subfolder? | PORT-001 | **Answered 2026-08-18: repo root**, alongside `ai-context/`. All doc paths already assume this. |
 | 2 | Which projects make the cut? | PORT-012 | **Answered:** Grades Repository System, CICT Project Gate, Construction Company Website, OpalusPH Company Website. One spare slot. |
 | 3 | Sending domain for Resend? | PORT-042 | — |
-| 4 | Keep the Uses page? | PORT-035 | Recommended: delete. Nothing real to put on it. |
+| 4 | Keep the Uses page? | PORT-035 | **Answered 2026-08-21: cut.** Vernel has no strong tooling opinions to write up, and PORT-014's "a note explaining *why*" bar makes a thin version worse than no page. PORT-014 and PORT-035 retired; `/uses` out of the nav, §3, the registry and the content model. Re-adding later is one content file, one page, one nav line. |
 | 5 | Which case study leads — Grades Repository or Project Gate? | PORT-032 | Both written in the prototype. Project Gate is technically stronger. |
 | 6 | Custom breakpoints (1000 / 760 / 460) as `@theme --breakpoint-*` overrides, or named additions alongside Tailwind defaults? | PORT-004 | **Answered 2026-08-19: outright override.** `--breakpoint-*: initial` clears Tailwind's scale, then `sm: 460 / md: 760 / lg: 1000`. `xl`/`2xl` stay cleared. Verified in the compiled CSS. |
 | 7 | `coral` on `ground` measures **3.97:1** in light mode — below AA for the error text it is specified for. Darken coral, or restrict it to icons/borders with a separate error-text colour? | PORT-023, PORT-052 | Dark mode passes at 6.99:1. `faint` is also below AA (2.94 light / 4.23 dark) but is metadata-only. |
@@ -194,6 +193,8 @@ Newest first. The **next step** field matters most — write it so you could pic
 
 | Date | Worked on | Outcome | Next step |
 |---|---|---|---|
+| 2026-08-21 | PORT-006 · closed | Six route stubs (`/`, `/projects`, `/skills`, `/about`, `/resume`, `/contact`), each with a unique `metadata.title` and a mono eyebrow naming the ticket that fills it, plus `not-found.tsx` and a Client Component `error.tsx` with a working `reset`. **Sprint 0's exit criterion is met** — the site is navigable end to end in both themes with no real content. `npm run verify` green; the build prerenders all six routes plus `/_not-found` as static, matching architecture.md §7. Browser-verified by Vernel at 1440/1024/768/375 in both themes: no horizontal overflow, focus rings visible on the 404 buttons in both themes, the **nested active pill holds** (`/projects/anything` keeps Projects highlighted — the `startsWith` branch PORT-005 closed without being able to test), and the error page renders correctly under the dismissed dev overlay. The scaffold `page.tsx` is gone; grep confirms zero `bg-foreground`/`text-background`/`text-zinc-*` left in `src/`, and zero test throws. Two things deliberately not built: `/projects/[slug]` (PORT-032) and `global-error.tsx`, which is the real gap — `error.tsx` does not catch a root-layout failure. | **PORT-007** — mobile menu, the last Sprint 0 ticket. Below `lg:` (1000) the nav is currently just absent, so on a phone the site has no navigation at all beyond the footer. Needs a focus trap, scroll lock, and close-on-resize; the design is already proven in the prototype. Watch: the trigger button belongs in `Header` beside `ThemeToggle`, and the menu is a Client Component while `Header` stays a Server Component. Two known debts to carry, not fix here: the `Button` classes inlined in `not-found.tsx`/`error.tsx` (PORT-020 sweeps them, grep `PORT-020 replaces this`), and `global-error.tsx` still missing. |
+| 2026-08-21 | Session catch-up · scope cut | Tracker verified against the repo and found accurate for PORT-001→005; `src/app/` confirmed to hold **no route folders**, so six of the seven nav links 404 on the live preview right now. Two stale docs corrected: CLAUDE.md's "Current state" was a full session behind (said 4/7, next PORT-005), and architecture.md §3's app tree was missing `skills/page.tsx` entirely — Skills has had its own page since 2026-08-18. **Open question 4 answered: the `/uses` page is cut.** Removed from project-overview §3, architecture (tree + rendering table), content-model (`UsesGroup`/`UsesItem` interfaces and the `uses.ts` row), ui-registry (`UsesList`), and the CLAUDE.md intro. PORT-014 and PORT-035 marked CUT in build-plan; totals recut 39 → 37 tickets, ~58h → ~56h. Also confirmed the live bug: `src/app/page.tsx` is still the untouched scaffold and references `bg-foreground`/`text-background`, neither of which exists in `globals.css` — grepped and confirmed zero hits. | **PORT-006** — route stubs and error boundaries. One `src/` change is outstanding before it starts: remove the `{ href: "/uses", label: "Uses" }` line from the `NAV` array in `src/components/layout/header.tsx:18`, which still points at the cut page. Then create the six route folders under `src/app/` (`projects`, `projects/[slug]`, `skills`, `about`, `resume`, `contact`), replace the scaffold `page.tsx`, and add `not-found.tsx` (designed, route home) plus `error.tsx` (Client Component, working reset). Each page needs placeholder `metadata` with a unique title. Push a branch and check the Vercel preview on the phone before merging. |
 | 2026-08-20 | Preview deploy + working agreement | **Site is live** at <https://vernel-portfolio.vercel.app>, imported from GitHub with zero config changes; every push to `main` now redeploys automatically, and a pushed branch gets its own preview URL. Verified independently from the served HTML: title, header, `#main`, footer socials and all seven nav links present. Confirmed on a real phone — sticky blurred header holds, nav correctly absent below 1000, theme follows the OS and a manual override sticks, no horizontal drift. **A clean `*.vercel.app` name is not obtainable** — Vercel builds it from project + scope, so a presentable URL means the custom domain in PORT-055. Two working-agreement changes recorded in CLAUDE.md and the `ticket` / `add-component` skills: (1) **Claude writes nothing to disk under `src/`** — every file is handed over paste-ready and Vernel places it, with explanations describing a component's role rather than its class names, and wiring given as numbered steps; (2) **every handover opens with the `New-Item` + `code` command** that creates the file, so no path is ever typed by hand. | **PORT-006** — route stubs and error boundaries. First action: create the six missing route folders under `src/app/` and replace the scaffold `page.tsx`, which still references `bg-foreground`/`text-background` — classes PORT-003 deleted, so the home page renders unstyled in production right now. Then `not-found.tsx` (designed, with a route home) and `error.tsx` (Client Component, working reset). Push a branch first and check the Vercel preview URL on the phone before merging. |
 | 2026-08-20 | PORT-005 · closed | App shell shipped: `Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` in `components/layout/`, wired into `src/app/layout.tsx` with `ThemeProvider`, `suppressHydrationWarning` and `<main id="main" tabIndex={-1}>`. Browser-checked in both themes at 1440/1024/768/375 and confirmed: no theme flash on hard reload, choice survives a reload, skip link appears on first Tab and moves focus into the page, sticky blurred header does not overlap, no horizontal scrollbar. `npm run verify` green. Three things resolved along the way: the **nav collapse breakpoint** was contradicted across two docs and is now settled at `lg:` 1000 with ui-rules §4 corrected; `ThemeToggle` had to use `useSyncExternalStore` because Next 16's React Compiler lint rejects the `useState`+`useEffect` mount gate the impl-guide prescribes; and **`lucide-react` v1 has no brand icons**, so footer socials are text links. ui-rules §6 rewritten — it still listed pre-token names (`rounded-btn`, `bg-bg`, `bg-brand`, `border-danger`) that do not exist in `globals.css`. Working agreement changed again mid-session: **Claude now writes nothing to disk under `src/`** — every file is handed over paste-ready and Vernel places it; explanations describe a component's role, not its class names; wiring gets numbered steps. Recorded in CLAUDE.md and the `ticket` / `add-component` skills. | **PORT-006** — route stubs and error boundaries. Create the seven routes from project-overview.md §3 as stub pages, plus a designed `app/not-found.tsx` and a Client Component `app/error.tsx` with a working reset button. Each page needs a placeholder `metadata` with a unique title. First real chance to verify the nav active-pill on a non-root route and that all seven links navigate. `src/app/page.tsx` is still the Next.js scaffold default and is full of non-token classes — PORT-030 replaces it, but PORT-006 may want a stub in the meantime. |
 | 2026-08-20 | PORT-004 · closed | Browser-checked at 1440/1024/768/375 in both themes and passed: no horizontal scrollbar at 375 (the long URL wraps — `break-words` was added to `Prose` for exactly that), gutter visibly steps 24px → 18px across 761/759, the `dark` class flips ground, text and link together, and the focus ring on a `Prose` link is visible in both themes. `npm run verify` green. Working agreement amended mid-ticket and recorded in CLAUDE.md: **wiring is now handed over as complete paste-ready files with an explanation**, not a skeleton to fill in — he places and assembles it, Claude still never writes into `src/app/`. | **PORT-005** — app shell. Header (sticky, backdrop-blur, bottom border), Footer, SkipLink, ThemeToggle, and the `<main id="main">` wrapper in `src/app/layout.tsx`. Needs `next-themes` and `lucide-react` installed. Nav array is hardcoded here and swapped for site config in PORT-011. The mobile menu is **not** in this ticket — that is PORT-007. Watch `suppressHydrationWarning` on `<html>` and the toggle rendering no icon before mount. |

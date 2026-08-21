@@ -93,7 +93,6 @@ All `designed` — they exist and are proven in the design prototype, not yet bu
 | `StackStrip` | designed | `sections/stack-strip.tsx` | no | `/`, `/skills` — `.stack-item` |
 | `PracticeCard` | designed | `sections/practice-card.tsx` | no | `/skills` — icon + heading + body |
 | `Timeline` | designed | `sections/timeline.tsx` | no | `/resume` — `.tl`, `.tl-item--now` |
-| `UsesList` | designed | `sections/uses-list.tsx` | no | `/uses` — `.uses-row` |
 | `ContactForm` | designed | `sections/contact-form.tsx` | **yes** — `useActionState` | `/contact` |
 | `ContactMethods` | designed | `sections/contact-methods.tsx` | no | `/contact` |
 | `Cta` | designed | `sections/cta.tsx` | no | `/`, `/skills`, `/about` — `.cta-panel` |
@@ -113,9 +112,9 @@ Every one of these must exist somewhere visible before the site ships. Tracked h
 | Success — message sent | `/contact` | designed |
 | Error — field validation | `/contact` | designed |
 | Error — email provider failed, with `mailto:` fallback | `/contact` | designed |
-| 404 — unknown route | `not-found.tsx` | planned |
+| 404 — unknown route | `src/app/not-found.tsx` | **built** (PORT-006) |
 | 404 — unknown project slug | `projects/[slug]/not-found.tsx` | planned |
-| 500 — render error | `error.tsx` | planned |
+| 500 — render error | `src/app/error.tsx` | **built** (PORT-006) |
 
 ---
 
@@ -123,6 +122,7 @@ Every one of these must exist somewhere visible before the site ships. Tracked h
 
 | Date | Component(s) | Change |
 |---|---|---|
+| 2026-08-21 | `not-found`, `error` (route-level pages) | Built (PORT-006), together with six route stubs. Neither is a registry component — they are pages — but both own UI, so their states are now `built` above. **Both inline the designed `Button` classes** rather than importing one: `Button` is PORT-020 and building it early would be building ahead. Each inlined spot carries a `PORT-020 replaces this` comment; that ticket must sweep them. `error.tsx` is a Client Component (Next requires it — `reset` is a callback) and therefore **cannot export `metadata`**; `not-found.tsx` can and does. `error.digest` is rendered only when present, because it exists in production builds and not in dev. Route stubs carry a mono eyebrow naming the ticket that fills them, so an unfinished page is obvious on sight. |
 | 2026-08-20 | `Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` | Built (PORT-005). Nav array and footer socials are hardcoded in `Header`/`Footer` until PORT-011. **Nav collapses at `lg:` (1000), not `md:` (760)** — seven items measure ~720px against a 760px header, inside the margin of error, and ui-rules §4 reserves an unbuilt header CTA slot; §4 corrected. `ThemeToggle` uses `useSyncExternalStore` for the hydration gate because Next 16 lint rejects the `useState`+`useEffect` pattern the impl-guide prescribes. Footer socials are text links, not brand icons — `lucide-react` v1 removed `Github`/`Linkedin` entirely. `MobileMenu` stays `designed` (PORT-007). |
 | 2026-08-19 | `Container`, `Section`, `Prose` | Built (PORT-004). Prototype classes replaced with the real token utilities. **`Section` now wraps its children in a `Container`** — the impl-guide page example (`<Section heading="Selected work">` with no wrapper) already assumed this; ui-rules §4's diagram did not, and was corrected. `SectionHead` stays `designed` — Section's plain heading slot covers the common case, and the eyebrow + gradient rule treatment lands when a page needs it. |
 | 2026-08-18 | All | Populated from the approved design prototype. Every row `designed` — proven visually, not yet built in React. |
