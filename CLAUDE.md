@@ -88,9 +88,9 @@ Review it honestly against [code-standards.md](ai-context/context/code-standards
 
 Check [ai-context/context/progress.md](ai-context/context/progress.md) at the start of every session. It is the source of truth for what is actually built. Never assume a feature exists.
 
-The content schema now exists — `src/content/types.ts` (PORT-010), 12 types validated by `satisfies`, not Zod. Note what `satisfies` actually does: it narrows fields *declared* as unions, and widens `slug`/`tags` to `string`. Slug uniqueness and tag casing are by-eye checks, not compile errors.
+The content layer has started. `src/content/types.ts` (PORT-010) holds 12 types validated by `satisfies`, not Zod — note what `satisfies` actually does: it narrows fields *declared* as unions, and widens `slug`/`tags` to `string`, so slug uniqueness and tag casing are by-eye checks, not compile errors. `src/content/site.ts` (PORT-011) now feeds the header nav, the footer socials and the name; `Header` and `Footer` import it directly, which content-model §4 carves out explicitly.
 
-Next ticket: **PORT-011** (site config — `src/content/site.ts`, then swap the hardcoded nav out of `Header` and the hardcoded socials out of `Footer`.)
+Next ticket: **PORT-012** (project content — the writing-heavy one). ⚠️ Its prerequisite is unmet: **project screenshots are not collected**, and `ImageAsset` requires real intrinsic `width`/`height`.
 
 ## Documentation map
 

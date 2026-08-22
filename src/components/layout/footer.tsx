@@ -1,17 +1,25 @@
 import { ArrowUpRight } from "lucide-react";
 
 import { Container } from "@/components/layout/container";
+import { site } from "@/content/site";
+import type { SocialLink } from "@/content/types";
 import { cn } from "@/lib/utils";
 
 /**
- * Hardcoded until PORT-011 creates src/content/site.ts. Replace with
- * site.socials then. LinkedIn is missing on purpose — the URL is not known
- * yet, and a guessed one is worse than an absent one.
+ * The word shown on screen for each platform.
+ *
+ * site.socials carries the *accessible* name ("GitHub profile"); this is the
+ * shorter visible text. Declared as a full Record over the platform union, so
+ * adding a platform in types.ts fails the build here until it has a word —
+ * rather than rendering `undefined` in the footer.
  */
-const SOCIALS = [
-  { href: "https://github.com/Vyrnyl", label: "GitHub" },
-  { href: "mailto:vernaquino73@gmail.com", label: "Email" },
-];
+const PLATFORM_TEXT: Record<SocialLink["platform"], string> = {
+  github: "GitHub",
+  linkedin: "LinkedIn",
+  email: "Email",
+  x: "X",
+  dribbble: "Dribbble",
+};
 
 type Props = {
   className?: string;
@@ -34,19 +42,22 @@ export function Footer({ className }: Props) {
   return (
     <footer className={cn("border-border mt-auto border-t", className)}>
       <Container className="flex flex-col gap-4 py-8 md:flex-row md:items-center md:justify-between">
-        <p className="text-faint text-badge font-mono">&copy; {year} Vernel Aquino</p>
+        <p className="text-faint text-badge font-mono">
+          &copy; {year} {site.name}
+        </p>
 
         <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          {SOCIALS.map((social) => (
-            <li key={social.href}>
+          {site.socials.map((social) => (
+            <li key={social.platform}>
               <a
                 href={social.href}
+                aria-label={social.label}
                 className={cn(
                   "text-muted hover:text-fern inline-flex items-center gap-1 rounded-md text-sm transition-colors",
                   "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
                 )}
               >
-                {social.label}
+                {PLATFORM_TEXT[social.platform]}
                 <ArrowUpRight size={14} strokeWidth={1.9} aria-hidden />
               </a>
             </li>

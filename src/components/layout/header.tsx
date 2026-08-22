@@ -2,22 +2,10 @@ import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
 import { MobileMenu } from "@/components/layout/mobile-menu";
-import { NavLinks, type NavItem } from "@/components/layout/nav-links";
+import { NavLinks } from "@/components/layout/nav-links";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { site } from "@/content/site";
 import { cn } from "@/lib/utils";
-
-/**
- * Hardcoded until PORT-011 creates src/content/site.ts. Replace this array
- * with site.nav then — nothing else in this file has to change.
- */
-const NAV: readonly NavItem[] = [
-  { href: "/", label: "Home" },
-  { href: "/projects", label: "Projects" },
-  { href: "/skills", label: "Skills" },
-  { href: "/about", label: "About" },
-  { href: "/resume", label: "Resume" },
-  { href: "/contact", label: "Contact" },
-];
 
 type Props = {
   className?: string;
@@ -30,10 +18,10 @@ type Props = {
  * as passing underneath it rather than colliding with it.
  *
  * This is a Server Component. Only NavLinks, ThemeToggle and MobileMenu run in
- * the browser, so the nav array and everything around it stay on the server.
+ * the browser, so site.nav and everything around it stay on the server.
  *
  * Above 1000px the links sit in a row; below it the row is hidden and
- * MobileMenu's burger takes over. Both are handed the same NAV array, so the
+ * MobileMenu's burger takes over. Both are handed the same site.nav, so the
  * two lists cannot drift apart.
  */
 export function Header({ className }: Props) {
@@ -53,15 +41,15 @@ export function Header({ className }: Props) {
             "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
           )}
         >
-          Vernel Aquino
+          {site.name}
         </Link>
 
         <div className="flex items-center gap-3">
           <nav aria-label="Main" className="hidden lg:block">
-            <NavLinks items={NAV} />
+            <NavLinks items={site.nav} />
           </nav>
           <ThemeToggle />
-          <MobileMenu items={NAV} className="lg:hidden" />
+          <MobileMenu items={site.nav} className="lg:hidden" />
         </div>
       </Container>
     </header>

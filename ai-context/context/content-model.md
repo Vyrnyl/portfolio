@@ -168,7 +168,9 @@ export interface Practice {
 
 ## 4. Accessors — `src/lib/content.ts`
 
-The only module allowed to import from `src/content/`. Pages import from here.
+The only module allowed to import **queryable** content — `projects`, `jobs`, `education`, `skillGroups` — from `src/content/`. Pages import those from here, so sorting, filtering and "featured" selection live in one place.
+
+**`site` is the exception, and imports directly.** It is a config singleton with nothing to query; wrapping it in a `getSite()` that returns a constant would be the "repository that returns an array literal" [architecture.md](architecture.md) §2 A7 rejects. `Header` and `Footer` import `@/content/site` (PORT-011). The ESLint boundary rule is unaffected either way — it restricts `components/ui/` only, and domain-aware components belong in `components/layout/` or `components/sections/`.
 
 ```ts
 import { projects } from "@/content/projects";
