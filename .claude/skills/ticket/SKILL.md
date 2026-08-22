@@ -2,7 +2,7 @@
 
 Work one ticket from [build-plan.md](../../../ai-context/context/build-plan.md).
 
-> **You author every file. He places every one of them.** (CLAUDE.md → How this project is worked on.) Nothing you write in this skill goes to disk under `src/` — components, `lib/`, content and the `src/app/` wiring alike are handed over for him to place — a new file whole, an existing file as a targeted REMOVE/ADD edit. The `ai-context/` docs are the exception: those are the record, and you write them yourself.
+> **You author every file. He places every one of them.** (CLAUDE.md → How this project is worked on.) Nothing you write in this skill goes to disk under `src/` — components, `lib/`, content and the `src/app/` wiring alike are handed over for him to place, always as the complete file, new or existing. The `ai-context/` docs are the exception: those are the record, and you write them yourself.
 
 ## 1. Orient
 
@@ -40,7 +40,7 @@ Prefix `New-Item -ItemType Directory -Force <dir>` when the folder is new. No `-
 
 **A new file is delivered whole** — no `// ...rest unchanged`, no `{/* fill this in */}`, no holes.
 
-**An existing file is edited in place.** Give the path, a line-number hint, the exact block to REMOVE and the exact block to ADD. Never a bare line number — format-on-save reflows the file, so show enough surrounding code to anchor the edit without it. Multi-hunk edits go **bottom-up**, so pasting one does not shift the line numbers of the rest. Fall back to the whole file when the change touches most of it, restructures it, or exceeds roughly four hunks — and say why.
+**An existing file is delivered whole too, not as a fragment.** Give the path and the complete new contents — no REMOVE/ADD blocks, no line-number targets, no `// ...rest unchanged`. A fragment has to be located before it can be applied, and that is the step that goes wrong: format-on-save moves line numbers, a near-duplicate block accepts the paste silently, and a half-applied multi-hunk edit leaves a file neither of you has seen. Select-all-and-paste has one failure mode and it is visible. Say in the prose what changed and why, so he knows what to look for in `git diff`.
 
 **What it does** describes the piece's role, not its stylesheet:
 

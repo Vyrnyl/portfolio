@@ -33,34 +33,22 @@ Every handover is the same four parts, in this order:
    When a step creates several files at once, give one command that creates them all, then the blocks in dependency order.
 
 2. **The path**, named in the prose so he knows which file he is looking at.
-3. **The code.** Two cases — see below.
+3. **The code** — the complete file, always. See below.
 4. **What it does** — see below.
 
-### Full file or targeted edit
+### Always the whole file
 
-**A new file is always delivered whole.** No skeleton, no holes, no `// ...rest unchanged`.
+**Every file is delivered whole — new or existing.** No skeleton, no holes, no `// ...rest unchanged`, no REMOVE/ADD fragments. If one line changes in a 200-line component, he gets the 200-line component back.
 
-**An existing file is edited in place, not retyped.** Give the path, a line-number hint, the exact block to remove, and the exact block that replaces it — not the whole file. He is editing, not repasting.
+This is more to paste, deliberately. A fragment has to be *located* before it can be applied, and locating it is the step that goes wrong:
 
-```
-src/components/layout/footer.tsx — around line 12
+- Format-on-save reflows the file, so a line number can be stale between writing the handover and pasting it.
+- A near-duplicate block further down the file accepts the paste silently, and the result still compiles.
+- A multi-hunk edit that is half-applied leaves the file in a state neither of you has seen, and the next error message describes a file you are not looking at.
 
-REMOVE
-  const SOCIALS = [
-    { href: "https://github.com/Vyrnyl", label: "GitHub" },
-  ];
+Replacing the whole file has one failure mode — select all, paste — and it is one he can see happen. Showing what changed is `git diff`'s job, not his to reconstruct from instructions.
 
-ADD
-  const PLATFORM_TEXT: Record<SocialLink["platform"], string> = {
-    github: "GitHub",
-  };
-```
-
-Three rules that keep this from going wrong:
-
-- **Never a bare line number.** Format-on-save reflows the file, so the number can be stale by the time he pastes. Always show enough surrounding code that the target is unambiguous without it — the number is a hint for scrolling, the code is the anchor.
-- **Multi-hunk edits go bottom-up.** Deliver the change nearest the end of the file first, so pasting it does not shift the line numbers of the ones still to come.
-- **Fall back to the whole file** when the change touches most of it, restructures it, or runs past roughly four separate hunks. At that point a full replacement is fewer operations and fewer chances to paste into the wrong place — say so and hand over the file.
+So: hand over `code <path>`, name the file, give the complete contents, and say in the prose what actually changed and why, so he knows what he is looking for when he reads the diff back.
 
 ### Explaining a component
 
