@@ -1,38 +1,81 @@
 import type { Project } from "./types";
 
 /* ---------------------------------------------------------------------------
-   PLACEHOLDER CONTENT — PORT-012 shipped deliberately incomplete.
+   MIXED CONTENT — read this before editing.
 
-   Every prose string below contains the word "Placeholder" and every image is a
-   generated stand-in. The SHAPE is real: field coverage, string lengths, status
-   values and tag overlap are all chosen to exercise the components that will be
-   built on top of this file. The FACTS are not real and must not ship.
+   The two academic projects carry REAL copy, written from public/resume.pdf.
+   The two OpalusPH sites are still placeholders.
 
-   Unverified and needing replacement: year, status, tags, stack, role, duration,
-   every URL, and all problem/approach/outcome prose.
+   Still unverified even on the real two — replace in PORT-057:
+     - year, status          inferred from the graduation timeline, not stated
+     - stack "TBC" entries   the resume lists no per-project stack
+     - liveUrl / repoUrl     omitted rather than invented; add if they exist
+     - every image           all eight files still read "SCREENSHOT PENDING"
 
-   PORT-057 closes this. Its gate: no occurrence of "Placeholder" survives in
-   this file, and no "SCREENSHOT PENDING" image survives in public/images/projects/.
+   No metric anywhere below was invented. Where an outcome has no measurement,
+   it says so — that is deliberate and should survive editing.
+
+   PORT-057 gate: neither "Placeholder" nor "TBC" appears in this file, and no
+   image in public/images/projects/ still reads "SCREENSHOT PENDING".
 
    Field coverage is intentional — do not "tidy" it:
-     grades-repository-system      every optional field present
-     cict-project-gate             cover + highlights, no gallery/duration/liveUrl
-     opalusph-website              role + liveUrl only
+     grades-repository-system      cover + gallery + highlights
+     cict-project-gate             cover + highlights, no gallery
+     opalusph-website              role + duration + both URLs
      construction-company-website  no optional fields at all
-   That spread is what forces every optional branch AND its fallback to be built.
+   Every optional field is present on at least one entry and absent on at least
+   one, and all three ProjectStatus values appear. That is what forces every
+   branch AND its fallback to get built in PORT-021 / 031 / 032.
 --------------------------------------------------------------------------- */
 
 export const projects = [
   {
+    slug: "cict-project-gate",
+    title: "CICT Project Gate",
+    summary:
+      "Capstone title submission with GPT-4 assistance and embedding-based duplicate detection.",
+    year: 2026,
+    status: "archived",
+    featured: true,
+    tags: ["school-project", "full-stack", "ai", "access-control"],
+    stack: ["GPT-4", "Vector embeddings", "TBC — confirm stack"],
+    thumbnail: {
+      src: "/images/projects/cict-project-gate.webp",
+      alt: "Placeholder graphic standing in for a screenshot of CICT Project Gate.",
+      width: 1600,
+      height: 1000,
+    },
+    cover: {
+      src: "/images/projects/cict-project-gate-cover.webp",
+      alt: "Placeholder graphic standing in for a wide header screenshot of CICT Project Gate.",
+      width: 2400,
+      height: 1000,
+    },
+
+    problem:
+      "Capstone and thesis titles are approved one at a time, by people reading them one at a time. Nobody holds every title already submitted in their head, so two groups can spend weeks on topics that turn out to be near-duplicates of each other — and the overlap surfaces at panel review, which is the most expensive possible moment to find it. The hard part is that duplicates are rarely worded alike; the same idea arrives phrased three different ways.",
+    approach:
+      "A submission and approval platform that compares a proposed title against everything already in the system before a human ever reviews it. Matching is done on vector embeddings with cosine similarity rather than keyword overlap, because the problem is semantic — two titles can share almost no words and still be the same project. GPT-4 sits on top as a decision support layer, suggesting and refining titles rather than deciding anything. Around that, role-based access separates the three groups: students submit, faculty review and comment, administrators manage users and settings.",
+    outcome:
+      "Near-duplicate topics are caught at submission instead of at panel review, and reviewers see a similarity signal alongside each title rather than having to recall the archive themselves. This was an academic build, so there are no production usage figures to quote.",
+
+    highlights: [
+      "Semantic duplicate detection using vector embeddings and cosine similarity, not keyword matching.",
+      "GPT-4 integrated as a decision support system that recommends and refines titles, with approval left to people.",
+      "Three-role access model — students submit, faculty review and comment, administrators manage the system.",
+      "Similarity checking runs at submission time, ahead of human review rather than after it.",
+    ],
+  },
+  {
     slug: "grades-repository-system",
     title: "Grades Repository System",
     summary:
-      "Placeholder summary — real copy pending. Sized near the 100-character card limit.",
-    year: 2023,
+      "Centralized academic records for students, faculty and admins, with role-based access throughout.",
+    year: 2025,
     status: "archived",
     featured: true,
-    tags: ["school-project", "full-stack", "dashboard"],
-    stack: ["Framework TBC", "Database TBC", "Hosting TBC"],
+    tags: ["school-project", "full-stack", "access-control"],
+    stack: ["RESTful APIs", "TBC — confirm stack"],
     thumbnail: {
       src: "/images/projects/grades-repository-system.webp",
       alt: "Placeholder graphic standing in for a screenshot of the Grades Repository System.",
@@ -45,21 +88,19 @@ export const projects = [
       width: 2400,
       height: 1000,
     },
-    liveUrl: "https://example.com",
-    repoUrl: "https://example.com",
 
     problem:
-      "Placeholder copy — the real problem statement goes here. A finished version names who was blocked, what they were trying to accomplish, and why the way they were already doing it had stopped working. This paragraph is sized to match that, so the detail page is laid out against a realistic block of text rather than a single line.",
+      "Students, faculty and administrators all need the same grade records, but for different reasons and with very different rights over them. A student needs to read their own results across several semesters. Faculty need to assign and revise them. Administrators need to manage the whole set. Serving all three from one system makes access control the central design problem rather than a feature added at the end — get it wrong once and a student sees somebody else's transcript.",
     approach:
-      "Placeholder copy — the real approach goes here. A finished version describes what was actually built and picks out one decision worth defending, including the option that was rejected and the reason. Two to four sentences is the target length.",
+      "A single records system with role-based access deciding what each group can read and change, enforced in one place instead of re-checked screen by screen. Faculty were given workflows for assigning, updating and managing grades; students were given read access scoped to their own results across multiple semesters. The data layer got the most attention: RESTful APIs over queries written to hold up as the number of records grows, since a grades table only ever gets longer.",
     outcome:
-      "Placeholder copy — the real outcome goes here. A finished version says what measurably changed, with a number where an honest one exists and a plain description where it does not. Inventing a metric here is worse than admitting there is not one.",
+      "The three groups work from one record set instead of coordinating across separate ones, and every permission decision lives in a single layer that can be reasoned about on its own. As an academic project it was never run at institutional scale, so there are no performance numbers from real load.",
 
     highlights: [
-      "Placeholder highlight one — real bullet pending.",
-      "Placeholder highlight two, deliberately longer so the list is tested against a bullet that wraps onto a second line.",
-      "Placeholder highlight three — real bullet pending.",
-      "Placeholder highlight four — real bullet pending.",
+      "One records system serving students, faculty and administrators from a single source.",
+      "Grades readable across multiple semesters, scoped per student by role-based access control.",
+      "Faculty workflows for assigning, updating and managing grades.",
+      "RESTful APIs over queries optimized for growth rather than for the size of the test data.",
     ],
     gallery: [
       {
@@ -75,45 +116,6 @@ export const projects = [
         height: 1000,
       },
     ],
-    role: "Placeholder role — pending",
-    duration: "Placeholder duration",
-  },
-  {
-    slug: "cict-project-gate",
-    title: "CICT Project Gate",
-    summary: "Placeholder summary — real copy pending.",
-    year: 2024,
-    status: "in-progress",
-    featured: true,
-    tags: ["school-project", "full-stack"],
-    stack: ["Framework TBC", "Database TBC"],
-    thumbnail: {
-      src: "/images/projects/cict-project-gate.webp",
-      alt: "Placeholder graphic standing in for a screenshot of CICT Project Gate.",
-      width: 1600,
-      height: 1000,
-    },
-    cover: {
-      src: "/images/projects/cict-project-gate-cover.webp",
-      alt: "Placeholder graphic standing in for a wide header screenshot of CICT Project Gate.",
-      width: 2400,
-      height: 1000,
-    },
-    repoUrl: "https://example.com",
-
-    problem:
-      "Placeholder copy — the real problem statement goes here. This entry deliberately carries no gallery, no duration and no live URL, so that the components built on top of it are forced to handle those fields being absent.",
-    approach:
-      "Placeholder copy — the real approach goes here. Keep the finished version concrete: what was built, and the one decision that took actual thought.",
-    outcome:
-      "Placeholder copy — the real outcome goes here. Say what changed for the people who use it.",
-
-    highlights: [
-      "Placeholder highlight one — real bullet pending.",
-      "Placeholder highlight two — real bullet pending.",
-      "Placeholder highlight three — real bullet pending.",
-    ],
-    role: "Placeholder role — pending",
   },
   {
     slug: "opalusph-website",
@@ -124,7 +126,7 @@ export const projects = [
     status: "live",
     featured: true,
     tags: ["internship", "marketing-site"],
-    stack: ["Framework TBC", "Hosting TBC"],
+    stack: ["TBC — confirm stack"],
     thumbnail: {
       src: "/images/projects/opalusph-website.webp",
       alt: "Placeholder graphic standing in for a screenshot of the OpalusPH company website.",
@@ -132,6 +134,7 @@ export const projects = [
       height: 1000,
     },
     liveUrl: "https://example.com",
+    repoUrl: "https://example.com",
 
     problem:
       "Placeholder copy — the real problem statement goes here. This entry has no cover image, so the detail page must fall back to the thumbnail exactly as the type comment promises.",
@@ -141,6 +144,7 @@ export const projects = [
       "Placeholder copy — the real outcome goes here. Numbers if honest ones exist; plain description if not.",
 
     role: "Placeholder role — pending",
+    duration: "Placeholder duration",
   },
   {
     slug: "construction-company-website",
@@ -148,10 +152,10 @@ export const projects = [
     summary:
       "Placeholder summary — real copy pending, sized mid-range for the card grid.",
     year: 2025,
-    status: "live",
+    status: "in-progress",
     featured: false,
     tags: ["internship", "marketing-site", "cms"],
-    stack: ["Framework TBC"],
+    stack: ["TBC — confirm stack"],
     thumbnail: {
       src: "/images/projects/construction-company-website.webp",
       alt: "Placeholder graphic standing in for a screenshot of the construction company website.",

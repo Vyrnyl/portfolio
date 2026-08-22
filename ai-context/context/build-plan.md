@@ -682,7 +682,7 @@ Added 2026-08-22. PORT-012 shipped with **placeholder copy and placeholder image
 **The shape is already correct**, so this is a fill-in job, not a rewrite: field coverage, string lengths and status spread were chosen in PORT-012 to exercise every branch. Keep that spread when replacing the values — if the real projects happen not to exercise some optional field, leave one entry that does, or the fallback branch stops being tested.
 
 **Acceptance criteria**
-- [ ] `Select-String -Pattern "Placeholder" src/content/projects.ts` returns **nothing**
+- [ ] `Select-String -Pattern "Placeholder|TBC" src/content/` returns **nothing**
 - [ ] Every `.webp` in `public/images/projects/` is a real capture — zero placeholders remain
 - [ ] `year`, `status`, `tags`, `stack`, `role`, `duration` replaced with verified values
 - [ ] Every `liveUrl`/`repoUrl` is a real URL that resolves — no `https://example.com` survives
