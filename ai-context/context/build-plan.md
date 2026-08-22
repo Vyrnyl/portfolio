@@ -69,7 +69,7 @@ Six sprints. A "sprint" here is a coherent chunk of work, not a fixed calendar b
 | **4** | Contact wiring | PORT-040 → 044 | ~7h | A real message lands in your inbox |
 | **5** | Production | PORT-050 → 056 | ~11h | Deployed to a custom domain, targets met, CI green |
 
-**Total: ~56h of focused work**, 37 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
+**Total: ~57h of focused work**, 38 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
 
 ### Build order rationale
 
@@ -671,6 +671,32 @@ Resend integration plus `lib/env.ts`.
 - [ ] 404 and error pages verified live
 - [ ] Content proofread — typos on a portfolio cost more than they do anywhere else
 - [ ] [progress.md](progress.md) marked complete; [ui-registry.md](ui-registry.md) fully populated
+
+---
+
+### PORT-057 · Replace placeholder project content `M`
+**Depends on:** 012
+
+Added 2026-08-22. PORT-012 shipped with **placeholder copy and placeholder images**, because the projects to be featured were still being built and the details were not to hand. This ticket pays that back. It is not optional polish — a portfolio whose cards all read "Placeholder summary" is worse than one showing two projects done properly.
+
+**The shape is already correct**, so this is a fill-in job, not a rewrite: field coverage, string lengths and status spread were chosen in PORT-012 to exercise every branch. Keep that spread when replacing the values — if the real projects happen not to exercise some optional field, leave one entry that does, or the fallback branch stops being tested.
+
+**Acceptance criteria**
+- [ ] `Select-String -Pattern "Placeholder" src/content/projects.ts` returns **nothing**
+- [ ] Every `.webp` in `public/images/projects/` is a real capture — zero placeholders remain
+- [ ] `year`, `status`, `tags`, `stack`, `role`, `duration` replaced with verified values
+- [ ] Every `liveUrl`/`repoUrl` is a real URL that resolves — no `https://example.com` survives
+- [ ] `problem`/`approach`/`outcome` are real prose with no invented metrics
+- [ ] Each `width`/`height` in `src/content/projects.ts` matches the new file's real intrinsic size
+- [ ] Each file is WebP and ≤ 200KB
+- [ ] Every `alt` still describes what the *new* image actually shows — the placeholder alt text will not survive the swap
+- [ ] Cards and detail pages checked at all four breakpoints; the new aspect ratios do not break the grid
+
+**Watch for:** the placeholders are 16:10. Captures at a different ratio will be cropped by `object-cover`, which is fine for a card but can decapitate a screenshot's header bar. Check, do not assume.
+
+**Blocks:** PORT-056.
+
+---
 
 **Sprint 5 exit:** live on a custom domain, all targets from [project-overview.md](project-overview.md) §5 measured and met.
 

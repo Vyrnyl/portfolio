@@ -4,7 +4,7 @@
 > Update at the end of every session and whenever a ticket changes status.
 > The plan lives in [build-plan.md](build-plan.md); this file is the record.
 
-**Last updated:** 2026-08-22 · **Current sprint:** 1 — Content layer · **In progress:** none · **Next ticket:** PORT-012 (⚠️ screenshots prerequisite unmet)
+**Last updated:** 2026-08-22 · **Current sprint:** 1 — Content layer · **In progress:** PORT-012 · **Next ticket:** PORT-013
 
 **Live (preview):** <https://vernel-portfolio.vercel.app> — auto-deploys on every push to `main`. Not the production domain; PORT-055 replaces it. This is the value PORT-011 needs for `site.url`.
 
@@ -12,19 +12,19 @@
 
 ## At a glance
 
-**9 / 37 tickets complete · 24%** — one cell per ticket.
+**9 / 38 tickets complete · 24%** — one cell per ticket.
 
-`█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+`█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
 
 | Sprint | Progress | ✔ Done | ▶ | ⚠ | ☐ Left |
 |---|---|---|---|---|---|
 | **0 — Foundation** ✔ complete | `███████` | 7 / 7 | 0 | 0 | 0 |
-| 1 — Content layer ◄ current | `██░░░` | 2 / 5 | 0 | 0 | 3 |
+| 1 — Content layer ◄ current | `██▶░░` | 2 / 5 | 1 | 0 | 2 |
 | 2 — UI primitives | `░░░░░░` | 0 / 6 | 0 | 0 | 6 |
 | 3 — Pages | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
 | 4 — Contact wiring | `░░░░░` | 0 / 5 | 0 | 0 | 5 |
-| 5 — Production | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
-| **Total** | | **9 / 37** | **0** | **0** | **28** |
+| 5 — Production | `░░░░░░░░` | 0 / 8 | 0 | 0 | 8 |
+| **Total** | | **9 / 38** | **1** | **0** | **28** |
 
 ---
 
@@ -52,7 +52,7 @@
 |---|---|---|---|---|
 | PORT-010 | Content types | S | ✔ | All 12 types present and name-identical to content-model §2. Probe-verified, not just compiled: 7 malformed shapes rejected, empty `alt` correctly *not* rejected (a by-eye rule). `tags` and `Practice.icon` stay `string` by decision — see decisions log. No browser check exists for this ticket; nothing renders. |
 | PORT-011 | Site config + nav swap | S | ✔ | `site.ts` built, both hardcoded arrays deleted, LinkedIn added. 144 browser assertions green at 4 breakpoints × 2 themes. The "adding a nav item needs no other edit" AC was mutation-tested by Vernel — a seventh item appeared in the header row *and* the mobile sheet, then was removed. Footer splits `aria-label` from visible text; see decisions. |
-| PORT-012 | Project content | L | ☐ | Writing-heavy. Real copy, no placeholders. |
+| PORT-012 | Project content | L | ▶ | **Shipped deliberately incomplete by decision 2026-08-22** — four entries with real *shape* and placeholder *facts*. Typecheck green against the real `types.ts`; 20/20 content-model §5 integrity checks green (slugs, featured count, alt text, paths exist, declared dims match real files, ≤200KB, tag casing). Field coverage is engineered so every optional field is present on ≥1 project and absent on ≥1, and all three `ProjectStatus` values appear. **Cannot close ✔** — the AC "no lorem ipsum, no TODO" is knowingly unmet. Closes only when PORT-057 lands. |
 | PORT-013 | Experience, education, skills | M | ☐ | |
 | PORT-015 | Content accessors | S | ☐ | |
 
@@ -100,6 +100,7 @@
 | PORT-054 | CI pipeline | S | ☐ | Can be done any time after PORT-002. |
 | PORT-055 | Deploy | M | ☐ | Vercel account and auto-deploy already live (see Prerequisites). What is left is the **custom domain** and the production cutover — `*.vercel.app` cannot be made clean, the name is always built from project + scope. |
 | PORT-056 | Launch checklist | S | ☐ | |
+| PORT-057 | Replace placeholder project content | M | ☐ | **Added 2026-08-22, widened same day.** Covers **both** the eight generated images in `public/images/projects/` **and** every placeholder string in `src/content/projects.ts` — year, status, tags, stack, role, duration, all URLs (`https://example.com` throughout) and all `problem`/`approach`/`outcome` prose. Two-line gate: `Select-String -Pattern "Placeholder" src/content/projects.ts` returns nothing, and no image in that folder still reads "SCREENSHOT PENDING". **Blocks PORT-056** — the launch checklist cannot pass over this. |
 
 ---
 
@@ -124,7 +125,7 @@ External things needed before certain tickets can start. Sort these out early �
 | Item | Needed for | Status |
 |---|---|---|
 | Design finalized (prototype approved) | PORT-003 | ✔ |
-| Project screenshots collected — Grades Repository, Project Gate, 2× OpalusPH sites | PORT-012 | ☐ |
+| Project screenshots collected — Grades Repository, Project Gate, 2× OpalusPH sites | PORT-012 → **PORT-057** | ☐ — **deferred by decision 2026-08-22.** Four generated placeholders stand in at `public/images/projects/*.webp` (1600×1000, real files, real intrinsic dimensions). Vernel is still building the projects he wants to show. Swapping in real captures is a per-project 3-line edit; PORT-057 is the ticket that must not close with a placeholder still present. |
 | Resume PDF updated — **add the OpalusPH internship, name the Grades Repository System** | PORT-034 | ☐ |
 | Profile photo | PORT-033 | ☐ |
 | Resend account + verified sending domain | PORT-042 | ☐ |
@@ -172,12 +173,16 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 | 2026-08-21 | **Claude runs the browser checks**, not Vernel | The old rule handed him a 20-step keyboard/DevTools checklist per ticket, which made closing a ticket slower than building it. Playwright drives the real dev server at all four breakpoints in both themes. He is asked only for what a script cannot settle: a real phone or touch device, whether something *looks* right against the prototype, or a major flow he wants to feel himself. CLAUDE.md and the `ticket` skill updated. |
 | 2026-08-21 | Mobile sheet and scrim **portal to `<body>`** | The header carries `backdrop-blur-md`, and an element with a backdrop-filter becomes the containing block for its `position: fixed` descendants — a `fixed inset-0` scrim rendered inside the header sizes itself to the 64px header box. Looks exactly like a z-index bug and is not one. |
 | 2026-08-21 | The mobile menu is a **disclosure**, not a modal dialog | `role="dialog"` + `aria-modal="true"` hides everything outside the sheet from assistive tech — including the burger, which is the labelled close control. The ticket specifies `aria-expanded`/`aria-controls` and a flipping label, so it was built as the disclosure it describes. **Forecloses:** a virtual cursor can still reach the page behind the scrim; the real fix is `inert` on `main`/`footer`, raised for PORT-052. |
+| 2026-08-22 | **Handover shape changed: existing files get targeted REMOVE/ADD edits**, not a full retype | Full-file-every-time meant scrolling a whole component to find the three lines that changed. New files are still delivered whole. Guardrails attached, because a fragment pasted in the wrong place is the failure mode the old rule was protecting against: **never a bare line number** (format-on-save reflows, so numbers go stale — the surrounding code is the anchor, the number is a scrolling hint), **multi-hunk edits go bottom-up** so pasting one does not shift the rest, and **fall back to the whole file** past ~4 hunks or when the change restructures the file. CLAUDE.md and the `ticket` / `add-component` skills updated. |
 | 2026-08-22 | `Header`/`Footer` import `@/content/site` **directly**, not through `lib/` | content-model §4 said `lib/content.ts` is "the only module allowed to import from `src/content/`", but architecture §5 gives the reason as keeping *sorting and "featured" logic* in one place. `site` is a config singleton with no logic to centralise, so a `getSite()` returning a constant would be precisely the "repository that returns an array literal" decision A7 rejects. §4 amended with the carve-out. ESLint is unaffected — its boundary rule only restricts `components/ui/`, and the shell lives in `components/layout/`. |
 | 2026-08-22 | Footer social `label` is the **accessible name**, visible text comes from a `PLATFORM_TEXT` map | `SocialLink.label` is documented as a screen-reader label ("GitHub profile"), and PORT-005 was rendering it as visible text. Splitting them means the visible word stays short while the accessible name stays descriptive. Typed `Record<SocialLink["platform"], string>` so adding a platform to the union fails the build rather than rendering `undefined`. **Constraint this creates:** WCAG 2.5.3 Label in Name — the accessible name must *contain* the visible text, or voice control ("click GitHub") stops matching. Asserted in the browser checks for all three socials. |
 | 2026-08-22 | LinkedIn URL stored without its share-sheet tracking parameters | The URL arrived as `…?utm_source=share_via&utm_content=profile&utm_medium=member_ios` from the iOS share sheet. Those would have been baked into the footer, the JSON-LD and every OG card permanently. Canonical profile URL only. |
 | 2026-08-22 | **Plain `satisfies`, not `as const satisfies`** — and content-model §1 principle 2 corrected | The doc claimed `satisfies` "keeps literal types, so slugs and tags stay narrow and autocomplete." Measured false. It narrows fields *declared* as unions (`status` infers `"live"`, not `ProjectStatus`) but `slug` and `tags` are declared `string`, so they widen to `string` — `(typeof projects)[number]["slug"]` is `string` and `getProjectsByTag("raect")` compiles. `as const satisfies` does deliver the narrowness (measured: `"a-b" \| "c-d"`, `"nextjs" \| "react"`) but propagates `readonly`, and then content-model §4's own `getAllProjects(): Project[] { return [...projects] }` fails — `readonly ["Next.js"]` is not assignable to `string[]`, and the spread copy does not help because the element types are readonly. Buying it means `readonly` through every array field and every accessor signature, for a six-page site. **Forecloses:** no tag autocomplete, no compile-checked slug union for PORT-032's `generateStaticParams`; duplicate slugs and `react`/`React` casing stay content-model §5 by-eye checks at content freeze. |
 | 2026-08-22 | `Practice.icon` stays `string`, narrowed in PORT-024 | The AC bars "loose `string` where a union is correct", and a typo'd lucide name renders nothing silently — so a union *is* correct here. But the right union is `keyof typeof ICONS`, and that map is PORT-024's deliverable. A hand-typed union now means maintaining the same list in two places for four tickets. JSDoc'd with the ticket that closes it. |
 | 2026-08-22 | `tags: string[]`, not a union of known tags | A union would compile-enforce the "reuse tags before inventing one" integrity rule — the strongest case in the file for narrowing. Rejected because it breaks content-model §6: adding a project would become two edits (append the object, extend the union), and §6 staying four steps is the point of the whole content architecture. |
+| 2026-08-22 | **Project images are generated placeholders** (superseded same day — the copy went placeholder too, see the row below) | Vernel is still building the projects he wants to feature and has deployed work whose details he has not handed over yet. Waiting stalls the whole build behind an unbounded wait, so PORT-012 ships with stand-in pixels. *(Superseded hours later: the prose became placeholder as well — the prototype holding the two written case studies turned out not to be in the repo and the details were not to hand.)* Deliberately **not** done as invented paths or invented dimensions: four real 1600×1000 WebPs sit at `public/images/projects/`, so `width`/`height` are honest, `next/image` reserves the correct box, no layout shift is introduced, and content-model §5's "every referenced path exists under `public/`" holds. Each placeholder names its own project, so a grid of them reads as pending rather than broken. **Forecloses:** the site cannot be called visually finished until PORT-057 swaps them; the aspect ratio is fixed at **16:10** by these files, so real captures should be taken at that ratio or accept `object-cover` cropping. Added **PORT-057** to guarantee the swap is a tracked ticket rather than a memory, not folded into an existing one where it would be invisible. |
+| 2026-08-22 | **PORT-012 ships placeholder facts as well as placeholder images**, at Vernel's direction | He does not have the project details to hand, is still building work he wants to feature, and chose to unblock the build rather than stall Sprints 2–3 behind an unbounded wait. Concern was raised once, restated, and overruled — recorded here rather than re-argued. **The form the placeholder takes was the part worth getting right:** invented-but-plausible case studies were rejected outright, because for building pages only string *length* and *field coverage* matter, while plausible prose is exactly the kind that survives unnoticed into production and puts false claims about real work in front of employers. So every prose string literally contains the word "Placeholder", every URL is IANA-reserved `https://example.com`, and the file opens with a banner naming every unverified field. The *shape* is engineered, not arbitrary: each optional field is present on at least one project and absent on at least one, and all three `ProjectStatus` values appear, so PORT-021/031/032 are forced to build both the branch and its fallback. **Forecloses:** PORT-012 cannot be marked ✔ — its "no lorem ipsum" criterion is knowingly unmet — and PORT-057 now gates PORT-056. | 
+| 2026-08-22 | Thumbnail aspect ratio set at **16:10** (1600×1000) | `ProjectCard` is `designed` but not built (PORT-021) and the registry records no thumbnail ratio — the prototype is not in the repo, so there was nothing to read it from. 16:10 is the honest default for browser-window captures and gives the card a stable box now. **Judgment call, not a settled value:** if the prototype's card is 16:9 or 3:2, say so and the placeholders regenerate in one command. |
 | 2026-08-19 | next/font variables (`--font-inter`, `--font-jetbrains`) named separately from the theme tokens (`--font-sans`, `--font-mono`) | implementation-guide.md had them sharing a name, which makes `--font-sans: var(--font-sans)` — self-referential, resolves to nothing, and falls back to the system font with no error. Guide corrected. |
 
 ---

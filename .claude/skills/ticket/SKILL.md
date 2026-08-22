@@ -2,7 +2,7 @@
 
 Work one ticket from [build-plan.md](../../../ai-context/context/build-plan.md).
 
-> **You author every file. He places every one of them.** (CLAUDE.md → How this project is worked on.) Nothing you write in this skill goes to disk under `src/` — components, `lib/`, content and the `src/app/` wiring alike are handed over as complete paste-ready files. The `ai-context/` docs are the exception: those are the record, and you write them yourself.
+> **You author every file. He places every one of them.** (CLAUDE.md → How this project is worked on.) Nothing you write in this skill goes to disk under `src/` — components, `lib/`, content and the `src/app/` wiring alike are handed over for him to place — a new file whole, an existing file as a targeted REMOVE/ADD edit. The `ai-context/` docs are the exception: those are the record, and you write them yourself.
 
 ## 1. Orient
 
@@ -38,7 +38,9 @@ New-Item -ItemType File src/components/ui/button.tsx; code src/components/ui/but
 
 Prefix `New-Item -ItemType Directory -Force <dir>` when the folder is new. No `-Force` on the file — it must refuse to overwrite. For an existing file, `code <path>` alone. Never redirect content into a file with `>` / `Out-File` / bare `Set-Content`: PowerShell writes UTF-16 + BOM and it will not parse. One command for a batch, then the blocks in dependency order.
 
-**Complete** means complete. No `// ...rest unchanged`, no `{/* fill this in */}`, no diffs. He copies the block whole.
+**A new file is delivered whole** — no `// ...rest unchanged`, no `{/* fill this in */}`, no holes.
+
+**An existing file is edited in place.** Give the path, a line-number hint, the exact block to REMOVE and the exact block to ADD. Never a bare line number — format-on-save reflows the file, so show enough surrounding code to anchor the edit without it. Multi-hunk edits go **bottom-up**, so pasting one does not shift the line numbers of the rest. Fall back to the whole file when the change touches most of it, restructures it, or exceeds roughly four hunks — and say why.
 
 **What it does** describes the piece's role, not its stylesheet:
 

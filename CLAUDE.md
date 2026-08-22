@@ -33,8 +33,34 @@ Every handover is the same four parts, in this order:
    When a step creates several files at once, give one command that creates them all, then the blocks in dependency order.
 
 2. **The path**, named in the prose so he knows which file he is looking at.
-3. **The complete file** in one fenced block. Not a fragment, not a diff, not `// ...rest unchanged`. He copies the block whole and saves it.
+3. **The code.** Two cases — see below.
 4. **What it does** — see below.
+
+### Full file or targeted edit
+
+**A new file is always delivered whole.** No skeleton, no holes, no `// ...rest unchanged`.
+
+**An existing file is edited in place, not retyped.** Give the path, a line-number hint, the exact block to remove, and the exact block that replaces it — not the whole file. He is editing, not repasting.
+
+```
+src/components/layout/footer.tsx — around line 12
+
+REMOVE
+  const SOCIALS = [
+    { href: "https://github.com/Vyrnyl", label: "GitHub" },
+  ];
+
+ADD
+  const PLATFORM_TEXT: Record<SocialLink["platform"], string> = {
+    github: "GitHub",
+  };
+```
+
+Three rules that keep this from going wrong:
+
+- **Never a bare line number.** Format-on-save reflows the file, so the number can be stale by the time he pastes. Always show enough surrounding code that the target is unambiguous without it — the number is a hint for scrolling, the code is the anchor.
+- **Multi-hunk edits go bottom-up.** Deliver the change nearest the end of the file first, so pasting it does not shift the line numbers of the ones still to come.
+- **Fall back to the whole file** when the change touches most of it, restructures it, or runs past roughly four separate hunks. At that point a full replacement is fewer operations and fewer chances to paste into the wrong place — say so and hand over the file.
 
 ### Explaining a component
 

@@ -7,7 +7,7 @@ description: Guide building a new UI component for the portfolio without duplica
 
 Enforces the discipline that keeps a component set coherent: **check first, tokens only, register after.**
 
-> **You author it; he places it.** Brief the decisions first — registry hit or miss, which layer it belongs in, which tokens it uses — then hand the component over as a complete paste-ready file: its path, the whole file in one block, and an explanation of what it *does* (role, props and what each is for, where it belongs, what breaks if wired wrong). Do not narrate class names — that detail belongs in ui-rules.md and ui-registry.md, which you update yourself. Never write the file to disk, and never place it in a page.
+> **You author it; he places it.** Brief the decisions first — registry hit or miss, which layer it belongs in, which tokens it uses — then hand the component over: its path, the whole file in one block (a new component is always delivered whole; an existing one is amended with a targeted REMOVE/ADD edit), and an explanation of what it *does* (role, props and what each is for, where it belongs, what breaks if wired wrong). Do not narrate class names — that detail belongs in ui-rules.md and ui-registry.md, which you update yourself. Never write the file to disk, and never place it in a page.
 
 ## 1. Check the registry — always first
 
