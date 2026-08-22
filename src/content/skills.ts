@@ -10,7 +10,11 @@ import type { SkillGroup } from "./types";
      confident  used to ship something end to end at least twice. RBAC is here
                 because it was built three separate times (the freelance app,
                 Grades Repository and Project Gate), not once.
-     working    real features built, but on a narrower base of evidence.
+      working    real features built, but on a narrower base of evidence.
+
+   TypeScript was moved confident <- working on 2026-08-22 at Vernel's call.
+   The evidence pointed the other way (every project he describes was built in
+   JavaScript), but depth in his own tools is his to judge, not mine.
      learning   in active use on THIS build and not yet claimed as known.
 
    Order is confident -> working -> learning and must stay that way: the /skills
@@ -28,6 +32,7 @@ export const skillGroups = [
     blurb:
       "Shipped working software with these more than once. I can start in them without looking up the basics.",
     items: [
+      "TypeScript",
       "JavaScript",
       "React.js",
       "Node.js",
@@ -44,14 +49,7 @@ export const skillGroups = [
     label: "Working knowledge",
     blurb:
       "Built real features with these and can be productive, but I still reach for the documentation on the harder parts.",
-    items: [
-      "TypeScript",
-      "Next.js",
-      "Tailwind CSS",
-      "Prisma",
-      "SQL",
-      "JWT authentication",
-    ],
+    items: ["Next.js", "Tailwind CSS", "Prisma", "SQL", "JWT authentication"],
   },
   {
     tier: "learning",

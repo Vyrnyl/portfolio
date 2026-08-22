@@ -1,22 +1,41 @@
 import type { Education, Job } from "./types";
 
 /* ---------------------------------------------------------------------------
-   Source: public/resume.pdf, extracted 2026-08-22. Bullets are rewritten
-   outcome-first per PORT-013's criterion; no claim was added that the resume
-   does not already make.
+   Source: public/resume.pdf, extracted 2026-08-22, plus the OpalusPH facts
+   Vernel supplied the same day. Bullets are rewritten outcome-first per
+   PORT-013's criterion; no claim was added that the resume does not make.
 
-   Two values are INFERRED, not read — replace them in PORT-034:
-     - education.start ("2022-08") — the resume gives only the graduation date.
-       A four-year BSIT starting in the August intake is the assumption.
-     - jobs[0].location — the resume lists this only in the page header.
+   Listed newest first. Sorting belongs to the accessors in PORT-015, not here.
 
-   KNOWN GAP: the OpalusPH internship is not here, because it is not on the
-   resume and no dates exist for it. Employment dates are the one thing not
-   being placeheld — a wrong one is caught in a background check. Four facts
-   add it: company name, role title, start "YYYY-MM", end "YYYY-MM".
+   INFERRED, not stated — confirm in PORT-034:
+     - jobs[0].start/end year ("2026")  Vernel gave "Feb" and "May" without a
+       year. Feb-May immediately preceding a June 2026 graduation is the
+       standard final-year OJT window, so 2026 is the reading. ONE WORD TO FIX
+       if wrong, and the only inferred employment date in this file.
+     - jobs[0].role   given as "frontend dev". If it was formally an internship
+       the title should read "Frontend Developer Intern".
+     - jobs[0].location   not supplied; "Philippines" is the safe floor.
+     - jobs[1].location   the resume lists this only in the page header.
+     - education.start ("2022-08")  the resume gives only the graduation date.
+
+   PLACEHOLDER: jobs[0].bullets. The dates are real, the achievements are not
+   written yet. Caught by the PORT-057 gate along with everything else marked
+   "Placeholder" or "TBC" under src/content/.
 --------------------------------------------------------------------------- */
 
 export const jobs = [
+  {
+    company: "OpalusPH",
+    role: "Frontend Developer",
+    start: "2026-02",
+    end: "2026-05",
+    location: "Philippines",
+    bullets: [
+      "Placeholder — real bullet pending. This role produced the two OpalusPH sites listed under projects; what was actually achieved still needs writing.",
+      "Placeholder — real bullet pending. Lead with the outcome, not the task.",
+      "Placeholder — real bullet pending.",
+    ],
+  },
   {
     company: "Freelance",
     role: "Web Developer",
