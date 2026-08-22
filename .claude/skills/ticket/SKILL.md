@@ -2,7 +2,7 @@
 
 Work one ticket from [build-plan.md](../../../ai-context/context/build-plan.md).
 
-> **You author every file. He places every one of them.** (CLAUDE.md → How this project is worked on.) Nothing you write in this skill goes to disk under `src/` — components, `lib/`, content and the `src/app/` wiring alike are handed over as complete paste-ready files. The `ai-context/` docs are the exception: those are the record, and you write them yourself.
+> **You author every file. He places every one of them.** (CLAUDE.md → How this project is worked on.) Nothing you write in this skill goes to disk under `src/` — components, `lib/`, content and the `src/app/` wiring alike are handed over for him to place, always as the complete file, new or existing. The `ai-context/` docs are the exception: those are the record, and you write them yourself.
 
 ## 1. Orient
 
@@ -38,7 +38,9 @@ New-Item -ItemType File src/components/ui/button.tsx; code src/components/ui/but
 
 Prefix `New-Item -ItemType Directory -Force <dir>` when the folder is new. No `-Force` on the file — it must refuse to overwrite. For an existing file, `code <path>` alone. Never redirect content into a file with `>` / `Out-File` / bare `Set-Content`: PowerShell writes UTF-16 + BOM and it will not parse. One command for a batch, then the blocks in dependency order.
 
-**Complete** means complete. No `// ...rest unchanged`, no `{/* fill this in */}`, no diffs. He copies the block whole.
+**A new file is delivered whole** — no `// ...rest unchanged`, no `{/* fill this in */}`, no holes.
+
+**An existing file is delivered whole too, not as a fragment.** Give the path and the complete new contents — no REMOVE/ADD blocks, no line-number targets, no `// ...rest unchanged`. A fragment has to be located before it can be applied, and that is the step that goes wrong: format-on-save moves line numbers, a near-duplicate block accepts the paste silently, and a half-applied multi-hunk edit leaves a file neither of you has seen. Select-all-and-paste has one failure mode and it is visible. Say in the prose what changed and why, so he knows what to look for in `git diff`.
 
 **What it does** describes the piece's role, not its stylesheet:
 

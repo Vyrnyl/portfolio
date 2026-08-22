@@ -168,12 +168,50 @@ export interface Practice {
 
 ## 4. Accessors — `src/lib/content.ts`
 
-The only module allowed to import from `src/content/`. Pages import from here.
+**Built 2026-08-22 (PORT-015). This section now describes the real file** — read `src/lib/content.ts` for the authoritative version; what follows is the contract and the reasoning.
+
+The only module allowed to import **queryable** content — `projects`, `jobs`, `education`, `skillGroups` — from `src/content/`. Pages import those from here, so sorting, filtering and "featured" selection live in one place.
+
+**`site` is the exception, and imports directly.** It is a config singleton with nothing to query; wrapping it in a `getSite()` that returns a constant would be the "repository that returns an array literal" [architecture.md](architecture.md) §2 A7 rejects. `Header` and `Footer` import `@/content/site` (PORT-011). The ESLint boundary rule is unaffected either way — it restricts `components/ui/` only, and domain-aware components belong in `components/layout/` or `components/sections/`.
+
+### The nine exports
+
+| Function | Returns | Notes |
+|---|---|---|
+| `getAllProjects()` | `Project[]` | Newest first. The canonical order everywhere projects are listed. |
+| `getFeaturedProjects(limit = 3)` | `Project[]` | Featured only, newest first, hard-capped. |
+| `getProjectBySlug(slug)` | `Project \| undefined` | Never throws. The route calls `notFound()`. |
+| `getProjectSlugs()` | `string[]` | For `generateStaticParams`. Unsorted. |
+| `getAllTags()` | `string[]` | Unique, alphabetical. Drives the filter. |
+| `getProjectsByTag(tag)` | `Project[]` | Case-sensitive, exact. Unknown tag → `[]`. |
+| `getJobs()` | `Job[]` | Current role first, then newest start first. |
+| `getEducation()` | `Education[]` | Newest start first. |
+| `getSkillGroups()` | `SkillGroup[]` | Depth order: confident → working → learning. |
+
+`TIER_ORDER`, the rank map behind `getSkillGroups()`, is module-private and deliberately not exported.
+
+### Four rules the file holds
+
+**1. Every sort copies first.** `[...projects].sort(...)` — `sort` mutates, and the imported array is module-level shared state. Sorting it in place would reorder it for every other caller, and on a warm server instance, for the next request that instance handles. This is the single most important line of reasoning in the file; it is verified by asserting the source arrays are unchanged after the accessors run.
+
+**2. Dates are compared as `"YYYY-MM"` strings, never `Date` objects.** Lexicographic order is chronological order for that format, which is why §5 requires the zero-padded month — `"2026-2"` sorts *after* `"2026-11"`. Comparisons use `<` / `>`, not `localeCompare`, so the result cannot vary with the runtime locale between your machine, CI and Vercel. The same reasoning applies to `getAllTags()`, which uses the default comparator.
+
+**3. Nothing throws.** Every accessor returns a value, `undefined`, or an empty array. Turning a miss into a 404 is the route's job; rendering an empty list is the page's. A content module has no opinion about HTTP.
+
+**4. Ties are broken by source order.** `getAllProjects()` sorts on `year` only, and `sort` is stable, so projects sharing a year keep the order `projects.ts` lists them in. Reordering two same-year projects is therefore a content edit, not a code change.
+
+### Two branches the current content cannot exercise
+
+Both are written and both were verified with synthetic input, because the day the content changes is not the day anyone remembers to add them:
+
+- **`getJobs()` puts `end: null` first** regardless of start date. §5 permits at most one current role and today there are zero, so nothing in the real data reaches this branch.
+- **`getSkillGroups()` re-sorts by tier** even though `skills.ts` is already written in order. §5's ordering rule is by-eye; this is the guarantee.
 
 ```ts
+import { education, jobs } from "@/content/experience";
 import { projects } from "@/content/projects";
-import { jobs, education } from "@/content/experience";
-import type { Project } from "@/content/types";
+import { skillGroups } from "@/content/skills";
+import type { Education, Job, Project, SkillGroup, SkillTier } from "@/content/types";
 
 /** Newest first. The canonical order everywhere projects are listed. */
 export function getAllProjects(): Project[] {
@@ -181,33 +219,58 @@ export function getAllProjects(): Project[] {
 }
 
 export function getFeaturedProjects(limit = 3): Project[] {
-  return getAllProjects().filter((p) => p.featured).slice(0, limit);
+  return getAllProjects()
+    .filter((project) => project.featured)
+    .slice(0, limit);
 }
 
 export function getProjectBySlug(slug: string): Project | undefined {
-  return projects.find((p) => p.slug === slug);
+  return projects.find((project) => project.slug === slug);
 }
 
 export function getProjectSlugs(): string[] {
-  return projects.map((p) => p.slug);
+  return projects.map((project) => project.slug);
 }
 
 /** Unique tags, alphabetical. Drives the filter control. */
 export function getAllTags(): string[] {
-  return [...new Set(projects.flatMap((p) => p.tags))].sort();
+  return [...new Set(projects.flatMap((project) => project.tags))].sort();
 }
 
 export function getProjectsByTag(tag: string): Project[] {
-  return getAllProjects().filter((p) => p.tags.includes(tag));
+  return getAllProjects().filter((project) => project.tags.includes(tag));
 }
 
-/** Current role first, then reverse-chronological. */
-export function getJobs() {
-  return [...jobs].sort((a, b) => (b.start > a.start ? 1 : -1));
+/** Current role first, then newest start first. */
+export function getJobs(): Job[] {
+  return [...jobs].sort((a, b) => {
+    if (a.end === null && b.end !== null) return -1;
+    if (b.end === null && a.end !== null) return 1;
+    if (a.start === b.start) return 0;
+    return a.start < b.start ? 1 : -1;
+  });
+}
+
+export function getEducation(): Education[] {
+  return [...education].sort((a, b) => {
+    if (a.start === b.start) return 0;
+    return a.start < b.start ? 1 : -1;
+  });
+}
+
+const TIER_ORDER: Record<SkillTier, number> = {
+  confident: 0,
+  working: 1,
+  learning: 2,
+};
+
+/** Depth order: confident → working → learning. */
+export function getSkillGroups(): SkillGroup[] {
+  return [...skillGroups].sort((a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier]);
 }
 ```
 
-Note `[...projects]` before `.sort()` — `sort` mutates, and the imported array is module-level shared state. Sorting it in place would reorder it for every other caller.
+> **What this section used to say, and why it changed (2026-08-22).** The original snippet had seven functions and did not compile: it imported `education` and never used it. It also contradicted its own opening sentence, which lists `skillGroups` among the content only this module may import while giving no accessor for it — so `/skills` would have had to break the rule to render. `getEducation()` and `getSkillGroups()` were added and the section rewritten to match the built file. `getJobs()`'s comparator was also replaced: `(b.start > a.start ? 1 : -1)` never returns `0`, so two jobs with the same start compared `-1` in both directions — an inconsistent comparator, which leaves the result order unspecified.
 
 ---
 
@@ -223,7 +286,7 @@ Note `[...projects]` before `.sort()` — `sort` mutates, and the imported array
 | Every referenced path exists under `public/` | A 404 image only shows up at runtime |
 | 2–3 projects have `featured: true` | The home grid is designed for three |
 | Tags reused from `getAllTags()` before inventing new ones | "react" and "React" become two filter chips |
-| Exactly one job has `end: null` | Two "current" roles reads as an error |
+| **At most one** job has `end: null` | Two "current" roles reads as an error. Zero is legitimate and must stay legitimate — between roles is a normal state, and a rule demanding a current job would force the content to claim one. Amended 2026-08-22. |
 | Exactly one `SkillGroup` per tier, in order confident → working → learning | The page renders them as three ordered tiers |
 | Dates are `"YYYY-MM"` strings | Sorting is lexicographic and silently wrong otherwise |
 | `summary` under ~100 chars | Longer strings break card grid alignment |

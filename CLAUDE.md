@@ -33,8 +33,22 @@ Every handover is the same four parts, in this order:
    When a step creates several files at once, give one command that creates them all, then the blocks in dependency order.
 
 2. **The path**, named in the prose so he knows which file he is looking at.
-3. **The complete file** in one fenced block. Not a fragment, not a diff, not `// ...rest unchanged`. He copies the block whole and saves it.
+3. **The code** — the complete file, always. See below.
 4. **What it does** — see below.
+
+### Always the whole file
+
+**Every file is delivered whole — new or existing.** No skeleton, no holes, no `// ...rest unchanged`, no REMOVE/ADD fragments. If one line changes in a 200-line component, he gets the 200-line component back.
+
+This is more to paste, deliberately. A fragment has to be *located* before it can be applied, and locating it is the step that goes wrong:
+
+- Format-on-save reflows the file, so a line number can be stale between writing the handover and pasting it.
+- A near-duplicate block further down the file accepts the paste silently, and the result still compiles.
+- A multi-hunk edit that is half-applied leaves the file in a state neither of you has seen, and the next error message describes a file you are not looking at.
+
+Replacing the whole file has one failure mode — select all, paste — and it is one he can see happen. Showing what changed is `git diff`'s job, not his to reconstruct from instructions.
+
+So: hand over `code <path>`, name the file, give the complete contents, and say in the prose what actually changed and why, so he knows what he is looking for when he reads the diff back.
 
 ### Explaining a component
 
@@ -84,13 +98,17 @@ Review it honestly against [code-standards.md](ai-context/context/code-standards
 
 ## Current state
 
-**Sprint 0 — Foundation, complete (7 / 7). Sprint 1 — Content layer underway (1 / 5).** The Next.js app is scaffolded and deployed (<https://vernel-portfolio.vercel.app>, auto-deploys on push to `main`), the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/` — the app shell is wired (`Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` around a `<main id="main">` in `src/app/layout.tsx`), all six routes exist as stubs (`/`, `/projects`, `/skills`, `/about`, `/resume`, `/contact`) alongside a designed `not-found.tsx` and a Client Component `error.tsx`, and the mobile menu is built — a burger below `lg:` opening a portaled sheet with a real focus trap. The site is navigable end to end at every breakpoint in both themes. Still **no content**, and two gaps carried deliberately: `/projects/[slug]` (PORT-032) and `global-error.tsx`, which means a root-layout failure is uncaught.
+**Sprint 0 — Foundation, complete (7 / 7). Sprint 1 — Content layer, functionally complete (4 / 5; PORT-012 stays open on placeholder copy). Sprint 2 — UI primitives is next.** The Next.js app is scaffolded and deployed (<https://vernel-portfolio.vercel.app>, auto-deploys on push to `main`), the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/` — the app shell is wired (`Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` around a `<main id="main">` in `src/app/layout.tsx`), all six routes exist as stubs (`/`, `/projects`, `/skills`, `/about`, `/resume`, `/contact`) alongside a designed `not-found.tsx` and a Client Component `error.tsx`, and the mobile menu is built — a burger below `lg:` opening a portaled sheet with a real focus trap. The site is navigable end to end at every breakpoint in both themes. Nothing renders content yet, and two gaps are carried deliberately: `/projects/[slug]` (PORT-032) and `global-error.tsx`, which means a root-layout failure is uncaught.
 
 Check [ai-context/context/progress.md](ai-context/context/progress.md) at the start of every session. It is the source of truth for what is actually built. Never assume a feature exists.
 
-The content schema now exists — `src/content/types.ts` (PORT-010), 12 types validated by `satisfies`, not Zod. Note what `satisfies` actually does: it narrows fields *declared* as unions, and widens `slug`/`tags` to `string`. Slug uniqueness and tag casing are by-eye checks, not compile errors.
+The content layer has started. `src/content/types.ts` (PORT-010) holds 12 types validated by `satisfies`, not Zod — note what `satisfies` actually does: it narrows fields *declared* as unions, and widens `slug`/`tags` to `string`, so slug uniqueness and tag casing are by-eye checks, not compile errors. `src/content/site.ts` (PORT-011) now feeds the header nav, the footer socials and the name; `Header` and `Footer` import it directly, which content-model §4 carves out explicitly.
 
-Next ticket: **PORT-011** (site config — `src/content/site.ts`, then swap the hardcoded nav out of `Header` and the hardcoded socials out of `Footer`.)
+`src/content/projects.ts` (PORT-012) and `experience.ts` + `skills.ts` (PORT-013) are placed. PORT-013 is closed; **PORT-012 stays `▶` on purpose** — the two OpalusPH sites, all four images and the per-project `year`/`status`/`stack`/URL values are still marked `Placeholder`/`TBC`, and **PORT-057** is the ticket that closes that gap. Screenshots were deferred by decision: four real 1600×1000 WebP stand-ins sit at `public/images/projects/`, so intrinsic dimensions are honest and no layout shift is introduced.
+
+`src/lib/content.ts` (PORT-015) closes the layer: **nine** accessors, not content-model §4's original seven — `getEducation()` and `getSkillGroups()` were added because §4's snippet imported `education` without using it and gave no accessor for `skillGroups` despite naming it as content only this module may import. §4 has been rewritten to match the built file. Pages import projects, jobs, education and skills from here, never from `src/content/` directly; `site` is the one carve-out.
+
+Next ticket: **PORT-020** (Button) — first of Sprint 2. It collects a waiting debt: `Button`'s classes are inlined in both `src/app/not-found.tsx` and `src/app/error.tsx`, marked `PORT-020 replaces this`. Sweep both in that ticket.
 
 ## Documentation map
 
@@ -145,6 +163,8 @@ These are the ones that have actually cost people hours:
 - **`params` and `searchParams` are Promises** in Next 15+. Await them.
 - **`useFormStatus` reads the parent form's status** — the submit button must be its own component or `pending` is always `false`.
 - **`.sort()` mutates.** Always `[...projects].sort(...)` — the imported array is shared module state.
+- **To prove an ESLint rule fires, use `--stdin`, not a temporary file.** `printf '...' | npx eslint --stdin --stdin-filename src/components/ui/__probe.tsx` lints a path that never exists on disk — no file to create, none to forget to delete, and nothing written under `src/`.
+- **No TypeScript runner is installed** (no `tsx`, `ts-node` or `esbuild`). To execute repo TS outside Next, compile it with `tsc -p` against a scratchpad config, rewrite the `@/` imports to relative, and run the JS under node.
 - **`components/ui/` must not import from `content/`.** Enforced by ESLint. Domain-aware components go in `components/sections/`.
 - **Check [ui-registry.md](ai-context/context/ui-registry.md) before building any component** — match what exists rather than inventing a near-duplicate.
 - **Every list needs a designed empty state**, and every optional content field needs a rendering branch.
