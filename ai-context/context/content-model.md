@@ -9,7 +9,8 @@ Rationale for the approach is [architecture.md](architecture.md) §2 (A3) and §
 ## 1. Principles
 
 1. **Types first.** `src/content/types.ts` is written before any content file. A content file that does not satisfy its type fails `tsc`, which fails the build.
-2. **`satisfies`, never `:`.** `satisfies Project[]` checks the shape *and* keeps literal types, so slugs and tags stay narrow and autocomplete.
+2. **`satisfies`, never `:`.** `satisfies Project[]` checks the shape while leaving the value's own inferred type in place — so a field declared as a union (`status`, `tier`, `platform`) stays narrow to the literal actually written (`"live"`, not `ProjectStatus`), which is what `:` would throw away.
+   **It does not narrow `string` fields.** `slug` and `tags` widen to `string`, because that is how they are declared. `(typeof projects)[number]["slug"]` is `string`, not a union of the real slugs, and `getProjectsByTag("raect")` compiles. Narrowing those needs `as const satisfies`, which propagates `readonly` and breaks the §4 accessors' `Project[]` returns — measured, rejected, and recorded in [progress.md](progress.md) (2026-08-22). Slug uniqueness and tag casing are therefore §5 by-eye rules, not compile errors.
 3. **Slugs are identity.** A slug is a permanent URL. Changing one breaks an inbound link — rename only with a deliberate redirect.
 4. **No logic in content files.** They export literals. Sorting, filtering, and "featured" selection live in `lib/content.ts`.
 5. **Optional means optional in the UI too.** Every `?` field needs a rendering branch. If a project has no `liveUrl`, the button must not render as a dead link.
@@ -19,7 +20,7 @@ Rationale for the approach is [architecture.md](architecture.md) §2 (A3) and §
 
 ## 2. `src/content/types.ts`
 
-The complete schema. Copy this as the first content ticket.
+The complete schema. **Built 2026-08-22 (PORT-010) — `src/content/types.ts` is now canonical.** The block below is the spec it was built from and matches it in shape; the file carries fuller JSDoc. Change the file first, then reconcile this block.
 
 ```ts
 // ---------- shared ----------

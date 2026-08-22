@@ -84,11 +84,13 @@ Review it honestly against [code-standards.md](ai-context/context/code-standards
 
 ## Current state
 
-**Sprint 0 — Foundation, complete (7 / 7). Sprint 1 — Content layer is next.** The Next.js app is scaffolded and deployed (<https://vernel-portfolio.vercel.app>, auto-deploys on push to `main`), the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/` — the app shell is wired (`Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` around a `<main id="main">` in `src/app/layout.tsx`), all six routes exist as stubs (`/`, `/projects`, `/skills`, `/about`, `/resume`, `/contact`) alongside a designed `not-found.tsx` and a Client Component `error.tsx`, and the mobile menu is built — a burger below `lg:` opening a portaled sheet with a real focus trap. The site is navigable end to end at every breakpoint in both themes. Still **no content**, and two gaps carried deliberately: `/projects/[slug]` (PORT-032) and `global-error.tsx`, which means a root-layout failure is uncaught.
+**Sprint 0 — Foundation, complete (7 / 7). Sprint 1 — Content layer underway (1 / 5).** The Next.js app is scaffolded and deployed (<https://vernel-portfolio.vercel.app>, auto-deploys on push to `main`), the design tokens are live in `src/app/globals.css` (colour, font, radius, container, gutter, type scale, section rhythm, breakpoint override), the layout primitives are built — `cn()` in `src/lib/utils.ts`, `Container` and `Section` in `components/layout/`, `Prose` in `components/ui/` — the app shell is wired (`Header`, `NavLinks`, `Footer`, `SkipLink`, `ThemeToggle` around a `<main id="main">` in `src/app/layout.tsx`), all six routes exist as stubs (`/`, `/projects`, `/skills`, `/about`, `/resume`, `/contact`) alongside a designed `not-found.tsx` and a Client Component `error.tsx`, and the mobile menu is built — a burger below `lg:` opening a portaled sheet with a real focus trap. The site is navigable end to end at every breakpoint in both themes. Still **no content**, and two gaps carried deliberately: `/projects/[slug]` (PORT-032) and `global-error.tsx`, which means a root-layout failure is uncaught.
 
 Check [ai-context/context/progress.md](ai-context/context/progress.md) at the start of every session. It is the source of truth for what is actually built. Never assume a feature exists.
 
-Next ticket: **PORT-010** (content types — `src/content/types.ts` per content-model.md, validated by `satisfies`, not Zod. ⚠️ It blocks all content and every page.)
+The content schema now exists — `src/content/types.ts` (PORT-010), 12 types validated by `satisfies`, not Zod. Note what `satisfies` actually does: it narrows fields *declared* as unions, and widens `slug`/`tags` to `string`. Slug uniqueness and tag casing are by-eye checks, not compile errors.
+
+Next ticket: **PORT-011** (site config — `src/content/site.ts`, then swap the hardcoded nav out of `Header` and the hardcoded socials out of `Footer`.)
 
 ## Documentation map
 
