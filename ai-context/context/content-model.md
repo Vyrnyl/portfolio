@@ -225,7 +225,7 @@ Note `[...projects]` before `.sort()` — `sort` mutates, and the imported array
 | Every referenced path exists under `public/` | A 404 image only shows up at runtime |
 | 2–3 projects have `featured: true` | The home grid is designed for three |
 | Tags reused from `getAllTags()` before inventing new ones | "react" and "React" become two filter chips |
-| Exactly one job has `end: null` | Two "current" roles reads as an error |
+| **At most one** job has `end: null` | Two "current" roles reads as an error. Zero is legitimate and must stay legitimate — between roles is a normal state, and a rule demanding a current job would force the content to claim one. Amended 2026-08-22. |
 | Exactly one `SkillGroup` per tier, in order confident → working → learning | The page renders them as three ordered tiers |
 | Dates are `"YYYY-MM"` strings | Sorting is lexicographic and silently wrong otherwise |
 | `summary` under ~100 chars | Longer strings break card grid alignment |

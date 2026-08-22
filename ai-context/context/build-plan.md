@@ -270,8 +270,8 @@ Write real content for 3–6 projects, with images. This is a **writing** ticket
 **Acceptance criteria**
 - [ ] `jobs`, `education`, `skillGroups` all satisfy their types
 - [ ] Bullets lead with outcomes, not responsibilities — "cut checkout latency 40%", not "was responsible for the checkout"
-- [ ] Dates are `"YYYY-MM"`; exactly one job has `end: null`
-- [ ] Skills grouped into 3–5 categories
+- [ ] Dates are `"YYYY-MM"`; **at most one** job has `end: null` (amended 2026-08-22 — zero is valid)
+- [ ] Skills grouped into 3–5 categories — in practice **exactly 3**, since PORT-037 added `SkillGroup.tier` and content-model §5 requires one group per tier, in order confident → working → learning
 
 ---
 
