@@ -1,25 +1,49 @@
 import type { Metadata } from "next";
 
 import { Section } from "@/components/layout/section";
-import { Prose } from "@/components/ui/prose";
+import { ProjectFilter } from "@/components/sections/project-filter";
+import { ProjectGrid } from "@/components/sections/project-grid";
+import { Button } from "@/components/ui/button";
+import { site } from "@/content/site";
+import { getAllProjects, getAllTags, getProjectsByTag } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Projects — Vernel Aquino",
+  title: `Projects — ${site.name}`,
   description: "Selected work, with the problem, the approach and the outcome for each.",
 };
 
-export default function ProjectsPage() {
+type ProjectsPageProps = {
+  searchParams: Promise<{ tag?: string | string[] }>;
+};
+
+export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
+  const params = await searchParams;
+  const tag = Array.isArray(params.tag) ? params.tag[0] : params.tag;
+
+  const tags = getAllTags();
+  const projects = tag ? getProjectsByTag(tag) : getAllProjects();
+
+  const emptyState = tag ? (
+    <div className="rounded-lg border border-border py-16 text-center">
+      <p className="text-muted">No projects match “{tag}”.</p>
+      <Button href="/projects" variant="outline" size="sm" className="mt-4">
+        Reset filter
+      </Button>
+    </div>
+  ) : (
+    <p className="text-muted py-16 text-center">Projects are on the way — check back soon.</p>
+  );
+
   return (
     <Section>
-      <p className="text-eyebrow text-faint mb-4 font-mono uppercase">PORT-031 · stub</p>
       <h1 className="text-h-lg text-ink">Projects</h1>
-      <Prose className="mt-6">
-        <p>
-          Every project as a card, filterable by tag with the active filter reflected in the
-          URL. PORT-031 builds the grid and the filter; PORT-032 builds the detail page behind
-          each card.
-        </p>
-      </Prose>
+      <p className="text-muted mt-4 max-w-measure">
+        Selected work, with the problem, the approach and the outcome for each.
+      </p>
+
+      <ProjectFilter tags={tags} activeTag={tag} className="mt-8 mb-8" />
+
+      <ProjectGrid projects={projects} emptyState={emptyState} />
     </Section>
   );
 }
