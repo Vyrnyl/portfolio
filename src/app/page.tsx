@@ -1,25 +1,53 @@
 import type { Metadata } from "next";
 
+import { Cta } from "@/components/sections/cta";
+import { Hero } from "@/components/sections/hero";
+import { ProjectCard } from "@/components/sections/project-card";
 import { Section } from "@/components/layout/section";
-import { Prose } from "@/components/ui/prose";
+import { site } from "@/content/site";
+import { getFeaturedProjects } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Vernel Aquino — Developer",
-  description: "Portfolio of Vernel Aquino, a developer based in the Philippines.",
+  title: `${site.name} — ${site.role}`,
+  description: site.tagline,
+  openGraph: {
+    title: `${site.name} — ${site.role}`,
+    description: site.tagline,
+    url: site.url,
+    siteName: site.name,
+    type: "website",
+  },
 };
 
 export default function HomePage() {
+  const featuredProjects = getFeaturedProjects();
+
   return (
-    <Section>
-      <p className="text-eyebrow text-faint mb-4 font-mono uppercase">PORT-030 · stub</p>
-      <h1 className="text-h-xl text-ink">Vernel Aquino</h1>
-      <Prose className="mt-6">
-        <p>
-          The hero, positioning statement, two or three featured projects and the closing call
-          to action all land here in PORT-030. This stub exists so the route is reachable and
-          the shell can be checked end to end.
-        </p>
-      </Prose>
-    </Section>
+    <>
+      <Section>
+        <Hero />
+      </Section>
+
+      <Section heading="Featured work">
+        {featuredProjects.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProjects.map((project) => (
+              <ProjectCard key={project.slug} project={project} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted">Projects are on the way — check back soon.</p>
+        )}
+      </Section>
+
+      <Section>
+        <Cta
+          heading="Have a project in mind?"
+          body="I'm open to new opportunities — reach out and let's talk about what you're building."
+          primary={{ label: "Get in touch", href: "/contact" }}
+          secondary={{ label: "See my work", href: "/projects" }}
+        />
+      </Section>
+    </>
   );
 }

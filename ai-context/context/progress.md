@@ -4,11 +4,13 @@
 > Update at the end of every session and whenever a ticket changes status.
 > The plan lives in [build-plan.md](build-plan.md); this file is the record.
 
-**Last updated:** 2026-08-24 · **Current sprint:** 3 — Pages · **In progress:** none · **Blocked:** PORT-012 (shape complete, waiting on PORT-057) · **Next ticket:** PORT-030 — Home
+**Last updated:** 2026-08-24 · **Current sprint:** 3 — Pages · **In progress:** none · **Blocked:** PORT-012 (shape complete, waiting on PORT-057) · **Next ticket:** PORT-031 — Projects index + filter
 
 **Sprint 1 is functionally complete.** Every content file is typed, compiling and reachable through `src/lib/content.ts`. It is recorded 4 / 5 rather than closed because PORT-012 cannot be marked `✔` while its copy is placeholder — that is PORT-057's job, and it does not block Sprint 2. Nothing renders content yet; that starts in Sprint 3.
 
 **Sprint 2 is complete (6 / 6).** Every `components/ui/` primitive the board named is built: `Button`, `Card`, `Badge`, `Input`, `Textarea`, `Field`, `Icon`. `/gallery` renders all of them (plus `ProjectCard`) in every variant and state real content can currently exercise, and 404s in a production build. Pages are now assembly, per build-plan §6's Sprint 2 exit line.
+
+**Sprint 3 has started (1 / 7).** `PORT-030` (Home) is the first page rendering real content — `getFeaturedProjects()`, not a hardcoded list. Two new `components/sections/` files, `Hero` and `Cta`, both scoped to exactly what the AC asked for rather than the fuller prototype-derived set `ui-registry.md` §4 names for `/` (`StatusPill`, `StatRow`, `StackStrip` are still `designed`, not built — the approved prototype these would come from is not currently in the repo, confirmed absent while checking `ui-rules.md`'s own "once found" caveats on the shadow tokens). See the decisions log for the full reasoning.
 
 **Live (preview):** <https://vernel-portfolio.vercel.app> — auto-deploys on every push to `main`. Not the production domain; PORT-055 replaces it. This is the value PORT-011 needs for `site.url`.
 
@@ -16,19 +18,19 @@
 
 ## At a glance
 
-**17 / 38 tickets complete · 45%** — one cell per ticket.
+**18 / 38 tickets complete · 47%** — one cell per ticket.
 
-`█████████████████░░░░░░░░░░░░░░░░░░░░░░`
+`██████████████████░░░░░░░░░░░░░░░░░░░░░`
 
 | Sprint | Progress | ✔ Done | ▶ | ⚠ | ☐ Left |
 |---|---|---|---|---|---|
 | **0 — Foundation** ✔ complete | `███████` | 7 / 7 | 0 | 0 | 0 |
 | 1 — Content layer | `████⚠` | 4 / 5 | 0 | 1 | 0 |
 | **2 — UI primitives** ✔ complete | `██████` | 6 / 6 | 0 | 0 | 0 |
-| 3 — Pages ◄ current | `░░░░░░░` | 0 / 7 | 0 | 0 | 7 |
+| 3 — Pages ◄ current | `█░░░░░░` | 1 / 7 | 0 | 0 | 6 |
 | 4 — Contact wiring | `░░░░░` | 0 / 5 | 0 | 0 | 5 |
 | 5 — Production | `░░░░░░░░` | 0 / 8 | 0 | 0 | 8 |
-| **Total** | | **17 / 38** | **0** | **1** | **20** |
+| **Total** | | **18 / 38** | **0** | **1** | **19** |
 
 ---
 
@@ -75,7 +77,7 @@
 
 | ID | Ticket | Size | Status | Notes |
 |---|---|---|---|---|
-| PORT-030 | Home | M | ☐ | |
+| PORT-030 | Home | M | ✔ | First real-content page. Three `Section`s: `Hero` (new, `src/components/sections/hero.tsx`) + featured-projects grid via `getFeaturedProjects()` (never hardcoded, capped at 3) + `Cta` (new, `src/components/sections/cta.tsx`). **Scoped to the build-plan AC only** — `ui-registry.md` §4 also lists `StatusPill`/`StatRow`/`StackStrip` as `designed` for `/`, all left unbuilt: their source copy (stat numbers, status text) doesn't exist anywhere, and the approved prototype they'd come from is confirmed not present in the repo (`ui-rules.md` itself flags this twice, re: unmeasured shadow values). Raised with Vernel directly rather than defaulted; he chose AC-only. Hero carries no buttons — build-plan's own ticket description reads as three parts ("Hero, featured projects, CTA"), so both CTAs live only in the closing `Cta` band. `Cta` takes `heading`/`body`/`primary`/`secondary` as props rather than hardcoding Home's copy, since the registry already names it as shared across `/`, `/skills`, `/about`. Metadata (`title`/`description`/`openGraph`) is built from `site.name`/`site.role`/`site.tagline`/`site.url` rather than typed out again; no `og:image` — that's PORT-050's job. `npm run verify` green, 8/8 routes static. **Confirmed zero client JS beyond the theme toggle** by grepping real `.next/static/chunks/*.js` for Home's own copy strings after a real `next build` — zero hits, so `Hero`/`Cta`/`ProjectCard` all render server-side. **69/69 scripted Playwright assertions green** across 1440/1024/768/375 × light/dark via a real `next start` production server: theme resolved correctly per `page.emulateMedia` before `goto`, zero horizontal overflow, hero `h1` and tagline both confirmed within the initial viewport at 375px (bottom edge 189px / 292px against an 812px viewport), exactly 3 featured cards with no nested `<a>`, CTA heading + both buttons present and correctly linked. **Three console 404s appeared at every breakpoint and are expected, not a defect**: Next's `<Link>` prefetches `/projects/[slug]` in the background, and that route doesn't exist yet — `PORT-032` is the still-open, already-documented gap. Full-page screenshots taken at 1440/375 × both themes and eyeballed directly. **Root `layout.tsx`'s own metadata is still hardcoded** (`"— Developer"`, not `site.role`) even though content-model.md §4's table says `site.ts` feeds "root metadata" — not fixed here (page-ticket scope), but now visibly stale next to Home's real metadata; worth a follow-up. |
 | PORT-031 | Projects index + filter | L | ☐ | Filter state in the URL. |
 | PORT-032 | Project detail | L | ☐ | Test an unknown slug. |
 | PORT-033 | About | M | ☐ | |
@@ -154,6 +156,9 @@ Settled decisions are in [build-plan.md](build-plan.md) §9. Record here only de
 
 | Date | Decision | Reason |
 |---|---|---|
+| 2026-08-24 | **PORT-030 (Home) built to the build-plan AC only, not the fuller prototype-derived component set `ui-registry.md` §4 names for `/`** | The registry lists six `/`-page composites as `designed`: `Hero`, `StatusPill`, `StatRow`, `ProjectGrid`, `StackStrip`, `Cta`. Build-plan's own AC for PORT-030 only asks for three things — hero, featured projects, CTA — and gives no copy for a status pill, stat numbers, or a stack strip; inventing that copy would be designing in React, which CLAUDE.md rules out. The approved prototype these would come from was confirmed absent while reading `ui-rules.md`, which twice flags its own shadow-token values as "unmeasured against the prototype... once found." Raised directly with Vernel rather than guessed; he chose AC-only. **Forecloses nothing** — `StatusPill`/`StatRow`/`StackStrip` stay `designed` in the registry, unbuilt, ready the day real copy or the prototype turns up. |
+| 2026-08-24 | **`Cta` (`src/components/sections/cta.tsx`) takes `heading`/`body`/`primary`/`secondary` as props rather than hardcoding Home's own copy** | `ui-registry.md` §4 already names it as shared across `/`, `/skills`, `/about`. Building it content-free now — while it's genuinely needed for PORT-030's own AC — means the next page that reuses it supplies its own copy instead of editing this file. Its visual treatment (centered, `bg-surface-2`, `rounded-xl` panel) is an unmeasured judgment call, same caveat as the dark shadow values above — worth a real eyeball pass once the prototype is found. |
+| 2026-08-24 | **Home's hero carries no buttons; both CTAs live only in the closing `Cta` band** | Build-plan's PORT-030 description reads as three literal parts — "Hero, featured projects, CTA" — not two CTAs duplicated into the hero. Keeping the hero to eyebrow + `h1` + tagline only also gives the "above the fold at 375px" AC more margin: verified in the browser check, hero `h1` bottom edge at 189px and tagline at 292px against an 812px viewport. |
 | 2026-08-24 | **`IconName` lives in `content/types.ts`, and `lib/icons.ts` imports it — not the other way around** | The architecture is `content → lib → components`: lib depends on content, never the reverse. Putting the icon-name union in `lib/icons.ts` instead would have meant `Practice.icon`'s type importing *from* lib to get narrowed, inverting that arrow for a type-only reason. Content stays upstream; `lib/icons.ts` imports `IconName` the same way `lib/content.ts` already imports `Project`/`Job`/etc., then re-exports it so `components/ui/icon.tsx` never has to touch `@/content/*` at all (which the ESLint boundary rule would reject anyway). |
 | 2026-08-24 | **`IconName`'s 12 members are each tied to a content type already built — nothing speculative** | 8 for `Practice` (the ticket's actual documented driver, even though `practices` content doesn't exist yet — PORT-037), 2 for `Job`/`Education` (the resume timeline), 2 for `SiteConfig.email`/`.location` (contact). Rejected padding the list with plausible-looking extras like `Phone` — `SiteConfig` has no phone field, so an icon for it would be inventing UI ahead of content that doesn't exist. **Forecloses nothing** — extending `IconName` and `ICONS` together is a two-line addition whenever a page actually needs one. |
 | 2026-08-24 | **The gallery (`/gallery`) is scoped to PORT-025's actual dependency list — Sprint 2's `components/ui/` primitives plus `ProjectCard`** | Not the app shell (Header, Footer, NavLinks, MobileMenu, ThemeToggle, Container, Section) — PORT-025 depends on 020/021/022/023, not the Sprint 0 shell tickets, and that chrome is already exercised on every real page at every breakpoint. Kept the gallery honest about a real gap instead of manufacturing a fix for it: the AC's "includes an empty state" is unmet, in writing, in a "Known gap" section on the page itself, because no built component has a designed empty state yet (`ProjectGrid`'s and `ContactForm`'s are both still `designed`, not built). |
