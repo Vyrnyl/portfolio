@@ -26,6 +26,7 @@
   --fern-wash: oklch(0.955 0.013 160);
   --coral: oklch(0.6065 0.1649 33.4);
   --coral-wash: oklch(0.951 0.019 38);
+  --coral-text: oklch(0.5486 0.1478 33.5);
   --ring: var(--fern);
 
   /* Card elevation. rgba(28,36,32) is --ink at full opacity — a warm
@@ -58,6 +59,7 @@
   --fern-wash: oklch(0.284 0.025 166);
   --coral: oklch(0.731 0.134 33);
   --coral-wash: oklch(0.271 0.028 37);
+  --coral-text: var(--coral);
   --ring: var(--fern);
 
   --card-shadow: 0 1px 2px rgb(0 0 0 / 0.24), 0 8px 24px -12px rgb(0 0 0 / 0.45);
@@ -93,6 +95,7 @@
   --color-fern-wash: var(--fern-wash);
   --color-coral: var(--coral);
   --color-coral-wash: var(--coral-wash);
+  --color-coral-text: var(--coral-text);
   --color-ring: var(--ring);
 
   --font-sans: var(--font-inter);

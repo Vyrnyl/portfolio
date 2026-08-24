@@ -43,21 +43,31 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
 --------------------------------------------------------------------------- */
 
 :root {
-  --ground:        oklch(0.985 0.004  91);
-  --surface:       oklch(1     0       0);
-  --surface-2:     oklch(0.966 0.007 107);
-  --border:        oklch(0.919 0.008 114);
+  --ground: oklch(0.985 0.004 91);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.966 0.007 107);
+  --border: oklch(0.919 0.008 114);
   --border-strong: oklch(0.866 0.012 117);
-  --ink:           oklch(0.251 0.014 164);
-  --muted:         oklch(0.514 0.020 159);
-  --faint:         oklch(0.661 0.018 157);
-  --fern:          oklch(0.532 0.0931 162.4);
-  --fern-hover:    oklch(0.457 0.080 162);
-  --fern-on:       oklch(1     0       0);
-  --fern-wash:     oklch(0.955 0.013 160);
-  --coral:         oklch(0.6065 0.1649 33.4);
-  --coral-wash:    oklch(0.951 0.019  38);
-  --ring:          var(--fern);
+  --ink: oklch(0.251 0.014 164);
+  --muted: oklch(0.514 0.02 159);
+  --faint: oklch(0.661 0.018 157);
+  --fern: oklch(0.532 0.0931 162.4);
+  --fern-hover: oklch(0.457 0.08 162);
+  --fern-on: oklch(1 0 0);
+  --fern-wash: oklch(0.955 0.013 160);
+  --coral: oklch(0.6065 0.1649 33.4);
+  --coral-wash: oklch(0.951 0.019 38);
+  --coral-text: oklch(0.5486 0.1478 33.5);
+  --ring: var(--fern);
+
+  /* Card elevation. rgba(28,36,32) is --ink at full opacity — a warm
+     near-black rather than a generic grey shadow. Dark mode does NOT invert
+     these: a warm shadow reads as dirt on a dark surface, so dark swaps to
+     pure black at higher opacity instead (ui-rules.md §3 already said this
+     would happen; these are the first concrete numbers). Judgment call, not
+     measured against the prototype — it isn't in the repo. */
+  --card-shadow: 0 1px 2px rgb(28 36 32 / 0.05), 0 8px 24px -12px rgb(28 36 32 / 0.14);
+  --card-shadow-lift: 0 2px 4px rgb(28 36 32 / 0.06), 0 18px 40px -16px rgb(28 36 32 / 0.2);
 
   /* Layout. Not theme-dependent. */
   --gut: 24px;
@@ -66,21 +76,25 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
 /* Re-derived for dark, not inverted: fern lightens to hold contrast on a dark
    ground, and --fern-on flips from white to near-black. */
 .dark {
-  --ground:        oklch(0.213 0.007 164);
-  --surface:       oklch(0.250 0.009 159);
-  --surface-2:     oklch(0.282 0.011 156);
-  --border:        oklch(0.321 0.012 161);
+  --ground: oklch(0.213 0.007 164);
+  --surface: oklch(0.25 0.009 159);
+  --surface-2: oklch(0.282 0.011 156);
+  --border: oklch(0.321 0.012 161);
   --border-strong: oklch(0.381 0.015 153);
-  --ink:           oklch(0.949 0.007 124);
-  --muted:         oklch(0.714 0.017 160);
-  --faint:         oklch(0.585 0.021 162);
-  --fern:          oklch(0.733 0.116 160);
-  --fern-hover:    oklch(0.788 0.106 160);
-  --fern-on:       oklch(0.227 0.025 168);
-  --fern-wash:     oklch(0.284 0.025 166);
-  --coral:         oklch(0.731 0.134  33);
-  --coral-wash:    oklch(0.271 0.028  37);
-  --ring:          var(--fern);
+  --ink: oklch(0.949 0.007 124);
+  --muted: oklch(0.714 0.017 160);
+  --faint: oklch(0.585 0.021 162);
+  --fern: oklch(0.733 0.116 160);
+  --fern-hover: oklch(0.788 0.106 160);
+  --fern-on: oklch(0.227 0.025 168);
+  --fern-wash: oklch(0.284 0.025 166);
+  --coral: oklch(0.731 0.134 33);
+  --coral-wash: oklch(0.271 0.028 37);
+  --coral-text: var(--coral);
+  --ring: var(--fern);
+
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.24), 0 8px 24px -12px rgb(0 0 0 / 0.45);
+  --card-shadow-lift: 0 2px 4px rgb(0 0 0 / 0.32), 0 18px 40px -16px rgb(0 0 0 / 0.55);
 }
 
 /* Page gutter tightens below the 760 breakpoint (ui-rules.md §3). */
@@ -98,21 +112,22 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
 --------------------------------------------------------------------------- */
 
 @theme inline {
-  --color-ground:        var(--ground);
-  --color-surface:       var(--surface);
-  --color-surface-2:     var(--surface-2);
-  --color-border:        var(--border);
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
   --color-border-strong: var(--border-strong);
-  --color-ink:           var(--ink);
-  --color-muted:         var(--muted);
-  --color-faint:         var(--faint);
-  --color-fern:          var(--fern);
-  --color-fern-hover:    var(--fern-hover);
-  --color-fern-on:       var(--fern-on);
-  --color-fern-wash:     var(--fern-wash);
-  --color-coral:         var(--coral);
-  --color-coral-wash:    var(--coral-wash);
-  --color-ring:          var(--ring);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-fern: var(--fern);
+  --color-fern-hover: var(--fern-hover);
+  --color-fern-on: var(--fern-on);
+  --color-fern-wash: var(--fern-wash);
+  --color-coral: var(--coral);
+  --color-coral-wash: var(--coral-wash);
+  --color-coral-text: var(--coral-text);
+  --color-ring: var(--ring);
 
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains);
@@ -124,11 +139,113 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
 
   /* max-w-shell (page) and max-w-measure (prose). Deliberately not named
      `max`/`prose` — both collide with Tailwind built-ins. */
-  --container-shell:   1120px;
-  --container-measure:  680px;
+  --container-shell: 1120px;
+  --container-measure: 680px;
 
   /* px-gut, gap-gut, ... */
   --spacing-gut: var(--gut);
+
+  /* shadow-card, shadow-card-lift. Named apart from the raw --card-shadow*
+     vars above for the same reason --font-sans isn't named --font-inter: a
+     theme key that shares its raw var's name is self-referential and
+     resolves to nothing. */
+  --shadow-card: var(--card-shadow);
+  --shadow-card-lift: var(--card-shadow-lift);
+}
+
+/* ---------------------------------------------------------------------------
+   Static scales.
+   Plain `@theme`, not `@theme inline` — nothing here resolves through a var()
+   that changes with the theme, so there is no dark-mode trap to avoid.
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Breakpoints are the DESIGN's (ui-rules.md §4), replacing Tailwind's defaults
+     outright. `--breakpoint-*: initial` clears the built-in scale first: keeping
+     both would leave `md:` at 768px sitting eight pixels from the real 760px
+     gate, and the wrong one gets typed from habit. One scale, no near-misses.
+     Nothing above lg is defined — the design has no widths above 1000. */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 460px;
+  --breakpoint-md: 760px;
+  --breakpoint-lg: 1000px;
+
+  /* py-section / py-section-tight. Vertical rhythm, owned by <Section>. */
+  --spacing-section: clamp(56px, 9vw, 104px);
+  --spacing-section-tight: clamp(36px, 5.5vw, 64px);
+
+  /* Type scale (ui-rules.md §3). Each step carries its own weight and tracking,
+     so `text-h-lg` is a whole heading style, not just a font-size. Inter is
+     loaded variable, so the 650/750 weights are real and not synthesised. */
+  --text-h-xl: clamp(2.5rem, 7vw, 4.25rem);
+  --text-h-xl--line-height: 1.02;
+  --text-h-xl--font-weight: 750;
+  --text-h-xl--letter-spacing: -0.035em;
+
+  --text-h-lg: clamp(1.75rem, 3.6vw, 2.5rem);
+  --text-h-lg--line-height: 1.1;
+  --text-h-lg--font-weight: 700;
+  --text-h-lg--letter-spacing: -0.028em;
+
+  --text-h-md: 1.3rem;
+  --text-h-md--line-height: 1.3;
+  --text-h-md--font-weight: 650;
+  --text-h-md--letter-spacing: -0.02em;
+
+  --text-h-sm: 1.0625rem;
+  --text-h-sm--line-height: 1.4;
+  --text-h-sm--font-weight: 650;
+  --text-h-sm--letter-spacing: -0.012em;
+
+  --text-lead: clamp(1.0625rem, 1.7vw, 1.25rem);
+  --text-lead--line-height: 1.55;
+  --text-lead--font-weight: 400;
+
+  /* Pair with `font-mono uppercase`. */
+  --text-eyebrow: 11px;
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--font-weight: 600;
+  --text-eyebrow--letter-spacing: 0.14em;
+
+  /* Pair with `font-mono`. */
+  --text-badge: 12px;
+  --text-badge--line-height: 1.2;
+
+  /* Body copy is 1rem/1.65 (§3), looser than Tailwind's stock 1.5. */
+  --text-base: 1rem;
+  --text-base--line-height: 1.65;
+
+  /* Motion (ui-rules.md §3). The mobile sheet's 0.26s decelerate slide, plus
+     the scrim fade that accompanies it. Keyframes must live inside @theme or
+     Tailwind emits the --animate-* variable without the animation it names.
+     The prefers-reduced-motion block below collapses both to ~0ms. */
+  --animate-sheet-in: sheet-in 260ms cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-scrim-in: scrim-in 260ms ease-out;
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scrim-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* aspect-thumbnail. Project thumbnails are generated at 1600x1000 (16:10) by
+     decision (progress.md, 2026-08-22) — this makes that ratio a real box
+     rather than trusting next/image's intrinsic width/height alone, so a
+     future replacement image at a slightly different ratio crops via
+     object-cover instead of shifting the card's height. */
+  --aspect-thumbnail: 16 / 10;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -138,7 +255,10 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
     @apply bg-ground text-ink font-sans antialiased;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     text-wrap: balance;
   }
 
@@ -169,6 +289,8 @@ Added in PORT-004: the **type scale** as `--text-*` tokens (each step carries it
 
 **Ported in PORT-021:** `--shadow-card` / `--shadow-card-lift`, the two shadow tokens §3 had recorded with no dark-theme values. Dark uses pure black at higher opacity rather than an inverted version of the light rgba — a warm near-black shadow reads as dirt on a dark surface. The exact numbers are a judgment call, not measured against the prototype (it isn't in the repo) — flagged for a real eyeball pass whenever it turns up. Card itself stays shadow-free at rest; only `ProjectCard`'s hover/focus state uses `shadow-card-lift`. Also added: `--aspect-thumbnail: 16 / 10`, matching the already-decided thumbnail ratio, so a `next/image fill` box crops instead of shifting when PORT-057 swaps in real captures.
 
+**§2 was found stale while settling open question 7 (2026-08-24)** and re-synced against the real `src/app/globals.css` in the same pass: it had stopped tracking the file after PORT-003 and never picked up the shadow tokens (PORT-021), the breakpoint/type-scale/motion `@theme` block (PORT-004/007), or `--aspect-thumbnail` (PORT-021) — all real, all shipped, none reflected here until now. **`--coral-text` is new**, added in the same pass — see §3 for what it's for and the exact contrast math.
+
 ---
 
 ## 3. Tokens
@@ -197,10 +319,13 @@ Neutrals carry a slight green bias so they read as chosen rather than inherited.
 | `--fern-hover` | `#256549` | `#79CFA3` | Primary button hover |
 | `--fern-on` | `#FFFFFF` | `#10201A` | Text **on** a fern background |
 | `--fern-wash` | `#E9F3ED` | `#1E2E27` | Active nav pill, success note, badge fill |
-| `--coral` | `#D2543A` | `#F08670` | Errors, required marks, status dot accent |
+| `--coral` | `#D2543A` | `#F08670` | Error **border** (`aria-invalid` on `Input`/`Textarea`), status dot accent — non-text UI only |
 | `--coral-wash` | `#FBEBE6` | `#33221D` | Error note background |
+| `--coral-text` | `#B74932` | `#F08670` (= `--coral`) | Error message **text**, required-field marks — the only two coral *text* uses on the site |
 
 Dark is **re-derived, not inverted** — fern lightens to hold contrast on a dark ground, and `--fern-on` flips from white to near-black.
+
+**`--coral-text` settles open question 7 (2026-08-24).** Plain `--coral` on `ground` measures 3.97:1 in light mode — comfortably past the 3:1 WCAG 1.4.11 floor for non-text UI (a border, a status dot), but short of the 4.5:1 AA floor for actual text. Rather than darken `--coral` itself — which would also recolor the status dot and the hero's hand-drawn underline, neither of which needed fixing — a second, darker token was added for the two places coral is genuinely *text*: `Field`'s error message and its required-field asterisk (PORT-023). Derived the same way every other token here is: pick a candidate hex, compute WCAG relative luminance and contrast against `--ground`'s `#FBFAF7` by hand, keep the same hue (a uniform ~13% RGB scale-down of `#D2543A`, not a hue shift), stop once there's real margin rather than landing just over the line. `#B74932` measures **5.01:1** in light mode — a full point of headroom above the 4.5:1 floor, so small measurement error doesn't tip it back below AA. Dark reuses `--coral` outright (`var(--coral)`, no second dark value) because dark-mode `--coral` already passes at 6.99:1 — there's no gap to fix on that side. **Verified (PORT-023).** The hand-computed math held up: canvas-pixel-sampled in a real browser at 5.01:1 light / 6.99:1 dark, matching the hand math to two decimal places.
 
 Contrast floor, measured in both themes: `ink`/`ground` ≥ 7:1 · `muted`/`ground` ≥ 4.5:1 · `fern-on`/`fern` ≥ 4.5:1.
 
@@ -363,8 +488,8 @@ Filled in as components are built. Keep in lockstep with [ui-registry.md](ui-reg
 | `Button` | base `inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap` · `rounded-md text-sm font-medium transition-colors` · `focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none` · `active:brightness-95` · `[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0` · `disabled:pointer-events-none disabled:opacity-50` — variants `primary` `bg-fern text-fern-on hover:bg-fern-hover` / `outline` `border-border text-ink hover:bg-surface-2 border` / `ghost` `text-muted hover:text-ink hover:bg-surface-2` — sizes `sm` `h-9 px-3` / `md` `h-10 px-4` | Built (PORT-020). Renders `next/link` when given `href`, `<button type="button">` otherwise — never a `div`. Icons go in `children`; the base sizes any `<svg>` descendant to 16px. **`cursor-pointer` is not optional** — Tailwind v4 defaults a button's cursor to `default`. The inlined copies in `not-found.tsx` and `error.tsx` are gone. |
 | `Card` | `rounded-lg border border-border bg-surface`, `+p-6` when `padded` | Built (PORT-021). Elevation via border, not shadow — genuinely no shadow class, at rest or otherwise. Renders a `<div>`, never a link; a whole-card link is the caller's `Link` wrapping `Card`, not a prop on `Card` itself. |
 | `Badge` | `inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-badge font-mono text-muted` | Planned. Stack/tag chips. `ProjectCard` inlines this exact class string today, marked `PORT-022 replaces this`. |
-| `Input` / `Textarea` | `w-full rounded-md border border-border-strong bg-ground px-3 py-2 text-base placeholder:text-faint` + focus ring | Planned. `aria-invalid` → `border-coral`. |
-| `Field` | `space-y-1.5` | Planned. Wraps label + control + error; owns the `id`/`htmlFor`/`aria-describedby` wiring. |
+| `Input` / `Textarea` | `w-full rounded-md border border-border-strong bg-ground px-3 py-2 text-base text-ink placeholder:text-faint` + focus ring · `aria-invalid:border-coral` — `Textarea` adds `resize-y` | Built (PORT-023). `aria-invalid:` is Tailwind v4's generic functional ARIA variant (compiles to `&[aria-invalid="true"]`) — confirmed firing in a real browser, not just inferred from the absence of a hardcoded variant list in the installed package. |
+| `Field` | `space-y-1.5` wrapper; label `text-sm font-medium text-ink`; required mark `text-coral-text` (never `text-coral` — see the `--coral-text` entry in §3); hint `text-sm text-faint`; error `text-sm text-coral-text` with `role="alert"` | Built (PORT-023). Wraps label + control + hint/error; owns `id`/`htmlFor`/`aria-describedby` wiring via a render prop, `id` derived from a required `name` prop rather than `useId()` so the component stays a Server Component — see the PORT-023 ui-registry.md entry. |
 | `ProjectCard` | Outer `Link`: `group block rounded-lg` + the standard focus ring, `aria-label={project.title}`. Inner `Card`: `overflow-hidden p-0 transition-all duration-200 group-hover:border-fern group-hover:shadow-card-lift group-focus-visible:border-fern group-focus-visible:shadow-card-lift`. Thumbnail: `aspect-thumbnail relative w-full` wrapping a `next/image fill` with `object-cover`. | Built (PORT-021). The `aria-label` pins the link's accessible name to the title regardless of what the card visually contains — deliberate, not the browser default. `group-focus-visible:`, not just `group-hover:`, so keyboard focus gets the same border/shadow feedback a mouse does. |
 | Route stub | `text-eyebrow text-faint font-mono uppercase` eyebrow + `text-h-lg text-ink` heading + `Prose` | Built (PORT-006). Six of them. The eyebrow names the ticket that replaces the page. Home uses `text-h-xl` — it is the only heading that is a hero. |
 | *(add rows as built)* | | |
