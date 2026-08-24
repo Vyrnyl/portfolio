@@ -28,6 +28,15 @@
   --coral-wash: oklch(0.951 0.019 38);
   --ring: var(--fern);
 
+  /* Card elevation. rgba(28,36,32) is --ink at full opacity — a warm
+     near-black rather than a generic grey shadow. Dark mode does NOT invert
+     these: a warm shadow reads as dirt on a dark surface, so dark swaps to
+     pure black at higher opacity instead (ui-rules.md §3 already said this
+     would happen; these are the first concrete numbers). Judgment call, not
+     measured against the prototype — it isn't in the repo. */
+  --card-shadow: 0 1px 2px rgb(28 36 32 / 0.05), 0 8px 24px -12px rgb(28 36 32 / 0.14);
+  --card-shadow-lift: 0 2px 4px rgb(28 36 32 / 0.06), 0 18px 40px -16px rgb(28 36 32 / 0.2);
+
   /* Layout. Not theme-dependent. */
   --gut: 24px;
 }
@@ -50,6 +59,9 @@
   --coral: oklch(0.731 0.134 33);
   --coral-wash: oklch(0.271 0.028 37);
   --ring: var(--fern);
+
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.24), 0 8px 24px -12px rgb(0 0 0 / 0.45);
+  --card-shadow-lift: 0 2px 4px rgb(0 0 0 / 0.32), 0 18px 40px -16px rgb(0 0 0 / 0.55);
 }
 
 /* Page gutter tightens below the 760 breakpoint (ui-rules.md §3). */
@@ -98,6 +110,13 @@
 
   /* px-gut, gap-gut, ... */
   --spacing-gut: var(--gut);
+
+  /* shadow-card, shadow-card-lift. Named apart from the raw --card-shadow*
+     vars above for the same reason --font-sans isn't named --font-inter: a
+     theme key that shares its raw var's name is self-referential and
+     resolves to nothing. */
+  --shadow-card: var(--card-shadow);
+  --shadow-card-lift: var(--card-shadow-lift);
 }
 
 /* ---------------------------------------------------------------------------
@@ -186,6 +205,13 @@
       opacity: 1;
     }
   }
+
+  /* aspect-thumbnail. Project thumbnails are generated at 1600x1000 (16:10) by
+     decision (progress.md, 2026-08-22) — this makes that ratio a real box
+     rather than trusting next/image's intrinsic width/height alone, so a
+     future replacement image at a slightly different ratio crops via
+     object-cover instead of shifting the card's height. */
+  --aspect-thumbnail: 16 / 10;
 }
 
 /* ------------------------------------------------------------------------- */

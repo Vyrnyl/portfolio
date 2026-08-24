@@ -167,7 +167,7 @@ Ported here beyond colour: `--container-shell` / `--container-measure` (delibera
 
 Added in PORT-004: the **type scale** as `--text-*` tokens (each step carries its own line-height, weight and tracking, so `text-h-lg` is a whole heading style), the **section rhythm** as `--spacing-section` / `--spacing-section-tight`, and the **breakpoints** as an outright replacement of Tailwind's scale (open question 6, answered — see §4).
 
-**Deliberately not ported yet:** the shadow tokens (§3) have no dark-theme values recorded, so they land with `Card` in PORT-021.
+**Ported in PORT-021:** `--shadow-card` / `--shadow-card-lift`, the two shadow tokens §3 had recorded with no dark-theme values. Dark uses pure black at higher opacity rather than an inverted version of the light rgba — a warm near-black shadow reads as dirt on a dark surface. The exact numbers are a judgment call, not measured against the prototype (it isn't in the repo) — flagged for a real eyeball pass whenever it turns up. Card itself stays shadow-free at rest; only `ProjectCard`'s hover/focus state uses `shadow-card-lift`. Also added: `--aspect-thumbnail: 16 / 10`, matching the already-decided thumbnail ratio, so a `next/image fill` box crops instead of shifting when PORT-057 swaps in real captures.
 
 ---
 
@@ -248,17 +248,17 @@ The Stitch scale was inverted (`full: 0.75rem` made pills square). Replaced with
 | `--narrow` (prose) | `680px` |
 | `--gut` (page gutter) | `24px`, `18px` below 760 |
 | Section rhythm | `clamp(56px, 9vw, 104px)` |
-| `--shadow` | `0 1px 2px rgba(28,36,32,.05), 0 8px 24px -12px rgba(28,36,32,.14)` |
-| `--shadow-lift` | `0 2px 4px rgba(28,36,32,.06), 0 18px 40px -16px rgba(28,36,32,.20)` |
+| `--shadow-card` | Light `0 1px 2px rgba(28,36,32,.05), 0 8px 24px -12px rgba(28,36,32,.14)` · Dark `0 1px 2px rgba(0,0,0,.24), 0 8px 24px -12px rgba(0,0,0,.45)` |
+| `--shadow-card-lift` | Light `0 2px 4px rgba(28,36,32,.06), 0 18px 40px -16px rgba(28,36,32,.20)` · Dark `0 2px 4px rgba(0,0,0,.32), 0 18px 40px -16px rgba(0,0,0,.55)` |
 
-Elevation is **border-first**. Shadows appear only on the primary button, card hover, and the avatar; dark mode swaps to pure-black shadows at higher opacity.
+Elevation is **border-first**. `Card` carries no shadow at rest — only `ProjectCard`'s hover/focus state uses `shadow-card-lift` (PORT-021). Dark values are pure black at higher opacity rather than the light rgba inverted, per the design note below — they are a judgment call, unmeasured against the prototype, and worth a real eyeball pass once it's found. The primary button and the avatar are recorded here as designed shadow users but neither has shipped with one: `Button` (PORT-020) has no shadow class, and the avatar isn't built yet.
 
 ### Motion
 
 | Property | Value |
 |---|---|
 | Standard | `transition: .18s` on color/border |
-| Card hover | `translateY(-3px)` + `--shadow-lift` |
+| Card hover | `--shadow-card-lift` (border-color to `fern` alongside it). The `translateY(-3px)` lift in the original spec was dropped in PORT-021 — no existing token represents 3px and Tailwind's spacing scale doesn't land on it, so adding one for a single micro-interaction not covered by any acceptance criterion was scope the ticket didn't need. Revisit if the prototype (once found) turns out to lean on it. |
 | Status dot | 2.4s `ping` scale-and-fade |
 | Hero underline | 0.9s `stroke-dashoffset` draw, 0.5s delay, once |
 | Mobile sheet | 0.26s `cubic-bezier(.32,.72,0,1)` slide — `animate-sheet-in` |
@@ -361,11 +361,11 @@ Filled in as components are built. Keep in lockstep with [ui-registry.md](ui-reg
 | `SkipLink` | `sr-only` → `focus:not-sr-only focus:fixed focus:bg-fern focus:text-fern-on focus:rounded-md` | Built. Targets `#main`. |
 | `ThemeToggle` | `inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border` | Built. Renders an empty same-sized `div` until hydrated. |
 | `Button` | base `inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap` · `rounded-md text-sm font-medium transition-colors` · `focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none` · `active:brightness-95` · `[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0` · `disabled:pointer-events-none disabled:opacity-50` — variants `primary` `bg-fern text-fern-on hover:bg-fern-hover` / `outline` `border-border text-ink hover:bg-surface-2 border` / `ghost` `text-muted hover:text-ink hover:bg-surface-2` — sizes `sm` `h-9 px-3` / `md` `h-10 px-4` | Built (PORT-020). Renders `next/link` when given `href`, `<button type="button">` otherwise — never a `div`. Icons go in `children`; the base sizes any `<svg>` descendant to 16px. **`cursor-pointer` is not optional** — Tailwind v4 defaults a button's cursor to `default`. The inlined copies in `not-found.tsx` and `error.tsx` are gone. |
-| `Card` | `rounded-lg border border-border bg-surface` | Planned. Elevation via border, not shadow. |
-| `Badge` | `inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-badge font-mono text-muted` | Planned. Stack/tag chips. |
+| `Card` | `rounded-lg border border-border bg-surface`, `+p-6` when `padded` | Built (PORT-021). Elevation via border, not shadow — genuinely no shadow class, at rest or otherwise. Renders a `<div>`, never a link; a whole-card link is the caller's `Link` wrapping `Card`, not a prop on `Card` itself. |
+| `Badge` | `inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-badge font-mono text-muted` | Planned. Stack/tag chips. `ProjectCard` inlines this exact class string today, marked `PORT-022 replaces this`. |
 | `Input` / `Textarea` | `w-full rounded-md border border-border-strong bg-ground px-3 py-2 text-base placeholder:text-faint` + focus ring | Planned. `aria-invalid` → `border-coral`. |
 | `Field` | `space-y-1.5` | Planned. Wraps label + control + error; owns the `id`/`htmlFor`/`aria-describedby` wiring. |
-| `ProjectCard` | `group` + `Card` + `hover:border-fern transition-colors` | Planned. Whole card is one link; title carries the accessible name. |
+| `ProjectCard` | Outer `Link`: `group block rounded-lg` + the standard focus ring, `aria-label={project.title}`. Inner `Card`: `overflow-hidden p-0 transition-all duration-200 group-hover:border-fern group-hover:shadow-card-lift group-focus-visible:border-fern group-focus-visible:shadow-card-lift`. Thumbnail: `aspect-thumbnail relative w-full` wrapping a `next/image fill` with `object-cover`. | Built (PORT-021). The `aria-label` pins the link's accessible name to the title regardless of what the card visually contains — deliberate, not the browser default. `group-focus-visible:`, not just `group-hover:`, so keyboard focus gets the same border/shadow feedback a mouse does. |
 | Route stub | `text-eyebrow text-faint font-mono uppercase` eyebrow + `text-h-lg text-ink` heading + `Prose` | Built (PORT-006). Six of them. The eyebrow names the ticket that replaces the page. Home uses `text-h-xl` — it is the only heading that is a hero. |
 | *(add rows as built)* | | |
 
@@ -373,7 +373,7 @@ Filled in as components are built. Keep in lockstep with [ui-registry.md](ui-reg
 
 **A flex item's `display` is blockified.** A `Button` inside a `flex` wrapper computes to `display: flex`, not the `inline-flex` its class says — normal CSS, identical rendering, but it will fail a naive computed-style assertion. Found while verifying PORT-020.
 
-**The focus ring**, everywhere: `focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none`. Note the offset is painted in `ground`, so a button sitting on a `surface` card will show a hairline of the wrong colour — unresolved, and it first bites in PORT-021. `SkipLink` uses the `focus:` variant instead, because it must appear for any focus, not only keyboard focus.
+**The focus ring**, everywhere: `focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none`. Note the offset is painted in `ground`, so a button sitting on a `surface` card will show a hairline of the wrong colour — **still unresolved.** PORT-021 did not trigger it: `ProjectCard`'s own focus ring sits on the outer whole-card `Link`, whose surrounding pixels are `ground` (correct), and there is no inner `Button` on the card for the mismatch to reach. First real trigger is whichever ticket puts a `Button` inside a `Card` — a `Cta` panel or `ContactMethods` card are the likely candidates. `SkipLink` uses the `focus:` variant instead, because it must appear for any focus, not only keyboard focus.
 
 ---
 
