@@ -74,7 +74,8 @@ portfolio/
     │   ├── skills/page.tsx
     │   ├── about/page.tsx
     │   ├── resume/page.tsx
-    │   └── contact/page.tsx
+    │   ├── contact/page.tsx
+    │   └── gallery/page.tsx       # dev-only — 404s in production (PORT-025)
     │
     ├── components/
     │   ├── ui/                    # generic primitives — know nothing about the domain
@@ -84,6 +85,7 @@ portfolio/
     │   │   ├── input.tsx
     │   │   ├── textarea.tsx
     │   │   ├── field.tsx
+    │   │   ├── icon.tsx
     │   │   └── prose.tsx
     │   ├── layout/                # site chrome — appears on every page
     │   │   ├── header.tsx
@@ -112,6 +114,7 @@ portfolio/
     │
     └── lib/
         ├── content.ts             # accessors: getAllProjects, getProjectBySlug…
+        ├── icons.ts                # ICONS: Record<IconName, LucideIcon>
         ├── actions/
         │   └── contact.ts         # "use server"
         ├── validation/

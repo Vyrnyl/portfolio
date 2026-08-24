@@ -146,12 +146,13 @@ export interface SkillGroup {
 
 /** A practice principle on /skills — how I work, not what I know. */
 export interface Practice {
-  /** lucide-react icon name */
-  icon: string;
+  icon: IconName;
   title: string;
   body: string;
 }
 ```
+
+`IconName` (PORT-024) is a union of every icon the site can render, declared above `Practice` in the real file. `src/lib/icons.ts` pairs each member with a real lucide-react component — `Record<IconName, LucideIcon>` there fails the build the moment the two lists disagree, in either direction.
 
 ---
 

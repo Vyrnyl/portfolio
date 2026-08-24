@@ -144,10 +144,28 @@ export interface SkillGroup {
   items: string[];
 }
 
+/**
+ * Every icon name the site can render. `src/lib/icons.ts` pairs each member
+ * with a real lucide-react component — `Record<IconName, LucideIcon>` there
+ * fails the build the moment the two lists disagree, in either direction.
+ */
+export type IconName =
+  | "BookOpen"
+  | "Briefcase"
+  | "Code2"
+  | "GraduationCap"
+  | "Lightbulb"
+  | "Mail"
+  | "MapPin"
+  | "MessageCircle"
+  | "Rocket"
+  | "ShieldCheck"
+  | "Target"
+  | "Users";
+
 /** A practice principle on /skills — how I work, not what I know. */
 export interface Practice {
-  /** lucide-react icon name. PORT-024 narrows this to the icon map's keys. */
-  icon: string;
+  icon: IconName;
   title: string;
   body: string;
 }
