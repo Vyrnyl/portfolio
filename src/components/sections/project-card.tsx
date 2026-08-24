@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { Project } from "@/content/types";
 import { cn } from "@/lib/utils";
@@ -54,12 +55,8 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
           {project.tags.length > 0 && (
             <ul className="flex flex-wrap gap-1.5">
               {project.tags.map((tag) => (
-                // PORT-022 replaces this inline chip with <Badge>.
-                <li
-                  key={tag}
-                  className="text-badge text-muted inline-flex items-center rounded-full border border-border px-2.5 py-0.5 font-mono"
-                >
-                  {tag}
+                <li key={tag}>
+                  <Badge>{tag}</Badge>
                 </li>
               ))}
             </ul>
