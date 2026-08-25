@@ -169,13 +169,13 @@ export interface Practice {
 
 ## 4. Accessors — `src/lib/content.ts`
 
-**Built 2026-08-22 (PORT-015). This section now describes the real file** — read `src/lib/content.ts` for the authoritative version; what follows is the contract and the reasoning.
+**Built 2026-08-22 (PORT-015), extended 2026-08-25 (PORT-032). This section now describes the real file** — read `src/lib/content.ts` for the authoritative version; what follows is the contract and the reasoning. The code block further down was written at PORT-015 and does **not** include `getAdjacentProjects`; the table below is the current list.
 
 The only module allowed to import **queryable** content — `projects`, `jobs`, `education`, `skillGroups` — from `src/content/`. Pages import those from here, so sorting, filtering and "featured" selection live in one place.
 
 **`site` is the exception, and imports directly.** It is a config singleton with nothing to query; wrapping it in a `getSite()` that returns a constant would be the "repository that returns an array literal" [architecture.md](architecture.md) §2 A7 rejects. `Header` and `Footer` import `@/content/site` (PORT-011). The ESLint boundary rule is unaffected either way — it restricts `components/ui/` only, and domain-aware components belong in `components/layout/` or `components/sections/`.
 
-### The nine exports
+### The ten exports
 
 | Function | Returns | Notes |
 |---|---|---|
@@ -185,6 +185,7 @@ The only module allowed to import **queryable** content — `projects`, `jobs`, 
 | `getProjectSlugs()` | `string[]` | For `generateStaticParams`. Unsorted. |
 | `getAllTags()` | `string[]` | Unique, alphabetical. Drives the filter. |
 | `getProjectsByTag(tag)` | `Project[]` | Case-sensitive, exact. Unknown tag → `[]`. |
+| `getAdjacentProjects(slug)` | `AdjacentProjects` | **Added 2026-08-25 (PORT-032).** The neighbours either side of a project in `getAllProjects()` order, as `{ previous, next }`, both `Project \| undefined`. `previous`/`next` mean **position in the list**, not time: `previous` is the entry above (the newer one). **Does not wrap around** — the newest project has no `previous`, the oldest no `next`, so the detail page's nav renders a single card at either end. Unknown slug → both `undefined`. |
 | `getJobs()` | `Job[]` | Current role first, then newest start first. |
 | `getEducation()` | `Education[]` | Newest start first. |
 | `getSkillGroups()` | `SkillGroup[]` | Depth order: confident → working → learning. |

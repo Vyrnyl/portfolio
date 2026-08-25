@@ -114,6 +114,51 @@ export function getProjectsByTag(tag: string): Project[] {
   return getAllProjects().filter((project) => project.tags.includes(tag));
 }
 
+/**
+ * The two projects either side of one, in the canonical newest-first order.
+ *
+ * `previous` and `next` mean POSITION IN THE LIST, not time: `previous` is the
+ * entry above — the newer neighbour — and `next` is the entry below. The detail
+ * page pairs each with a directional arrow and the real project title, so a
+ * reader never has to work out which sense is meant.
+ */
+export type AdjacentProjects = {
+  previous: Project | undefined;
+  next: Project | undefined;
+};
+
+/**
+ * The neighbours of one project, for the previous/next links on
+ * /projects/[slug].
+ *
+ * Lives here rather than in the page because "which project comes next" is an
+ * ordering fact, and every ordering fact on this site is decided in this file.
+ * A page that did its own index arithmetic would also have to know that
+ * adjacency is defined against `getAllProjects()`'s order specifically.
+ *
+ * DELIBERATELY DOES NOT WRAP AROUND. The newest project has no `previous` and
+ * the oldest has no `next`, so the nav renders a single card at either end.
+ * Wrapping would make the list feel like a carousel with no beginning, and
+ * would quietly send a reader who clicks "next" on the last project back to the
+ * first one.
+ *
+ * An unknown slug returns both as `undefined` rather than throwing — same
+ * reason as `getProjectBySlug`: the caller is answering an arbitrary URL.
+ */
+export function getAdjacentProjects(slug: string): AdjacentProjects {
+  const all = getAllProjects();
+  const index = all.findIndex((project) => project.slug === slug);
+
+  if (index === -1) {
+    return { previous: undefined, next: undefined };
+  }
+
+  // `noUncheckedIndexedAccess` types both of these as `Project | undefined`,
+  // which is exactly right: index - 1 is -1 at the top of the list and
+  // index + 1 is past the end at the bottom. No bounds check needed.
+  return { previous: all[index - 1], next: all[index + 1] };
+}
+
 // ---------- experience ----------
 
 /**
