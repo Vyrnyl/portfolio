@@ -681,8 +681,12 @@ Added 2026-08-22. PORT-012 shipped with **placeholder copy and placeholder image
 
 **The shape is already correct**, so this is a fill-in job, not a rewrite: field coverage, string lengths and status spread were chosen in PORT-012 to exercise every branch. Keep that spread when replacing the values — if the real projects happen not to exercise some optional field, leave one entry that does, or the fallback branch stops being tested.
 
+**Narrowed 2026-08-25.** This ticket briefly covered `experience.ts` too (the three OpalusPH bullets, added to its scope 2026-08-22). That part is **done** — it was pulled forward ahead of PORT-034, because `/resume` renders those bullets and shipping the page would have put literal "Placeholder" text on a live page for the first time. `experience.ts` now returns zero gate hits. **What remains is `projects.ts` and the images, nothing else.**
+
+One caveat on the first criterion: the grep also catches **one hit in `src/content/site.ts`** — `photo.alt` — which belongs to **PORT-058**, not this ticket. Neither ticket can close while the grep is non-empty, so whichever lands second gets a clean run; do not "fix" the other's hit to make the check pass here.
+
 **Acceptance criteria**
-- [ ] `Select-String -Pattern "Placeholder|TBC" src/content/` returns **nothing**
+- [ ] `Select-String -Pattern "Placeholder|TBC" src/content/` returns **nothing** (the `site.ts` hit is PORT-058's to clear)
 - [ ] Every `.webp` in `public/images/projects/` is a real capture — zero placeholders remain
 - [ ] `year`, `status`, `tags`, `stack`, `role`, `duration` replaced with verified values
 - [ ] Every `liveUrl`/`repoUrl` is a real URL that resolves — no `https://example.com` survives

@@ -2,39 +2,41 @@ import type { Education, Job } from "./types";
 
 /* ---------------------------------------------------------------------------
    Source: public/resume.pdf, extracted 2026-08-22, plus the OpalusPH facts
-   Vernel supplied the same day. Bullets are rewritten outcome-first per
-   PORT-013's criterion; no claim was added that the resume does not make.
+   Vernel supplied that day and the achievements he supplied 2026-08-25.
+   Bullets are rewritten outcome-first per PORT-013's criterion; no claim was
+   added that the resume, or Vernel, does not make.
 
    Listed newest first. Sorting belongs to the accessors in PORT-015, not here.
 
-   INFERRED, not stated — confirm in PORT-034:
-     - jobs[0].start/end year ("2026")  Vernel gave "Feb" and "May" without a
-       year. Feb-May immediately preceding a June 2026 graduation is the
-       standard final-year OJT window, so 2026 is the reading. ONE WORD TO FIX
-       if wrong, and the only inferred employment date in this file.
-     - jobs[0].role   given as "frontend dev". If it was formally an internship
-       the title should read "Frontend Developer Intern".
-     - jobs[0].location   not supplied; "Philippines" is the safe floor.
-     - jobs[1].location   the resume lists this only in the page header.
-     - education.start ("2022-08")  the resume gives only the graduation date.
+   CONFIRMED 2026-08-25, ahead of PORT-034 — all four were previously inferred:
+     - jobs[0] year "2026"          correct.
+     - jobs[0].role                 formally an internship; title corrected to
+                                    "Frontend Developer Intern".
+     - jobs[0].location             "Philippines" stands; no city supplied.
+     - education.start "2022-08"    correct.
 
-   PLACEHOLDER: jobs[0].bullets. The dates are real, the achievements are not
-   written yet. Caught by the PORT-057 gate along with everything else marked
-   "Placeholder" or "TBC" under src/content/.
+   jobs[0] carries TWO bullets where the other role carries four, and that is
+   deliberate. The work was frontend-only, to designs authored by someone
+   else, across parts of two sites — a third bullet would have had to invent
+   something. Nothing here is quantified, because no measurable outcome was
+   available; the work is described instead.
+
+   jobs[1].location comes from the resume's page header, the only place it
+   appears.
 --------------------------------------------------------------------------- */
 
 export const jobs = [
   {
     company: "OpalusPH",
-    role: "Frontend Developer",
+    role: "Frontend Developer Intern",
     start: "2026-02",
     end: "2026-05",
     location: "Philippines",
     bullets: [
-      "Placeholder — real bullet pending. This role produced the two OpalusPH sites listed under projects; what was actually achieved still needs writing.",
-      "Placeholder — real bullet pending. Lead with the outcome, not the task.",
-      "Placeholder — real bullet pending.",
+      "Built assigned sections of two company websites in Next.js, turning handed-over designs into working pages.",
+      "Delivered frontend-only work inside an existing team, implementing designs authored by someone else rather than making the visual decisions.",
     ],
+    stack: ["Next.js"],
   },
   {
     company: "Freelance",
