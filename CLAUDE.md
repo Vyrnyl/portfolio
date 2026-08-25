@@ -34,7 +34,7 @@ Every handover is the same four parts, in this order:
 
 2. **The path**, named in the prose so he knows which file he is looking at.
 3. **The code** — the complete file, always. See below.
-4. **What it does** — see below.
+4. **What it does, or what changed** — **one or two plain sentences.** See below.
 
 ### Always the whole file
 
@@ -50,21 +50,24 @@ Replacing the whole file has one failure mode — select all, paste — and it i
 
 So: hand over `code <path>`, name the file, give the complete contents, and say in the prose what actually changed and why, so he knows what he is looking for when he reads the diff back.
 
-### Explaining a component
+### Explaining a component — one or two sentences
 
-Explain the **role**, not the stylesheet. He needs to know what the piece is for and how it behaves, so that when he assembles pages he knows what he is reaching for.
+**Set 2026-08-25.** Every file's explanation is **one or two plain sentences**, whether it is new ("what it does") or existing ("what changed"). Not a bulleted anatomy, not a prop-by-prop tour.
 
-Say:
+Say what the piece is for and, for an edit, what moved and why. Nothing else — the props are readable in the file he is holding, and the detail lives in [ui-registry.md](ai-context/context/ui-registry.md).
 
-- What it is and what job it does on the page.
-- What it exports, what props it takes, and what each prop is *for*.
-- Where it belongs and what it expects to be given.
-- What visibly breaks if it is wired wrong, or left out.
-- Any real trap — a hydration rule, an ordering requirement, a dependency on something else being present.
+> `AboutIntro` is the page header for `/about` and owns its single `<h1>`; it takes no content props and reads `site` directly, the same way `Hero` does.
 
-Do **not** narrate the styling. No walking through class names, no listing which token maps to which colour, no explaining that `mt-auto` pins something to the bottom. That detail belongs in [ui-rules.md](ai-context/context/ui-rules.md) and [ui-registry.md](ai-context/context/ui-registry.md), which is exactly what those files are for. Mention a class only when it is a genuine gotcha he would otherwise trip on.
+> One class changed: the intro grid is now centred at `lg`, because the portrait is four times the height of the text beside it and top-aligned it left a visible hole.
 
-The test: if the explanation would still be useful to someone who never opens the CSS, it is at the right altitude.
+Two things survive the trim, and only when they genuinely apply:
+
+- **A real trap** — a hydration rule, an ordering requirement, a dependency on something else existing. One sentence, and only if it would actually bite.
+- **The reasoning behind a judgment call**, which belongs in the ticket brief or the close-out, not appended to each file. "Explain the why" still holds; it just does not live here.
+
+Do **not** narrate the styling — no class-name tours, no token mappings, no explaining that `mt-auto` pins something to the bottom. That is what [ui-rules.md](ai-context/context/ui-rules.md) and [ui-registry.md](ai-context/context/ui-registry.md) are for, and both are written at close anyway. Name a class only when it is the gotcha itself.
+
+The test: if it runs past two sentences without naming a trap, it is a registry entry wearing a handover's clothes.
 
 ### Explaining wiring
 
