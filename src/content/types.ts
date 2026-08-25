@@ -61,6 +61,12 @@ export interface SiteConfig {
   url: string;
   email: string;
   location: string;
+  /**
+   * The About page portrait. Required rather than optional, so there is never a
+   * "no photo" branch to design: what stands in until a real photo exists is a
+   * generated placeholder that says so on its face. PORT-058 swaps it.
+   */
+  photo: ImageAsset;
   /** Order here is the order in the header nav. */
   nav: Link[];
   socials: SocialLink[];

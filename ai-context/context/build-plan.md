@@ -69,7 +69,7 @@ Six sprints. A "sprint" here is a coherent chunk of work, not a fixed calendar b
 | **4** | Contact wiring | PORT-040 → 044 | ~7h | A real message lands in your inbox |
 | **5** | Production | PORT-050 → 056 | ~11h | Deployed to a custom domain, targets met, CI green |
 
-**Total: ~57h of focused work**, 38 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
+**Total: ~57h of focused work**, 39 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
 
 ### Build order rationale
 
@@ -693,6 +693,27 @@ Added 2026-08-22. PORT-012 shipped with **placeholder copy and placeholder image
 - [ ] Cards and detail pages checked at all four breakpoints; the new aspect ratios do not break the grid
 
 **Watch for:** the placeholders are 16:10. Captures at a different ratio will be cropped by `object-cover`, which is fine for a card but can decapitate a screenshot's header bar. Check, do not assume.
+
+**Blocks:** PORT-056.
+
+---
+
+### PORT-058 · Replace the profile photo placeholder `S`
+**Depends on:** 033
+
+Added 2026-08-25. PORT-033 shipped `/about` with a **generated stand-in portrait** — Vernel had no photo to hand and chose to unblock the page rather than stall Sprint 3 behind it. The file says so on its own face (`PHOTO PENDING`), which is the same rule the project thumbnails follow: a placeholder that reads as pending, never as a finished thing.
+
+This is a three-line edit plus a file, not a rewrite. `site.photo` already carries `src`/`alt`/`width`/`height`, and `SiteConfig.photo` is **required**, so nothing can render `/about` with the field missing.
+
+**Acceptance criteria**
+- [ ] `public/images/profile-placeholder.webp` deleted, replaced by a real photo under `public/images/`
+- [ ] `site.photo.alt` describes the actual photo — the "Placeholder graphic standing in for…" string does not survive
+- [ ] `site.photo.width`/`height` match the new file's real intrinsic size
+- [ ] WebP, ≤ 200KB
+- [ ] `/about` checked at all four breakpoints in both themes — a different aspect ratio must not break the intro grid
+- [ ] Decide at the same time whether `/about` now earns an `og:image`; PORT-033 deliberately ships none while the portrait is a placeholder
+
+**Watch for:** the placeholder is **4:5 portrait** (1000×1250). A photo at a different ratio changes the height of the intro's right-hand column — it will not overflow, but it will shift where the text centres against it.
 
 **Blocks:** PORT-056.
 
