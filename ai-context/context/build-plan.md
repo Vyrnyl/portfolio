@@ -69,7 +69,7 @@ Six sprints. A "sprint" here is a coherent chunk of work, not a fixed calendar b
 | **4** | Contact wiring | PORT-040 → 044 | ~7h | A real message lands in your inbox |
 | **5** | Production | PORT-050 → 056 | ~11h | Deployed to a custom domain, targets met, CI green |
 
-**Total: ~57h of focused work**, 39 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
+**Total: ~57h of focused work**, 40 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
 
 ### Build order rationale
 
@@ -457,13 +457,13 @@ Hero, featured projects, CTA.
 **Depends on:** 015, 022
 
 **Acceptance criteria**
-- [ ] Experience as a timeline from `getJobs()`, current role first
-- [ ] `end: null` renders as "Present"
-- [ ] Education and skills sections present
-- [ ] PDF download button linking to `site.resumePdf`, opening in a new tab with `rel="noopener"`
-- [ ] The PDF actually exists in `public/` and is current
-- [ ] Timeline stacks legibly at 768px and 375px — this layout breaks most often
-- [ ] Sensible print stylesheet (`@media print`): no header, nav, or footer
+- [x] Experience as a timeline from `getJobs()`, current role first
+- [x] `end: null` renders as "Present" — **code path unexercised by real content**: no job has `end: null`, so this is proven against `formatMonth` in isolation, never on screen
+- [x] Education and skills sections present
+- [x] PDF download button linking to `site.resumePdf`, opening in a new tab with `rel="noopener"`
+- [ ] The PDF actually exists in `public/` and is current — **it exists; it is NOT current.** Deferred to **PORT-059** by Vernel's decision 2026-09-02. This is the one bullet keeping the ticket off ✔
+- [x] Timeline stacks legibly at 768px and 375px — this layout breaks most often
+- [x] Sensible print stylesheet (`@media print`): no header, nav, or footer
 
 ---
 
@@ -718,6 +718,40 @@ This is a three-line edit plus a file, not a rewrite. `site.photo` already carri
 - [ ] Decide at the same time whether `/about` now earns an `og:image`; PORT-033 deliberately ships none while the portrait is a placeholder
 
 **Watch for:** the placeholder is **4:5 portrait** (1000×1250). A photo at a different ratio changes the height of the intro's right-hand column — it will not overflow, but it will shift where the text centres against it.
+
+**Blocks:** PORT-056.
+
+---
+
+### PORT-059 · Replace the stale resume PDF `S`
+**Depends on:** 034
+
+Added 2026-09-02. PORT-034 shipped `/resume` against a PDF that **predates the OpalusPH internship entirely**. `pdftotext public/resume.pdf` was run before the page was built, and the file it returned lists only the Freelance role — so the page's timeline shows a job the download has never heard of. Vernel chose to ship the download live and track the gap rather than hide the button, which is the same unblock-and-track move PORT-012 made for screenshots and PORT-033 made for the portrait.
+
+This one is **worse than those two**, and the difference matters: a `PHOTO PENDING` graphic announces itself, and a placeholder thumbnail is visibly a placeholder. A stale PDF looks exactly like a current one. Nothing on the page tells a reader the download disagrees with the timeline above it, so this cannot be caught by looking — only by remembering, which is why it is a ticket.
+
+**What the current PDF actually says**, extracted 2026-09-02:
+
+| | `experience.ts` (the page) | `public/resume.pdf` (the download) |
+|---|---|---|
+| OpalusPH internship | Frontend Developer Intern, Feb–May 2026 | **absent** |
+| Freelance | Web Developer, Aug–Dec 2024 | present, matches |
+| Education | CSU BSIT, 2022-08 → 2026-06 | present, matches |
+| Email | `vernaquino73@gmail.com` | **`aquinovern0@gmail.com`** |
+
+The email divergence is the part with real consequences: a reader who takes the address from the PDF writes to an inbox the site never mentions. Note a **third** address, `aquinovern15@gmail.com`, appears as the git author on this repo — settle which one is canonical here, not in three places later.
+
+Two further defects worth fixing in the same pass, both cosmetic but both visible to a recruiter: the skills block reads **"Langauges"**, and the PDF's Projects section lists two academic projects (Grades Repository System, CICT Project Gate) that are not the two OpalusPH sites `projects.ts` carries — so the PDF and `/projects` currently describe different bodies of work. Deciding which projects belong on the one-page resume is a judgment call for Vernel, not a defect to silently fix.
+
+**Acceptance criteria**
+- [ ] `public/resume.pdf` contains the OpalusPH internship with the same dates and title as `jobs[0]`
+- [ ] Every email address in the PDF matches `site.email` exactly
+- [ ] "Langauges" typo corrected
+- [ ] The PDF's projects and `projects.ts` tell a consistent story — same projects, or a deliberate documented subset
+- [ ] `pdftotext -layout public/resume.pdf -` diffed by eye against `/resume` — no fact appears in one and contradicts the other
+- [ ] The download still opens in a new tab and the file is not corrupted after replacement
+
+**Watch for:** the file is replaced in place at `public/resume.pdf`, so `site.resumePdf` needs no edit — and *because* it needs no edit, nothing in the codebase changes when this ticket lands. `npm run verify` will pass identically before and after. The only proof is reading the new PDF.
 
 **Blocks:** PORT-056.
 

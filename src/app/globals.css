@@ -246,3 +246,55 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Print.
+   PORT-034's last acceptance criterion — /resume must print without the site
+   chrome around it.
+
+   Keyed on the shell's landmark elements rather than a `print:hidden` class,
+   because Header, Footer and SkipLink are rendered by the ROOT LAYOUT: a page
+   cannot reach them to add a class, and giving them one would hide them when
+   any page is printed, which is in fact what we want. Scoped by element so it
+   keeps working if those components are ever refactored.
+
+   Colours are forced back to black on white. The theme's tokens are an
+   off-white ground and a near-black ink; sent to a printer the ground becomes
+   a full-page wash of ink most browsers drop anyway, and any reader printing
+   from dark mode would otherwise get a black page.
+--------------------------------------------------------------------------- */
+
+@media print {
+  body > header,
+  body > footer,
+  a[href="#main"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Sections carry a clamp()-based vertical rhythm tuned for a viewport, not
+     a page. On paper it wastes most of the first sheet. */
+  main section {
+    padding-block: 0 !important;
+    margin-block: 0 0 1.5rem !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: #000 !important;
+    break-after: avoid;
+  }
+
+  /* The timeline rail and node rings are the one place a border carries
+     meaning rather than decoration, so they are kept — just in grey. */
+  li::before,
+  [class*="ring-"] {
+    color: #999 !important;
+  }
+}
