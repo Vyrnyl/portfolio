@@ -491,14 +491,24 @@ Form UI **only** — no submission logic. This is the deliberate UI-before-wirin
 Added after the design review — Skills is a nav item, not just a home-page strip.
 
 **Acceptance criteria**
-- [ ] Three honest tiers — Confident / Working knowledge / Learning now — each with a label saying what the tier *means*
-- [ ] **No percentage bars.** Tier is encoded by dot weight and swatch saturation
-- [ ] Tiers render from `skillGroups`; a `tier` field drives the grouping
-- [ ] "How I work" grid: four practice cards, each icon + heading + body
-- [ ] CTA through to `/projects` and `/resume`
-- [ ] Real metadata
+- [x] Three honest tiers — Confident / Working knowledge / Learning now — each with a label saying what the tier *means*
+- [x] **No percentage bars.** Tier is encoded by dot weight and ~~swatch saturation~~ **dot size** — see the amendment below
+- [x] Tiers render from `skillGroups`; a `tier` field drives the grouping
+- [x] "How I work" grid: four practice cards, each icon + heading + body — needed a new `practices` array in `skills.ts` and an eleventh accessor, `getPractices()`
+- [x] CTA through to `/projects` and `/resume`
+- [x] Real metadata
 
-**Note:** needs `tier: "confident" | "working" | "learning"` on `SkillGroup` in [content-model.md](content-model.md) §2 — add it in PORT-010 rather than retrofitting.
+**Note:** needs `tier: "confident" | "working" | "learning"` on `SkillGroup` in [content-model.md](content-model.md) §2 — add it in PORT-010 rather than retrofitting. Done in PORT-010 as written.
+
+**AC amended 2026-09-02, on measurement.** "Swatch saturation" cannot be built as written and still pass WCAG 1.4.11, which asks 3:1 of a non-text element that carries meaning. Both attempts were measured in a real browser and both failed:
+
+| Attempt | Light (working / learning) | Dark (working / learning) |
+|---|---|---|
+| Wash tokens (`fern-wash`, `surface-2`) | 1.06:1 / 1.02:1 | 1.23:1 / 1.22:1 |
+| `fern` at 70% / 45% opacity | 2.79:1 / 1.86:1 | passed / 2.60:1 |
+| **`fern` full strength, dot size 10/8/6px** | **4.78:1** | **7.81:1** |
+
+The cause is headroom: `--fern` is only 4.78:1 against the light ground, so there is almost nothing to dim into before a step drops under 3:1. Saturation is therefore replaced by **dot size** as the second visual variable — full-strength fern at every tier, sizes stepping 10 → 8 → 6px. Depth is still encoded twice (how many dots are filled, and how large they are), so the meter never rests on colour alone (WCAG 1.4.1). Settled with Vernel rather than defaulted; the rejected option was inventing a `--fern-deep` token, which would have been a design decision made inside a build ticket.
 
 ---
 

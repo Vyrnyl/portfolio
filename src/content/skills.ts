@@ -1,4 +1,4 @@
-import type { SkillGroup } from "./types";
+import type { Practice, SkillGroup } from "./types";
 
 /* ---------------------------------------------------------------------------
    Source: public/resume.pdf, extracted 2026-08-22. Every item below appears on
@@ -20,9 +20,6 @@ import type { SkillGroup } from "./types";
    Order is confident -> working -> learning and must stay that way: the /skills
    page renders the tiers as ordered depth, and content-model §5 requires
    exactly one group per tier.
-
-   `practices` (the Practice[] export content-model §3 places in this file) is
-   deliberately absent — it belongs to PORT-037, not PORT-013.
 --------------------------------------------------------------------------- */
 
 export const skillGroups = [
@@ -64,3 +61,54 @@ export const skillGroups = [
     ],
   },
 ] satisfies SkillGroup[];
+
+/* ---------------------------------------------------------------------------
+   How I work — written for PORT-037, the /skills page.
+
+   These are the four habits, not four more technologies. Each one is drawn
+   from something already in this repo rather than from a list of virtues, and
+   the traceable source is named so a future edit can check the claim still
+   holds:
+
+     Access control first   jobs[1].bullets (RBAC on the freelance app) plus
+                            the "grades-repository-system" and
+                            "cict-project-gate" problem statements — three
+                            builds where permissions were the design problem,
+                            not a late feature.
+     Schema and API together  jobs[1].bullets, verbatim in substance: the
+                            schema and the API contract were designed as one
+                            thing, which is what kept data consistent as
+                            features landed on top.
+     Say what is true       PORT-013's own "no metric invented" rule, visible
+                            on this site: the OpalusPH role carries two
+                            bullets rather than three, and the learning tier
+                            above exists so the list is not only strengths.
+     Learning in the open   the learning tier, and this site itself — the
+                            App Router and WCAG work is happening here.
+
+   Icons are IconName members (PORT-024), which already reserved eight names
+   for exactly this content. Four are used; the other four stay available.
+--------------------------------------------------------------------------- */
+
+export const practices = [
+  {
+    icon: "ShieldCheck",
+    title: "Access control first",
+    body: "On three separate builds the hard part was not the feature — it was deciding who may see it. I would rather settle a permission once, in one layer, than re-check it screen by screen and find the gap in review.",
+  },
+  {
+    icon: "Code2",
+    title: "Schema and API together",
+    body: "The database schema and the contract over it get designed in the same sitting. Designing them apart is how the two drift, and the drift only shows up later, as data that disagrees with itself.",
+  },
+  {
+    icon: "MessageCircle",
+    title: "Say what is actually true",
+    body: "No invented numbers, and no skill claimed a level above where it is. The tiers on this page are graded honestly and the learning one is listed on purpose — a page that only shows strengths tells a reader nothing they can use.",
+  },
+  {
+    icon: "BookOpen",
+    title: "Learning in the open",
+    body: "Server Components, accessibility to WCAG 2.2 AA, and token-driven design systems are things I am working through right now, and this site is where most of it is happening rather than a private sandbox.",
+  },
+] satisfies Practice[];

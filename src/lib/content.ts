@@ -1,9 +1,10 @@
 import { education, jobs } from "@/content/experience";
 import { projects } from "@/content/projects";
-import { skillGroups } from "@/content/skills";
+import { practices, skillGroups } from "@/content/skills";
 import type {
   Education,
   Job,
+  Practice,
   Project,
   SkillGroup,
   SkillTier,
@@ -13,8 +14,8 @@ import type {
    The accessor layer. Spec: ai-context/context/content-model.md §4.
 
    This is the ONLY module that imports queryable content — `projects`, `jobs`,
-   `education`, `skillGroups`. Pages import from here rather than from
-   src/content/ directly, so "newest first", "which three are featured" and
+   `education`, `skillGroups`, `practices`. Pages import from here rather than
+   from src/content/ directly, so "newest first", "which three are featured" and
    "what order do the skill tiers go in" are each decided in exactly one place
    instead of being re-derived, slightly differently, on every page.
 
@@ -218,4 +219,19 @@ export function getSkillGroups(): SkillGroup[] {
   return [...skillGroups].sort(
     (a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier],
   );
+}
+
+/**
+ * The "how I work" practice principles, in the order the content file lists
+ * them.
+ *
+ * Unsorted, and deliberately so — unlike every other list in this module there
+ * is no ordering fact to enforce here. Four habits have no natural rank, so the
+ * file's own order IS the intended order, and imposing one (alphabetical, say)
+ * would invent a meaning the content does not have. Returning a copy anyway
+ * keeps a caller from mutating shared module state through the returned
+ * reference.
+ */
+export function getPractices(): Practice[] {
+  return [...practices];
 }

@@ -189,8 +189,11 @@ The only module allowed to import **queryable** content — `projects`, `jobs`, 
 | `getJobs()` | `Job[]` | Current role first, then newest start first. |
 | `getEducation()` | `Education[]` | Newest start first. |
 | `getSkillGroups()` | `SkillGroup[]` | Depth order: confident → working → learning. |
+| `getPractices()` | `Practice[]` | **Added 2026-09-02 (PORT-037).** The "how I work" principles, in the order `skills.ts` lists them. **The only accessor that does not sort** — four habits have no natural rank, so the content file's order IS the intended order and imposing one (alphabetical, say) would invent a meaning the content does not have. Still returns a copy, so a caller cannot mutate shared module state through the returned reference. |
 
 `TIER_ORDER`, the rank map behind `getSkillGroups()`, is module-private and deliberately not exported.
+
+The file now exports **eleven** accessors. `practices` joins `projects`, `jobs`, `education` and `skillGroups` as content only this module may import.
 
 ### Four rules the file holds
 
