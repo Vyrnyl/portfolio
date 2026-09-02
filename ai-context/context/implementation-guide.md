@@ -489,21 +489,40 @@ Build outward: schema → action → email → hardening. Each step is testable 
 
 ### PORT-040 · Schema
 
+**Zod v4 syntax** (4.5.4 is what `npm install zod` lands). Three v3 idioms this guide originally used are deprecated: `z.string().email()` -> top-level `z.email()`, the `{ message: ... }` error key -> `{ error: ... }`, and `error.flatten()` -> top-level `z.flattenError()`.
+
 ```ts
 import { z } from "zod";
 
 export const contactSchema = z.object({
-  name: z.string().trim().min(2, "Please enter your name").max(100),
-  email: z.string().trim().email("Please enter a valid email address").max(200),
-  message: z.string().trim().min(10, "Please write at least a sentence or two").max(2000),
+  name: z
+    .string({ error: "Please enter your name." })
+    .trim()
+    .min(2, { error: "Please enter your name." })
+    .max(100, { error: "That name is too long — 100 characters at most." }),
+  email: z
+    .email({ error: "Please enter a valid email address." })
+    .trim()
+    .max(200, { error: "That email address is too long — 200 characters at most." }),
+  message: z
+    .string({ error: "Please write a message." })
+    .trim()
+    .min(10, { error: "Please write at least a sentence or two." })
+    .max(2000, { error: "That message is too long — 2000 characters at most." }),
   // Bots fill hidden fields. Humans never see this one.
-  honeypot: z.string().max(0).optional(),
+  honeypot: z
+    .string({ error: "This field must be left empty." })
+    .max(0, { error: "This field must be left empty." }),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;
 ```
 
 Every string has a `.max()`. Without one, a 10MB message body reaches your email provider.
+
+**`honeypot` is required, not `.optional()`** — PORT-040's AC says "present and required to be empty", and the difference is the whole gate: with `.optional()` a bot that simply *omits* the field parses clean and the trap never fires. The cost is that the hidden input must actually exist in the form, so **PORT-041 owes one line of markup** on top of its `useActionState` swap.
+
+**`.trim()` runs before `.min()`** — it is a parse-time transform, so a message of nine spaces fails rather than passing a length check on untrimmed input, and `parsed.data` arrives already clean for PORT-042 to send.
 
 ### PORT-041 · The action
 
@@ -521,7 +540,9 @@ export async function submitContact(_prev: ActionResult | null, formData: FormDa
     return {
       ok: false,
       message: "Please check the fields below.",
-      fieldErrors: parsed.error.flatten().fieldErrors,
+      // v4: top-level z.flattenError(), not the deprecated error.flatten().
+      // Returns Record<string, string[]> — exactly ActionResult.fieldErrors.
+      fieldErrors: z.flattenError(parsed.error).fieldErrors,
     };
   }
 

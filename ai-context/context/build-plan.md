@@ -526,10 +526,12 @@ The cause is headroom: `--fern` is only 4.78:1 against the light ground, so ther
 `lib/validation/contact.ts` — one zod schema shared by client and server.
 
 **Acceptance criteria**
-- [ ] `name` 2–100, `email` valid, `message` 10–2000 — **every string field has a `.max()`**
-- [ ] `honeypot` field present and required to be empty
-- [ ] Type inferred from the schema (`z.infer`), not declared twice
-- [ ] Error messages are human ("Please enter your email address", not "Invalid input")
+- [x] `name` 2–100, `email` valid, `message` 10–2000 — **every string field has a `.max()`**
+- [x] `honeypot` field present and required to be empty
+- [x] Type inferred from the schema (`z.infer`), not declared twice
+- [x] Error messages are human ("Please enter your email address", not "Invalid input")
+
+**Closed 2026-09-02.** Zod **4.5.4**; the guide's original snippet was v3 and has been rewritten. `honeypot` ships **required, not `.optional()`** — Vernel's call when the AC and the guide disagreed — so **PORT-041 owes one hidden input** alongside its `useActionState` swap. Verified by 28 real parses compiled out of the repo and run under node (no TS runner installed): bounds at and over every limit including a 10MB body, `.trim()` proven to run *before* `.min()`, an omitted honeypot proven to fail, all seven error messages asserted human, and `z.flattenError()` confirmed to return the `Record<string, string[]>` that `ActionResult.fieldErrors` is typed as.
 
 ---
 
