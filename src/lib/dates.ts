@@ -64,4 +64,3 @@ export function machineDate(value: string | null): string | undefined {
 export function entryRange(entry: Job | Education): string {
   return formatRange(entry.start, entry.end);
 }
-const ciProbe: number = "PORT-054 probe";
