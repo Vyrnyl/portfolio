@@ -12,7 +12,7 @@ A six-page Next.js portfolio site — home, projects (index + detail), skills, a
 |---|---|---|
 | **Authoring** | **You** | The complete contents of every file — components, `lib/`, content, tokens, config, and the `src/app/` wiring. Delivered in the reply as a full paste-ready file with its path. Never a skeleton with holes. |
 | **Placing** | **He does this** | Creating the file and pasting it in. **You do not write to disk** — not in `src/app/`, not in `components/`, not anywhere under `src/`. Reading is unrestricted. |
-| **Git** | **He runs this** | Branching, staging, committing, pushing. You may read history freely (`git log`, `git status`, `git diff`) and you hand over the exact commands — you never run one that writes. |
+| **Git** | **He runs this** | Staging, committing, pushing — **straight to `main`, no branches, no PRs** (set 2026-09-03). You may read history freely (`git log`, `git status`, `git diff`) and you hand over the exact commands — you never run one that writes. |
 
 You **may** write directly to the `ai-context/` docs, `CLAUDE.md` and `.claude/` — those are the record, not the build. You **may** run read-only and verification commands yourself: `npm run verify`, `lint`, `typecheck`, `build`, and any file reading or searching.
 
@@ -182,7 +182,7 @@ Full list with rationale in [build-plan.md](ai-context/context/build-plan.md) §
 - Every component accepts `className`, merged with `cn()`
 - Server Actions return a typed result union; they never throw to the client
 - `process.env` accessed only through `lib/env.ts`
-- Branch per ticket: `feat/PORT-021-project-card`
+- **Commit straight to `main`** — no feature branches, no PRs (set 2026-09-03). `main` auto-deploys, so verify before committing, not after
 
 ## Gotchas
 

@@ -137,7 +137,8 @@ ESLint: `next/core-web-vitals` + `next/typescript`, plus one project-specific ru
 
 ## 10. Git
 
-- Branch per ticket: `feat/PORT-021-project-card`, `fix/PORT-043-rate-limit`.
+- **Commit straight to `main`. No feature branches, no PRs.** Set 2026-09-03, replacing the branch-per-ticket rule this project started with: it is a solo build with no reviewer, so a branch bought review that never happened and added two steps to every ticket.
+- **Know what that costs.** `main` auto-deploys, so a ticket is live the moment it is pushed and there is no preview URL in between. The check that used to happen on a branch now has to happen *before* the commit — which is why a ticket is not closed until `npm run verify` and the browser checks are green.
 - Conventional commits, subject ≤ 72 chars, ticket ID in the body or subject:
 
 ```
