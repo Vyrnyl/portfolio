@@ -541,14 +541,16 @@ The cause is headroom: `--fern` is only 4.78:1 against the light ground, so ther
 `lib/actions/contact.ts`, wired to the form with `useActionState`.
 
 **Acceptance criteria**
-- [ ] `"use server"`; returns the typed `ActionResult` union
-- [ ] Server-side zod parse is authoritative — verified by submitting with JS disabled or via a crafted request
-- [ ] Field errors map back to the correct inputs
-- [ ] Pending state disables the submit button and shows a spinner
-- [ ] The action **never throws to the client**; unexpected errors are caught, logged server-side, returned as a generic message
-- [ ] Result announced in an `aria-live="polite"` region
-- [ ] Successful submission clears the form
+- [x] `"use server"`; returns the typed `ActionResult` union
+- [x] Server-side zod parse is authoritative — verified by submitting with JS disabled or via a crafted request
+- [x] Field errors map back to the correct inputs
+- [x] Pending state disables the submit button and shows a spinner
+- [x] The action **never throws to the client**; unexpected errors are caught, logged server-side, returned as a generic message
+- [x] Result announced in an `aria-live="polite"` region
+- [x] Successful submission clears the form
 
+
+**Closed 2026-09-03.** The "crafted request" bullet was met by **defeating the client rather than forging a request**: Next refuses a guessed action id outright and a raw FormData POST returns "Connection closed", so the page's own JS is rewritten at runtime the way an attacker would — `required` stripped, `type="email"` downgraded to text, `maxlength` removed, the honeypot revealed and filled — and the server caught all ten cases. **The honeypot must be read off raw `FormData` BEFORE `safeParse`**, not from `parsed.data`: the schema rejects a filled one first, which surfaces as a `fieldErrors.honeypot` that no visible field renders, so the form silently refuses to submit showing no reason at all. Three additions PORT-036 did not forecast, each found by running the code: a `formKey` remount (a `<Link href="/contact">` reset is DEAD — same-route navigation never unmounts the component, so the success panel is permanent), a split `SubmitButton` (`useFormStatus` reads the PARENT form), and an inline `Spinner` (none existed; not a `lib/icons.ts` entry, since `IconName` is scoped to content-backed icons). 298/298 assertions across four widths × both themes plus a tamper suite. **Delivery is NOT wired** — a valid submission returns `{ ok: true }` and is written to the server log; PORT-042 owns the email, so the success panel's "it reached my inbox" is not yet true.
 ---
 
 ### PORT-042 · Email delivery `M`

@@ -236,6 +236,33 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   The contact honeypot's hiding rule. PORT-041.
+
+   A honeypot must be invisible to humans AND absent from the accessibility
+   tree, and `sr-only` does only the first — it is built to keep content
+   available to screen readers, which is the opposite of what is wanted here.
+   Putting `aria-hidden` on the input instead would hide a FOCUSABLE control
+   from assistive tech, which ARIA forbids outright.
+
+   So: moved off-canvas, out of the a11y tree via aria-hidden on the wrapper,
+   and out of the tab order via tabIndex={-1} on the input itself.
+
+   It lives here rather than in the component because `left: -9999px` is an
+   arbitrary value, and ui-rules.md §1 does not allow those in a className.
+   `display: none` and `visibility: hidden` are not options: a bot that renders
+   CSS skips fields it can see are hidden, and the trap never fires.
+--------------------------------------------------------------------------- */
+
+.honeypot-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

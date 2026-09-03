@@ -1,64 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { site } from "@/content/site";
+import { submitContact } from "@/lib/actions/contact";
 import { cn } from "@/lib/utils";
 
-/**
- * The four states this form can be in. Mirrors the shape the Server Action will
- * return in PORT-041 (code-standards.md §6) so that ticket swaps the *source*
- * of this value — useActionState instead of useState — without touching a
- * single branch of the JSX below.
- */
-type FormState =
-  | { status: "idle" }
-  | { status: "pending" }
-  | { status: "success" }
-  | { status: "error"; message: string; fieldErrors?: Record<string, string[]> };
-
 const FIELD_ERRORS_EMPTY: Record<string, string[]> = {};
-
-/**
- * PORT-036 IS UI ONLY. Everything in this block is scaffolding and PORT-041
- * deletes it outright — it exists so all four states can actually be reached
- * and reviewed in a browser, which is this ticket's acceptance criterion.
- *
- * It is deliberately NOT a Zod schema. The real one lives in lib/validation/,
- * is shared with the server, and the server parse is authoritative
- * (code-standards.md §6) — writing half of it here, in the wrong layer, to be
- * moved later is worse than checks that are obviously throwaway.
- *
- * How to reach each state:
- *   leave a field empty        -> error, field validation
- *   put "fail" in the email    -> error, provider failure + mailto: fallback
- *   fill everything in         -> pending (1.2s), then success
- */
-function mockValidate(values: {
-  name: string;
-  email: string;
-  message: string;
-}): Record<string, string[]> {
-  const errors: Record<string, string[]> = {};
-
-  if (values.name.trim() === "") {
-    errors.name = ["Tell me what to call you."];
-  }
-  if (values.email.trim() === "") {
-    errors.email = ["I need an address to reply to."];
-  } else if (!values.email.includes("@")) {
-    errors.email = ["That does not look like an email address."];
-  }
-  if (values.message.trim() === "") {
-    errors.message = ["The message is empty."];
-  }
-
-  return errors;
-}
 
 type Props = {
   className?: string;
@@ -68,51 +21,57 @@ type Props = {
  * The contact form — fields, submit, and the four states.
  *
  * This is the leaf that carries "use client" (code-standards.md §4): the page
- * around it stays a Server Component and Field/Input/Textarea all stay server
+ * around it stays a Server Component, and Field/Input/Textarea all stay server
  * components too, exactly as PORT-023 built them.
+ *
+ * PORT-036 shaped this component's local state as the same union the action
+ * returns, so this ticket changed the SOURCE of `state` and nothing else about
+ * how the JSX reads it — `useActionState` in place of `useState`, the action in
+ * place of `mockValidate` and its setTimeout.
  */
 export function ContactForm({ className }: Props) {
-  const [state, setState] = useState<FormState>({ status: "idle" });
+  /**
+   * Bumping this remounts <ContactFormFields>, which is the only way to clear
+   * a useActionState result — the hook returns no reset function, and its state
+   * lives for the life of the mounted component.
+   *
+   * The first attempt at "Send another" was a <Link href="/contact">, and it
+   * was DEAD: the visitor is already on /contact, so the client router treats
+   * it as a same-route navigation, keeps the component mounted, and the success
+   * panel never goes away. A hard reload cleared it — which is what proved the
+   * state is client-only and a remount is the real fix.
+   */
+  const [formKey, setFormKey] = useState(0);
 
-  const pending = state.status === "pending";
+  return (
+    <ContactFormFields
+      key={formKey}
+      className={className}
+      onReset={() => setFormKey((n) => n + 1)}
+    />
+  );
+}
+
+function ContactFormFields({
+  className,
+  onReset,
+}: {
+  className?: string;
+  onReset: () => void;
+}) {
+  /**
+   * `useActionState` returns the action's last result, a wrapped action to pass
+   * to `<form action>`, and a pending flag. The initial state is `null` — no
+   * submission has happened yet, which is a distinct thing from a submission
+   * that returned `{ ok: false }`, and the union has no member for "idle"
+   * because `null` already says it.
+   */
+  const [state, formAction] = useActionState(submitContact, null);
+
   const fieldErrors =
-    state.status === "error" ? (state.fieldErrors ?? FIELD_ERRORS_EMPTY) : FIELD_ERRORS_EMPTY;
+    state?.ok === false ? (state.fieldErrors ?? FIELD_ERRORS_EMPTY) : FIELD_ERRORS_EMPTY;
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const data = new FormData(event.currentTarget);
-    const values = {
-      name: String(data.get("name") ?? ""),
-      email: String(data.get("email") ?? ""),
-      message: String(data.get("message") ?? ""),
-    };
-
-    const errors = mockValidate(values);
-    if (Object.keys(errors).length > 0) {
-      setState({
-        status: "error",
-        message: "Some fields need another look.",
-        fieldErrors: errors,
-      });
-      return;
-    }
-
-    setState({ status: "pending" });
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-
-    if (values.email.includes("fail")) {
-      setState({
-        status: "error",
-        message: "The message could not be sent — the email service did not respond.",
-      });
-      return;
-    }
-
-    setState({ status: "success" });
-  }
-
-  if (state.status === "success") {
+  if (state?.ok) {
     return (
       <div
         className={cn("border-fern bg-surface-2 rounded-lg border p-6", className)}
@@ -123,12 +82,7 @@ export function ContactForm({ className }: Props) {
         <p className="text-muted mt-2 text-sm">
           Thanks — it reached my inbox. I usually reply within a couple of days.
         </p>
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-6"
-          onClick={() => setState({ status: "idle" })}
-        >
+        <Button variant="outline" size="sm" className="mt-6" onClick={onReset}>
           Send another
         </Button>
       </div>
@@ -136,11 +90,14 @@ export function ContactForm({ className }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className={cn("space-y-6", className)}>
+    <form action={formAction} noValidate className={cn("space-y-6", className)}>
+      {/*
+        noValidate is load-bearing, as it was in PORT-036 — without it the
+        browser's own bubble fires first and preempts the server parse, so the
+        authoritative errors never render.
+      */}
       <Field name="name" label="Name" required error={fieldErrors.name?.[0]}>
-        {(props) => (
-          <Input {...props} type="text" autoComplete="name" placeholder="Your name" />
-        )}
+        {(props) => <Input {...props} type="text" autoComplete="name" placeholder="Your name" />}
       </Field>
 
       <Field
@@ -156,19 +113,46 @@ export function ContactForm({ className }: Props) {
       </Field>
 
       <Field name="message" label="Message" required error={fieldErrors.message?.[0]}>
-        {(props) => (
-          <Textarea {...props} rows={6} placeholder="What are you working on?" />
-        )}
+        {(props) => <Textarea {...props} rows={6} placeholder="What are you working on?" />}
       </Field>
+
+      {/*
+        The honeypot. PORT-040 made this REQUIRED in the schema, so the form
+        does not parse without it — it is load-bearing markup, not an optional
+        extra.
+
+        Hidden three ways, each doing a different job: `.honeypot-field` moves
+        it off-canvas (a human never sees it), `aria-hidden` on the WRAPPER
+        keeps it out of the accessibility tree without the ARIA violation of
+        hiding a focusable control, and `tabIndex={-1}` keeps it out of the tab
+        order so keyboard users cannot land in it.
+
+        The input is NAMED `website` on its id rather than `honeypot`: a
+        password manager filling every text field it recognises would trip a
+        field named for its purpose, and a real person would then be silently
+        classed as a bot and told their message sent. `name="honeypot"` is what
+        the schema reads. autoComplete="off" is the first line of that defence;
+        the id is the second, because "off" is not universally honoured.
+      */}
+      <div className="honeypot-field" aria-hidden="true">
+        <label htmlFor="contact-website">Leave this field empty</label>
+        <input
+          id="contact-website"
+          name="honeypot"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
+        />
+      </div>
 
       {/*
         The form-level failure. Field-level problems render inside their own
         Field (PORT-023 wired role="alert" there already), so this banner is
-        only for the failure no single field owns — the provider being down —
-        and it carries the mailto: fallback code-standards.md §6 requires of
-        every user-facing failure.
+        only for the failure no single field owns — and it carries the mailto:
+        fallback code-standards.md §6 requires of every user-facing failure.
       */}
-      {state.status === "error" && state.fieldErrors === undefined ? (
+      {state?.ok === false && state.fieldErrors === undefined ? (
         <div className="border-coral bg-surface-2 rounded-lg border p-4" role="alert">
           <p className="text-coral-text text-sm font-medium">{state.message}</p>
           <p className="text-muted mt-2 text-sm">
@@ -187,18 +171,80 @@ export function ContactForm({ className }: Props) {
         </div>
       ) : null}
 
-      <div className="flex items-center gap-4">
-        <Button type="submit" disabled={pending}>
-          {pending ? "Sending…" : "Send message"}
-        </Button>
-        {/*
-          The pending word is announced as well as shown: the button's own label
-          changing is a visual cue only for anyone not focused on it.
-        */}
-        <p aria-live="polite" className="text-muted text-sm">
-          {pending ? "Sending your message…" : ""}
-        </p>
-      </div>
+      {/*
+        The validation summary is announced, not just displayed. Each field's
+        own error already carries role="alert", but a visitor who submits from
+        the button hears nothing about WHY the page did not move on unless the
+        form-level message is spoken too.
+      */}
+      <p aria-live="polite" className="sr-only">
+        {state?.ok === false && state.fieldErrors !== undefined ? state.message : ""}
+      </p>
+
+      <SubmitButton />
     </form>
+  );
+}
+
+/**
+ * The pending spinner.
+ *
+ * Inline rather than an entry in lib/icons.ts: PORT-024 scoped `IconName` to
+ * icons a built content type actually names, and a spinner is a UI affordance
+ * with no content behind it. It is also the only place in the project that
+ * needs one, so a shared abstraction would have exactly one caller.
+ *
+ * `aria-hidden` because the pending state is already announced twice over — by
+ * the button's label and by the live region beside it. A third announcement of
+ * a decorative mark is noise.
+ *
+ * Note what the global prefers-reduced-motion block does to this: it collapses
+ * animation-duration to 0.01ms, which FREEZES the spinner rather than hiding
+ * it. That is acceptable because the meaning is carried by the text — the mark
+ * is decoration either way — but it is a static circle for those users, not an
+ * absent one.
+ */
+function Spinner() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="animate-spin">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
+      <path
+        d="M12 2a10 10 0 0 1 10 10"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/**
+ * Its own component on purpose. `useFormStatus` reads the status of the
+ * PARENT form, so calling it inside ContactFormFields — which renders the form
+ * rather than sitting inside one — returns `pending: false` forever.
+ */
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <div className="flex items-center gap-4">
+      <Button type="submit" disabled={pending}>
+        {pending ? (
+          <>
+            <Spinner />
+            Sending…
+          </>
+        ) : (
+          "Send message"
+        )}
+      </Button>
+      {/*
+        Pending is announced as well as shown: the button's own label changing
+        is a visual-only cue for anyone not focused on it.
+      */}
+      <p aria-live="polite" className="text-muted text-sm">
+        {pending ? "Sending your message…" : ""}
+      </p>
+    </div>
   );
 }
