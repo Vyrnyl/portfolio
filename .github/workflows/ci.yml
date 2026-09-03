@@ -1,0 +1,63 @@
+# Continuous integration for the portfolio.
+#
+# Runs on every push to main and on every pull request. Because main
+# auto-deploys to Vercel, this is the only gate between a bad commit and
+# the live site — keep it green.
+#
+# The three checks mirror `npm run verify`, but run as SEPARATE steps on
+# purpose: `verify` chains them with `&&`, so a type error would mask
+# whether lint also fails. Split out, the GitHub UI names the one that broke.
+#
+# NOTE for PORT-042: this job has no environment variables. `.env*` is
+# gitignored, so the runner never sees RESEND_API_KEY, CONTACT_TO_EMAIL or
+# NEXT_PUBLIC_SITE_URL. That is fine today because nothing reads them at
+# build time. Once `lib/env.ts` throws at module load on a missing var,
+# `next build` will evaluate it and this workflow will go red — add the
+# vars as GitHub repository secrets and an `env:` block on the build step
+# at that point.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same branch cancels the first run still in flight,
+# so a quick follow-up commit does not queue behind a stale one.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, lint, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Read the version from .nvmrc rather than hardcoding it here,
+          # so the pin lives in exactly one place and cannot drift.
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        # `npm ci` installs from package-lock.json exactly and fails if the
+        # lockfile and package.json disagree. Never `npm install` in CI —
+        # it can silently resolve a different tree than the one tested locally.
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
