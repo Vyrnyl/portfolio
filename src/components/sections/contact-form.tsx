@@ -25,7 +25,7 @@ type Props = {
  * components too, exactly as PORT-023 built them.
  *
  * PORT-036 shaped this component's local state as the same union the action
- * returns, so this ticket changed the SOURCE of `state` and nothing else about
+ * returns, so PORT-041 changed the SOURCE of `state` and nothing else about
  * how the JSX reads it — `useActionState` in place of `useState`, the action in
  * place of `mockValidate` and its setTimeout.
  */
@@ -40,6 +40,12 @@ export function ContactForm({ className }: Props) {
    * it as a same-route navigation, keeps the component mounted, and the success
    * panel never goes away. A hard reload cleared it — which is what proved the
    * state is client-only and a remount is the real fix.
+   *
+   * PORT-043 gave the remount a second job: `startedAt` is captured on mount,
+   * so bumping the key also issues a FRESH timestamp for the next message.
+   * Without that, "Send another" would reuse the original mount time and the
+   * minimum-time guard would wave the second message through on the strength
+   * of how long the first one took.
    */
   const [formKey, setFormKey] = useState(0);
 
@@ -67,6 +73,37 @@ function ContactFormFields({
    * because `null` already says it.
    */
   const [state, formAction] = useActionState(submitContact, null);
+
+  /**
+   * When this form became available to fill in — the value the server's
+   * minimum-time guard measures against (PORT-043).
+   *
+   * A LAZY useState initialiser, and the shape is not a free choice. The first
+   * build of this used `useRef(Date.now())` and read `startedAt.current` in the
+   * JSX; ESLint's react-hooks plugin rejected it twice over, and both rules
+   * were right:
+   *
+   *   - `react-hooks/purity` — `Date.now()` is impure and must not be called
+   *     during render. Passing it as useRef's argument calls it on EVERY
+   *     render, not just the first; the value is discarded after mount, so it
+   *     looked stable while doing pointless work in a rule-breaking place.
+   *   - `react-hooks/refs` — reading `.current` during render is a bug in
+   *     waiting, because a ref change does not re-render and React makes no
+   *     promise the value read at render time is the one committed.
+   *
+   * `useState(() => Date.now())` fixes both: React calls the initialiser once,
+   * on mount, outside the purity constraint, and the value is ordinary state
+   * that is legitimately read during render. The setter is deliberately not
+   * destructured — nothing ever updates this.
+   *
+   * IT IS DELIBERATELY NOT A SERVER-COMPUTED DEFAULT. A timestamp baked into
+   * the HTML at build time would be the moment `next build` ran — hours or
+   * weeks before any visitor arrives — and the elapsed time would be
+   * astronomically large for everyone, including a bot. The value has to come
+   * from the client for the guard to mean anything, which is also exactly why
+   * the server treats it as untrusted.
+   */
+  const [startedAt] = useState(() => Date.now());
 
   const fieldErrors =
     state?.ok === false ? (state.fieldErrors ?? FIELD_ERRORS_EMPTY) : FIELD_ERRORS_EMPTY;
@@ -147,9 +184,37 @@ function ContactFormFields({
       </div>
 
       {/*
+        The mount timestamp for the minimum-time guard (PORT-043). Also
+        required by the schema, so this is the SECOND piece of load-bearing
+        hidden markup — delete either one and every submission fails.
+
+        type="hidden" rather than the off-canvas treatment the honeypot gets:
+        a hidden input is not focusable, not rendered and not in the
+        accessibility tree, so it needs none of that machinery. The honeypot
+        only lives off-canvas because it has to look real to a bot.
+
+        suppressHydrationWarning IS REQUIRED HERE and is not decoration. This
+        component prerenders on the server, where the initialiser runs and
+        stamps the server's clock; the client then runs it again on hydration
+        and gets a different millisecond. Without the attribute React logs a
+        mismatch on every single page load. The CLIENT value is the one that
+        survives hydration and the one that gets posted, which is what the
+        guard needs — the same class of legitimately-client-only value as the
+        next-themes rule in CLAUDE.md, marked as such rather than worked around.
+      */}
+      <input
+        type="hidden"
+        name="startedAt"
+        value={startedAt}
+        suppressHydrationWarning
+        readOnly
+      />
+
+      {/*
         The form-level failure. Field-level problems render inside their own
         Field (PORT-023 wired role="alert" there already), so this banner is
-        only for the failure no single field owns — and it carries the mailto:
+        only for the failure no single field owns — the rate limit, and the
+        provider failure PORT-042 will add — and it carries the mailto:
         fallback code-standards.md §6 requires of every user-facing failure.
       */}
       {state?.ok === false && state.fieldErrors === undefined ? (

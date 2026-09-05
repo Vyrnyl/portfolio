@@ -26,6 +26,20 @@ import { z } from "zod";
 --------------------------------------------------------------------------- */
 
 /**
+ * The minimum plausible time between a form appearing and a person submitting
+ * it, in milliseconds. PORT-043.
+ *
+ * Three seconds is short — the point is not to measure typing speed, it is
+ * that a scripted POST arrives in tens of milliseconds and a person filling
+ * three fields cannot. Set it high enough to catch a fast human and the guard
+ * starts rejecting real messages, which is the expensive failure.
+ *
+ * Exported so the action and the timing schema below share one definition
+ * rather than two constants that drift.
+ */
+export const MIN_SUBMIT_MS = 3000;
+
+/**
  * Trim before length is checked, not after.
  *
  * `.trim()` in Zod v4 is a transform that runs as part of parsing, so `.min(2)`
@@ -77,6 +91,33 @@ export const contactSchema = z.object({
   honeypot: z
     .string({ error: "This field must be left empty." })
     .max(0, { error: "This field must be left empty." }),
+
+  /**
+   * When the form was rendered, as epoch milliseconds — planted by the client
+   * on mount and read back here so the action can reject a submission that
+   * arrived too fast to have been typed. PORT-043.
+   *
+   * THIS VALUE IS NOT TRUSTWORTHY AND IS NOT TREATED AS IF IT WERE. It comes
+   * from the browser, so anything that can post a form can post whatever
+   * timestamp it likes; a bot that sets it to five seconds ago walks straight
+   * past the guard. It stops the naive case — a script that scrapes the form
+   * and posts it back immediately — and nothing beyond that, which is why it
+   * is one of three guards rather than the only one.
+   *
+   * `z.coerce.number()` because FormData carries strings and nothing else. It
+   * is the one place in this schema where coercion is right: every other field
+   * IS a string, and coercing them would turn a bad value into a plausible one
+   * rather than rejecting it.
+   *
+   * The bounds are not cosmetic. `.int().positive()` rejects "abc" (NaN),
+   * "" (which coerces to 0, and is what a missing value looks like), and a
+   * negative number — each of which would otherwise reach the arithmetic in
+   * the action and produce a nonsense elapsed time that happens to pass.
+   */
+  startedAt: z.coerce
+    .number({ error: "This form could not be verified — please reload the page." })
+    .int({ error: "This form could not be verified — please reload the page." })
+    .positive({ error: "This form could not be verified — please reload the page." }),
 });
 
 /**
