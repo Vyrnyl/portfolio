@@ -1,16 +1,17 @@
-import type { Metadata } from "next";
-
 import { Section } from "@/components/layout/section";
 import { ProjectFilter } from "@/components/sections/project-filter";
 import { ProjectGrid } from "@/components/sections/project-grid";
 import { Button } from "@/components/ui/button";
-import { site } from "@/content/site";
 import { getAllProjects, getAllTags, getProjectsByTag } from "@/lib/content";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: `Projects — ${site.name}`,
-  description: "Selected work, with the problem, the approach and the outcome for each.",
-};
+const description = "Selected work, with the problem, the approach and the outcome for each.";
+
+export const metadata = buildPageMetadata({
+  title: "Projects",
+  description,
+  path: "/projects",
+});
 
 type ProjectsPageProps = {
   searchParams: Promise<{ tag?: string | string[] }>;
@@ -37,9 +38,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   return (
     <Section>
       <h1 className="text-h-lg text-ink">Projects</h1>
-      <p className="text-muted mt-4 max-w-measure">
-        Selected work, with the problem, the approach and the outcome for each.
-      </p>
+      <p className="text-muted mt-4 max-w-measure">{description}</p>
 
       <ProjectFilter tags={tags} activeTag={tag} className="mt-8 mb-8" />
 

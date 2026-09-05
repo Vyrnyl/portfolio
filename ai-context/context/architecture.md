@@ -183,10 +183,11 @@ contact-form.tsx  ("use client", useActionState)
    │  FormData
    ▼
 lib/actions/contact.ts  ("use server")
-   │  1. zod safeParse         → field errors on failure
-   │  2. honeypot check        → silent success (do not tell a bot it failed)
-   │  3. rate limit by IP      → 429-style message
-   │  4. lib/email.ts sendContactEmail()
+   │  1. rate limit by IP       → 429-style message  — cheapest check first
+   │  2. honeypot check         → silent success (do not tell a bot it failed)
+   │  3. zod safeParse          → field errors on failure
+   │  4. minimum time-to-submit → silent success (needs the parsed number)
+   │  5. lib/email.ts sendContactEmail()
    ▼
 ActionResult  { ok: true } | { ok: false; message: string; fieldErrors?: … }
    │
@@ -196,6 +197,8 @@ form re-renders with the result — success panel or inline field errors
 
 Rules for this path:
 
+- **The order of the guards above is load-bearing, and it changed in PORT-043.** It originally read parse → honeypot → rate limit; both later checks moved ahead of the parse, for two different reasons. The rate limit went first because *a limiter that only counts valid submissions counts nothing a flooder sends* — a bot posting garbage fails the parse every time and would never increment a counter. The honeypot went ahead of the parse because PORT-041 proved by running it that checking afterwards returns `fieldErrors: { honeypot }`, which no visible field renders, leaving a dead form. The minimum-time check stays *after* the parse because it needs a validated number, and the schema already rejects `"abc"`, `""` and negatives.
+- **A failure no visible field owns must omit `fieldErrors` entirely — never send `{}`.** The form branches on `fieldErrors === undefined` to choose between inline field errors and the form-level banner, and an empty object is truthy. PORT-043 shipped this bug for one build: stripping the hidden-field errors left `{}`, so a tampered submission rendered "Please check the fields below" above three clean fields, with no banner and no way forward. Found by reading the page, not by the assertion, which had only checked that no hidden field name leaked.
 - The **server** parse is authoritative. The client parse exists only to avoid a round trip on obvious mistakes. Never trust client validation.
 - The action returns a **typed discriminated union**, never throws to the client. Unexpected errors are caught, logged server-side, and returned as a generic message — never as a stack trace.
 - `RESEND_API_KEY` is read through `lib/env.ts`, which throws at module load if it is missing. Fail at boot, not on a visitor's submission.
@@ -215,7 +218,11 @@ Rules for this path:
 - Root `layout.tsx` sets `metadataBase`, title template, description, and default OpenGraph.
 - Every page exports `metadata`; `/projects/[slug]` uses `generateMetadata`.
 - `lib/seo.ts` holds builders so no page hand-assembles an OG object.
-- `opengraph-image.tsx` generates social cards at build time via `next/og`.
+- `opengraph-image.tsx` generates social cards at build time via `next/og`. **Built in PORT-050, with three rules learned by checking the served HTML rather than reading the source:**
+  - **The convention does NOT cascade to sibling routes.** `app/opengraph-image.tsx` produced a card for `/` and left `/projects /skills /about /resume /contact` with no `og:image` at all, on a green build. `buildPageMetadata` names the image explicitly for exactly this reason; a route with its own generated card (the `[slug]` segment) passes its own URL.
+  - **The title template applies only to `<title>`.** OpenGraph inherits nothing from it, so `og:title` must be composed separately or every shared link says "Projects" with no indication whose it is.
+  - **Satori cannot parse `oklch()`, and does not say so** — an unsupported colour is skipped and the card renders black on transparent with a clean build log. The cards use the source hexes ui-rules §3 records for the same tokens, which is a knowing duplication of the palette.
+- **Nothing that reaches a share preview may carry placeholder content.** A card and its description are two separate surfaces: PORT-050 filtered placeholder chips out of the card, reported it fixed, and the `og:description` went on serving "real copy pending" until a served-tag audit caught it. On the page itself a placeholder is honest, because the visitor sees it in context; a preview travels into a chat or an application with no context at all.
 - `sitemap.ts` and `robots.ts` are generated from the content layer — a new project appears in the sitemap automatically.
 - JSON-LD `Person` schema in the root layout; `CreativeWork` on project detail pages.
 
@@ -235,8 +242,8 @@ Rules for this path:
 Small surface, but it is not zero:
 
 - **Server Action input** — zod-parsed with `.max()` bounds on every string field before anything touches the email body.
-- **Rate limiting** — per-IP, in-memory. Adequate for a portfolio's traffic; documented as such so nobody mistakes it for distributed protection.
-- **Spam** — honeypot field plus a minimum time-to-submit. No CAPTCHA unless spam actually materializes.
+- **Rate limiting** — per-IP, in-memory, **5 per 15 minutes** (`lib/rate-limit.ts`, PORT-043). Adequate for a portfolio's traffic; documented as such so nobody mistakes it for distributed protection. Two properties to know before calling it security: the Map is **per-instance**, so several warm serverless instances each grant a full quota and a cold start forgets every counter; and the key comes from **`x-forwarded-for`, which is client-supplied** — trustworthy behind Vercel's proxy, forgeable anywhere without one.
+- **Spam** — honeypot field plus a minimum time-to-submit (**3s**, `MIN_SUBMIT_MS`). Both return `{ ok: true }` and drop the message: telling a bot which guard caught it is how the next version evades it. The timestamp is **client-planted and therefore untrusted** — it stops naive scripted posts and nothing more, which is why it is one of three guards rather than the only one. No CAPTCHA unless spam actually materializes.
 - **Email injection** — visitor input goes only in the body, never in headers, subject, or the `to` field.
 - **Secrets** — `.env.local` only, never committed. `.env.example` documents the names with no values.
 - **No `dangerouslySetInnerHTML`** anywhere. Content is authored, but the habit is what protects you later.

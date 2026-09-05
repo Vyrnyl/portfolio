@@ -1,27 +1,18 @@
-import type { Metadata } from "next";
-
 import { Section } from "@/components/layout/section";
 import { Timeline, type TimelineEntry } from "@/components/sections/timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { site } from "@/content/site";
 import { getEducation, getJobs, getSkillGroups } from "@/lib/content";
+import { buildPageMetadata } from "@/lib/seo";
 
-const title = `Resume — ${site.name}`;
-const description =
-  "Experience, education and the tools I work with — plus a PDF you can take away.";
+export const metadata = buildPageMetadata({
+  title: "Resume",
+  description: "Experience, education and the tools I work with — plus a PDF you can take away.",
+  path: "/resume",
+  type: "profile",
+});
 
-export const metadata: Metadata = {
-  title,
-  description,
-  openGraph: {
-    title,
-    description,
-    url: `${site.url}/resume`,
-    siteName: site.name,
-    type: "profile",
-  },
-};
 
 /**
  * /resume — the timeline version of the PDF.

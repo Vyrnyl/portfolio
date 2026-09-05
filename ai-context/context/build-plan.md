@@ -569,15 +569,19 @@ Resend integration plus `lib/env.ts`.
 
 ---
 
-### PORT-043 · Spam and rate limiting `M`
-**Depends on:** 042
+### PORT-043 · Spam and rate limiting `M` — ✔ **closed 2026-09-05**
+**Depends on:** 042 — **taken out of order.** Four of the five criteria never touch Resend and the fifth was already met by PORT-041, so nothing here was half-built by pulling it ahead of a ticket parked by choice.
 
 **Acceptance criteria**
-- [ ] Honeypot filled → returns **success** to the client, sends nothing. Never tell a bot it was caught.
-- [ ] Minimum time-to-submit (~3s) rejects instant machine submissions
-- [ ] Per-IP rate limit (e.g. 3 per 10 minutes) with a clear message when hit
-- [ ] Rate limit tested by submitting repeatedly
-- [ ] `lib/rate-limit.ts` documents in a comment that it is in-memory and per-instance — adequate here, **not** distributed protection
+- [x] Honeypot filled → returns **success** to the client, sends nothing. Never tell a bot it was caught. *(already met by PORT-041; re-proven here)*
+- [x] Minimum time-to-submit (~3s) rejects instant machine submissions — `MIN_SUBMIT_MS`, checked **after** the parse because it needs a validated number
+- [x] Per-IP rate limit with a clear message when hit — **5 per 15 minutes, amended from the "e.g. 3 per 10" this line originally carried**
+- [x] Rate limit tested by submitting repeatedly — driven to the 6th submission in a real browser, and proven per-IP by a second address passing freely
+- [x] `lib/rate-limit.ts` documents in a comment that it is in-memory and per-instance — adequate here, **not** distributed protection
+
+**Amendment — the limit is 5 per 15 minutes, not 3 per 10.** Put to Vernel rather than defaulted, and he chose the looser bound. A single IP is not a single person: an office, a campus network or a mobile carrier behind CGNAT puts many real visitors on one address, and the cost of being wrong is asymmetric — blocking a genuine message loses an opportunity the visitor cannot act on beyond waiting, while letting a bot send five instead of three costs two emails.
+
+**Amendment — the guard order is not architecture §5's.** §5 drew parse → honeypot → rate limit; the built order is rate limit → honeypot → parse → minimum-time, and §5 has been corrected to match. The rate limit moved first because *a limiter that only counts valid submissions counts nothing a flooder sends* — a bot posting garbage fails the parse every time and would never increment a counter. Rate limit ahead of the honeypot was the second call put to Vernel: it means a visitor whose password manager fills the trap spends quota, but a bot that trips it can no longer hammer the endpoint uncapped.
 
 ---
 
@@ -599,16 +603,20 @@ Resend integration plus `lib/env.ts`.
 
 ---
 
-### PORT-050 · Metadata and OG images `M`
-**Depends on:** 032
+### PORT-050 · Metadata and OG images `M` — ✔ **closed 2026-09-05**
+**Depends on:** 032 ✔
 
 **Acceptance criteria**
-- [ ] Root layout sets `metadataBase`, title template, and default OG/Twitter tags
-- [ ] Every page exports real `metadata`; descriptions are unique and under 160 chars
-- [ ] `opengraph-image.tsx` generates a default card via `next/og`
-- [ ] Project pages generate per-project OG images
-- [ ] `lib/seo.ts` holds the builders — no page hand-assembles an OG object
-- [ ] Cards verified in a link preview debugger, not just by reading the HTML
+- [x] Root layout sets `metadataBase`, title template, and default OG/Twitter tags — closes the missing-`metadataBase` debt carried since PORT-030
+- [x] Every page exports real `metadata`; descriptions are unique and under 160 chars — verified against the SERVED HTML on all ten routes, not the source
+- [x] `opengraph-image.tsx` generates a default card via `next/og`
+- [x] Project pages generate per-project OG images — one prerendered card per slug
+- [x] `lib/seo.ts` holds the builders — no page hand-assembles an OG object
+- [ ] **Cards verified in a link preview debugger** — *genuinely unmet and left unticked.* A debugger needs a public URL, which does not exist until this is pushed. Everything a local check can prove is proven (200 image/png at every advertised URL, correct 1200×630, cards read by eye); the debugger step is Vernel's, listed in progress.md.
+
+**Amendment — generated cards everywhere, including `/about` and the project pages.** Two calls put to Vernel rather than defaulted (2026-09-05). PORT-033 had deliberately shipped `/about` with **no** `og:image` rather than share the "PHOTO PENDING" placeholder; that reason is gone, because the generated card is typography and brand colour and never touches `site.photo`, so PORT-058 no longer has anything to do here. The project pages previously advertised `project.cover ?? project.thumbnail`, which are all four still PORT-012 placeholders — the generated card carries the real title instead.
+
+**The placeholder filter is the part worth carrying.** The reasoning for choosing generated cards was "the title and summary are real" — which turned out to be true of **two of the four projects**. `stack` carries a literal "TBC — confirm stack" entry on all four, and it rendered as a chip on the first card produced; two summaries are placeholder prose. Both surfaces now filter: the card drops placeholder chips and falls back for a placeholder summary, and `generateMetadata` substitutes a plain true sentence for a placeholder description. **Fixing the card did not fix the description** — that was found only by auditing the served tags, and is the ticket's sharpest lesson: the image and the text under it are two separate surfaces.
 
 ---
 

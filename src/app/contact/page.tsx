@@ -1,27 +1,13 @@
-import type { Metadata } from "next";
-
 import { Section } from "@/components/layout/section";
 import { ContactForm } from "@/components/sections/contact-form";
 import { ContactMethods } from "@/components/sections/contact-methods";
-import { site } from "@/content/site";
+import { buildPageMetadata } from "@/lib/seo";
 
-const title = `Contact — ${site.name}`;
-const description =
-  "Get in touch about work, a project, or a question — by form or directly by email.";
-
-export const metadata: Metadata = {
-  title,
-  description,
-  openGraph: {
-    title,
-    description,
-    url: `${site.url}/contact`,
-    siteName: site.name,
-    type: "website",
-    // No `images` — site-wide OG images are PORT-050, and /about set the
-    // precedent of opting out rather than shipping a broken card.
-  },
-};
+export const metadata = buildPageMetadata({
+  title: "Contact",
+  description: "Get in touch about work, a project, or a question — by form or directly by email.",
+  path: "/contact",
+});
 
 /**
  * /contact — the form and the direct alternatives, side by side at lg.

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Section } from "@/components/layout/section";
@@ -6,27 +5,29 @@ import { AboutIntro } from "@/components/sections/about-intro";
 import { Cta } from "@/components/sections/cta";
 import { Badge } from "@/components/ui/badge";
 import { Prose } from "@/components/ui/prose";
-import { site } from "@/content/site";
 import { getSkillGroups } from "@/lib/content";
+import { buildPageMetadata } from "@/lib/seo";
 
-const title = `About — ${site.name}`;
-const description =
-  "Full-stack web developer in the Philippines — what I build, where I have built it, and what I am learning now.";
+/**
+ * /about now ships an OG card, reversing PORT-033's deliberate opt-out.
+ *
+ * That opt-out was correct at the time and its reason has gone: the card would
+ * have been `site.photo`, which is still the "PHOTO PENDING" placeholder, and a
+ * shared link is the worst place for a stand-in image. PORT-050's card is
+ * typography and brand colour only — it never touches `site.photo` — so the
+ * placeholder cannot leak into a shared link, and there is no longer a reason
+ * for this page to be the one that shares as a bare title. Decided with Vernel
+ * 2026-09-05; PORT-058 no longer has anything to do here.
+ */
+export const metadata = buildPageMetadata({
+  title: "About",
+  description:
+    "Full-stack web developer in the Philippines — what I build, where I have built it, and what I am learning now.",
+  path: "/about",
+  type: "profile",
+});
 
-export const metadata: Metadata = {
-  title,
-  description,
-  openGraph: {
-    title,
-    description,
-    url: `${site.url}/about`,
-    siteName: site.name,
-    type: "profile",
-    // No `images` on purpose. The portrait is still the "PHOTO PENDING"
-    // placeholder, and an OG image is what every shared link renders. Site-wide
-    // OG images are PORT-050; this page opts out until there is a real photo.
-  },
-};
+
 
 /**
  * /about — intro, bio, what I work with, and the way out to the resume and the

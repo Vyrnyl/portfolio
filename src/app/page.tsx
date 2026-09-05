@@ -1,22 +1,25 @@
-import type { Metadata } from "next";
-
+import { Section } from "@/components/layout/section";
 import { Cta } from "@/components/sections/cta";
 import { Hero } from "@/components/sections/hero";
 import { ProjectCard } from "@/components/sections/project-card";
-import { Section } from "@/components/layout/section";
 import { site } from "@/content/site";
 import { getFeaturedProjects } from "@/lib/content";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: `${site.name} — ${site.role}`,
-  description: site.tagline,
-  openGraph: {
+/**
+ * The home page is the one route whose title must NOT take the root template.
+ *
+ * `%s — Vernel Aquino` applied to a home title would render "Vernel Aquino —
+ * Full-stack web developer — Vernel Aquino". `title.absolute` opts this single
+ * page out of the template, which is precisely what that field is for.
+ */
+export const metadata = {
+  ...buildPageMetadata({
     title: `${site.name} — ${site.role}`,
     description: site.tagline,
-    url: site.url,
-    siteName: site.name,
-    type: "website",
-  },
+    path: "/",
+  }),
+  title: { absolute: `${site.name} — ${site.role}` },
 };
 
 export default function HomePage() {

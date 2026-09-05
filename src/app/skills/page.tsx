@@ -1,27 +1,17 @@
-import type { Metadata } from "next";
-
 import { Section } from "@/components/layout/section";
 import { Cta } from "@/components/sections/cta";
 import { PracticeCard } from "@/components/sections/practice-card";
 import { SkillTier } from "@/components/sections/skill-tier";
-import { site } from "@/content/site";
 import { getPractices, getSkillGroups } from "@/lib/content";
+import { buildPageMetadata } from "@/lib/seo";
 
-const title = `Skills — ${site.name}`;
-const description =
-  "What I am confident in, what I have working knowledge of, and what I am learning now — graded honestly, with no percentage bars.";
+export const metadata = buildPageMetadata({
+  title: "Skills",
+  description:
+    "What I am confident in, what I have working knowledge of, and what I am learning now — graded honestly, with no percentage bars.",
+  path: "/skills",
+});
 
-export const metadata: Metadata = {
-  title,
-  description,
-  openGraph: {
-    title,
-    description,
-    url: `${site.url}/skills`,
-    siteName: site.name,
-    type: "website",
-  },
-};
 
 /**
  * /skills — three honest tiers, then the four habits behind them.
