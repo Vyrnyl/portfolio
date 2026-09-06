@@ -624,11 +624,11 @@ Resend integration plus `lib/env.ts`.
 **Depends on:** 050
 
 **Acceptance criteria**
-- [ ] `sitemap.ts` generated from the content layer — a new project appears automatically
-- [ ] `/gallery` excluded from the sitemap
-- [ ] `robots.ts` allows crawling and points to the sitemap
-- [ ] JSON-LD `Person` in the root layout, `CreativeWork` on project pages
-- [ ] Structured data passes a validator with no errors
+- [x] `sitemap.ts` generated from the content layer — a new project appears automatically
+- [x] `/gallery` excluded from the sitemap
+- [x] `robots.ts` allows crawling and points to the sitemap
+- [x] JSON-LD `Person` in the root layout, `CreativeWork` on project pages
+- [x] Structured data passes a validator with no errors
 
 ---
 

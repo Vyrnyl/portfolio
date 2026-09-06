@@ -45,6 +45,47 @@ export function absoluteUrl(path: string): string {
 }
 
 /**
+ * Does this string still carry a PORT-012 placeholder marker?
+ *
+ * MOVED HERE IN PORT-051, and the move is the point. This function existed as
+ * two hand-copied private functions — one in `projects/[slug]/page.tsx`, one in
+ * that segment's `opengraph-image.tsx` — with a comment arguing the duplication
+ * was deliberate because `lib/seo.ts` "has no business knowing that this
+ * project's content is half-written".
+ *
+ * That argument was reasonable with two copies and stops being reasonable at
+ * three: PORT-051's structured data is a THIRD share surface reading the same
+ * summaries, and JSON-LD feeds a search index directly. Three copies of a
+ * predicate that must agree is three chances for them to disagree, and this
+ * exact class of bug has already been shipped twice on this content — the card
+ * was filtered while the description was not, then reported fixed.
+ *
+ * It is still deleted wholesale by PORT-057. It is now deleted in one place.
+ */
+export function isPlaceholder(text: string): boolean {
+  return /\b(TBC|placeholder|pending|TODO|lorem)\b/i.test(text);
+}
+
+/**
+ * The description a project shows to a machine when its own summary is still
+ * a placeholder.
+ *
+ * PORT-050 CLOSED WITH THIS INCONSISTENCY FLAGGED AND UNFIXED, and PORT-051
+ * fixes it because it would otherwise be inconsistent three ways rather than
+ * two. The OG card fell back to `site.tagline` while `og:description` fell back
+ * to a title-derived sentence — so a link preview, where the image and the text
+ * sit together, showed two different descriptions of one project. Both were
+ * true; they simply were not the same sentence.
+ *
+ * The title-derived sentence wins over `site.tagline` because it is about THIS
+ * project rather than about the site, which is what a description under a
+ * project's own card should say.
+ */
+export function projectDescription(title: string, summary: string): string {
+  return isPlaceholder(summary) ? `${title} — a case study on ${site.name}'s portfolio.` : summary;
+}
+
+/**
  * The default generated card, as an absolute URL.
  *
  * THE CONVENTION DOES NOT CASCADE THE WAY THE FIRST BUILD OF THIS FILE CLAIMED,

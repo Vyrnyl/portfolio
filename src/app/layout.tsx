@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/layout/skip-link";
 import { site } from "@/content/site";
 import { metadataBase } from "@/lib/seo";
+import { buildPersonSchema, buildWebSiteSchema, jsonLdScriptProps } from "@/lib/structured-data";
 
 import "./globals.css";
 
@@ -93,6 +94,27 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${jetbrainsMono.variable} h-full`}
     >
       <body className="flex min-h-full flex-col">
+        {/*
+          JSON-LD for the site owner and the site itself (PORT-051).
+
+          IN <body>, NOT <head>, and that is not a compromise — Google's own
+          documentation states JSON-LD may appear in either, and a Server
+          Component cannot write to <head> without the metadata API, which has
+          no field for arbitrary structured data.
+
+          These sit OUTSIDE ThemeProvider deliberately. ThemeProvider is a
+          client boundary; anything inside it is part of that subtree, and there
+          is no reason to hand a script tag to the client renderer when its
+          content is a build-time constant. They are also outside <main>, so the
+          skip link still lands on the first real content.
+
+          Two nodes rather than one graph array: `Person` and `WebSite`
+          cross-reference each other by @id, so a consumer resolves them into
+          one graph either way, and separate tags are easier to read in
+          view-source when one of them is wrong.
+        */}
+        <script {...jsonLdScriptProps(buildPersonSchema())} />
+        <script {...jsonLdScriptProps(buildWebSiteSchema())} />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

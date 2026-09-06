@@ -2,7 +2,13 @@ import { ImageResponse } from "next/og";
 
 import { site } from "@/content/site";
 import { getProjectBySlug, getProjectSlugs } from "@/lib/content";
-import { OG_COLORS, OG_IMAGE_CONTENT_TYPE, OG_IMAGE_SIZE } from "@/lib/seo";
+import {
+  isPlaceholder,
+  OG_COLORS,
+  OG_IMAGE_CONTENT_TYPE,
+  OG_IMAGE_SIZE,
+  projectDescription,
+} from "@/lib/seo";
 
 /* ---------------------------------------------------------------------------
    Per-project social cards. Spec: build-plan.md PORT-050.
@@ -33,23 +39,17 @@ import { OG_COLORS, OG_IMAGE_CONTENT_TYPE, OG_IMAGE_SIZE } from "@/lib/seo";
    real and silently omits what is not — the same instinct as PORT-012's
    generated screenshots saying "PHOTO PENDING" on their face, applied to the
    surface where saying so is not possible.
+
+   PORT-051 MOVED `isPlaceholder` INTO lib/seo.ts and took the summary fallback
+   with it. This file used to own a private copy of the predicate, and the
+   detail page owned an identical one — with a comment on each arguing the
+   duplication was deliberate. The argument held at two copies and broke at
+   three, when the structured data became another reader of the same summaries.
 --------------------------------------------------------------------------- */
 
 export const alt = "Project case study";
 export const size = OG_IMAGE_SIZE;
 export const contentType = OG_IMAGE_CONTENT_TYPE;
-
-/**
- * Text still carrying a PORT-012 placeholder marker.
- *
- * Matched rather than hardcoded per project, so a new placeholder written in
- * the same house style is caught without an edit here. It is deliberately
- * loose: on a social card a false positive costs one omitted chip, while a
- * false negative publishes "TBC — confirm stack" to everyone who sees the link.
- */
-function isPlaceholder(text: string): boolean {
-  return /\b(TBC|placeholder|pending|TODO|lorem)\b/i.test(text);
-}
 
 /**
  * Prerender one card per project at build time.
@@ -87,14 +87,21 @@ export default async function ProjectOpengraphImage({
   const title = project?.title ?? site.name;
 
   /**
-   * A placeholder summary falls back to the site tagline rather than being
-   * dropped: the card has a designed slot under the title, and an empty one
-   * leaves a visible hole where a sentence belongs. The tagline is true of
-   * every project page on this site, so it is a weaker line but never a false
-   * one.
+   * A placeholder summary falls back to the SAME sentence `og:description` and
+   * the JSON-LD use, which is a change PORT-051 made deliberately.
+   *
+   * This line used to fall back to `site.tagline` while the description fell
+   * back to a title-derived sentence — PORT-050 closed with that inconsistency
+   * flagged for Vernel rather than silently fixed. Both were true, but a link
+   * preview shows the card and the description TOGETHER, so one project
+   * described itself two different ways in a single preview. The title-derived
+   * sentence wins because it is about this project; the tagline is about the
+   * site.
+   *
+   * The unknown-slug case still needs the tagline, because there is no project
+   * title to derive from.
    */
-  const rawSummary = project?.summary ?? site.tagline;
-  const summary = isPlaceholder(rawSummary) ? site.tagline : rawSummary;
+  const summary = project ? projectDescription(project.title, project.summary) : site.tagline;
 
   /**
    * Placeholder stack entries are dropped, not replaced — the chip row is a
