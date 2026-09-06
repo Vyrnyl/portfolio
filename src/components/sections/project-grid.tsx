@@ -8,6 +8,8 @@ type ProjectGridProps = {
   projects: Project[];
   /** Rendered instead of the grid when `projects` is empty. Defaults to a plain message. */
   emptyState?: ReactNode;
+  /** Heading level for each card title — passed straight through to ProjectCard. */
+  cardHeadingLevel?: "h2" | "h3";
   className?: string;
 };
 
@@ -16,7 +18,12 @@ type ProjectGridProps = {
  * filtered). Renders cards or the empty state — filtering, sorting and
  * "which projects" are entirely the caller's decision.
  */
-export function ProjectGrid({ projects, emptyState, className }: ProjectGridProps) {
+export function ProjectGrid({
+  projects,
+  emptyState,
+  cardHeadingLevel,
+  className,
+}: ProjectGridProps) {
   if (projects.length === 0) {
     return emptyState ?? <p className="text-muted">No projects to show yet.</p>;
   }
@@ -24,7 +31,11 @@ export function ProjectGrid({ projects, emptyState, className }: ProjectGridProp
   return (
     <div className={cn("grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3", className)}>
       {projects.map((project) => (
-        <ProjectCard key={project.slug} project={project} />
+        <ProjectCard
+          key={project.slug}
+          project={project}
+          headingLevel={cardHeadingLevel}
+        />
       ))}
     </div>
   );

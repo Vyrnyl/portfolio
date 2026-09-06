@@ -9,6 +9,24 @@
    Source of truth is the prototype hex in ui-rules.md §3; the values below are
    exact sRGB -> OKLCH conversions of those hexes, not hand-tuned. Change the
    hex in §3 first, then re-convert. Never edit these in isolation.
+
+   THREE EXCEPTIONS, all from PORT-052's contrast audit — these are measured
+   overrides of the prototype, and §3 records the prototype value alongside
+   the shipped one:
+     --faint (light)  0.661 -> 0.5395  prototype #8a968e was 3.07:1
+     --faint (dark)   0.585 -> 0.654   prototype #718078 was 3.84:1
+     --fern-wash (lt) 0.955 -> 0.963   text-fern on it was 4.40:1
+
+   Each --faint value is solved against ALL THREE surfaces it can sit on
+   (--ground, --surface, --surface-2), not just the page ground, and the
+   binding constraint is --surface-2 in both themes: it is the darkest light
+   surface and the lightest dark one, so it is the worst case each way.
+   Solving against the wrong background is the trap here — --ground is
+   off-white (#fbfaf7) and therefore HARDER than pure-white --surface, which
+   is the reverse of the intuition.
+
+   --fern-wash moved rather than --fern, because --fern is a button ground,
+   the focus ring and a hover border in 29 places and text-on-wash in only two.
 --------------------------------------------------------------------------- */
 
 :root {
@@ -19,11 +37,11 @@
   --border-strong: oklch(0.866 0.012 117);
   --ink: oklch(0.251 0.014 164);
   --muted: oklch(0.514 0.02 159);
-  --faint: oklch(0.661 0.018 157);
+  --faint: oklch(0.5395 0.018 157);
   --fern: oklch(0.532 0.0931 162.4);
   --fern-hover: oklch(0.457 0.08 162);
   --fern-on: oklch(1 0 0);
-  --fern-wash: oklch(0.955 0.013 160);
+  --fern-wash: oklch(0.963 0.013 160);
   --coral: oklch(0.6065 0.1649 33.4);
   --coral-wash: oklch(0.951 0.019 38);
   --coral-text: oklch(0.5486 0.1478 33.5);
@@ -52,7 +70,7 @@
   --border-strong: oklch(0.381 0.015 153);
   --ink: oklch(0.949 0.007 124);
   --muted: oklch(0.714 0.017 160);
-  --faint: oklch(0.585 0.021 162);
+  --faint: oklch(0.654 0.021 162);
   --fern: oklch(0.733 0.116 160);
   --fern-hover: oklch(0.788 0.106 160);
   --fern-on: oklch(0.227 0.025 168);

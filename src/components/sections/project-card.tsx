@@ -8,6 +8,13 @@ import { cn } from "@/lib/utils";
 
 type ProjectCardProps = {
   project: Project;
+  /**
+   * Heading level for the card title. The card sits under an <h2> section
+   * heading on / ("Featured work"), where h3 is correct, but directly under
+   * the page <h1> on /projects, where h3 skips a level. The level is the
+   * caller's to declare because only the caller knows what precedes it.
+   */
+  headingLevel?: "h2" | "h3";
   className?: string;
 };
 
@@ -17,7 +24,13 @@ type ProjectCardProps = {
  * inside it, including the tags, is deliberately non-interactive, because a
  * link cannot contain another link without breaking.
  */
-export function ProjectCard({ project, className }: ProjectCardProps) {
+export function ProjectCard({
+  project,
+  headingLevel = "h3",
+  className,
+}: ProjectCardProps) {
+  const Heading = headingLevel;
+
   return (
     <Link
       href={`/projects/${project.slug}`}
@@ -46,7 +59,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         </div>
         <div className="space-y-3 p-6">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="text-h-sm text-ink">{project.title}</h3>
+            <Heading className="text-h-sm text-ink">{project.title}</Heading>
             <span className="text-badge text-faint shrink-0 font-mono">
               {project.year}
             </span>

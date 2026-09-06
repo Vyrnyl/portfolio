@@ -25,7 +25,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const projects = tag ? getProjectsByTag(tag) : getAllProjects();
 
   const emptyState = tag ? (
-    <div className="rounded-lg border border-border py-16 text-center">
+    <div className="border-border rounded-lg border py-16 text-center">
       <p className="text-muted">No projects match “{tag}”.</p>
       <Button href="/projects" variant="outline" size="sm" className="mt-4">
         Reset filter
@@ -38,11 +38,11 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   return (
     <Section>
       <h1 className="text-h-lg text-ink">Projects</h1>
-      <p className="text-muted mt-4 max-w-measure">{description}</p>
+      <p className="text-muted max-w-measure mt-4">{description}</p>
 
       <ProjectFilter tags={tags} activeTag={tag} className="mt-8 mb-8" />
 
-      <ProjectGrid projects={projects} emptyState={emptyState} />
+      <ProjectGrid projects={projects} emptyState={emptyState} cardHeadingLevel="h2" />
     </Section>
   );
 }

@@ -50,11 +50,11 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
   --border-strong: oklch(0.866 0.012 117);
   --ink: oklch(0.251 0.014 164);
   --muted: oklch(0.514 0.02 159);
-  --faint: oklch(0.661 0.018 157);
+  --faint: oklch(0.5395 0.018 157);
   --fern: oklch(0.532 0.0931 162.4);
   --fern-hover: oklch(0.457 0.08 162);
   --fern-on: oklch(1 0 0);
-  --fern-wash: oklch(0.955 0.013 160);
+  --fern-wash: oklch(0.963 0.013 160);
   --coral: oklch(0.6065 0.1649 33.4);
   --coral-wash: oklch(0.951 0.019 38);
   --coral-text: oklch(0.5486 0.1478 33.5);
@@ -83,7 +83,7 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
   --border-strong: oklch(0.381 0.015 153);
   --ink: oklch(0.949 0.007 124);
   --muted: oklch(0.714 0.017 160);
-  --faint: oklch(0.585 0.021 162);
+  --faint: oklch(0.654 0.021 162);
   --fern: oklch(0.733 0.116 160);
   --fern-hover: oklch(0.788 0.106 160);
   --fern-on: oklch(0.227 0.025 168);
@@ -314,11 +314,11 @@ Neutrals carry a slight green bias so they read as chosen rather than inherited.
 | `--border-strong` | `#D2D4CB` | `#3D453F` | Input borders, emphasised edges |
 | `--ink` | `#1C2420` | `#EDEFEA` | Primary text, headings |
 | `--muted` | `#5E6B63` | `#9AA69F` | Body copy, secondary text |
-| `--faint` | `#8A968E` | `#718078` | Metadata, eyebrow labels |
+| `--faint` | `#66726A` | `#86958C` | Metadata, eyebrow labels. **Re-derived in PORT-052** — the prototype's `#8A968E`/`#718078` measured 3.07:1 / 3.84:1 and failed WCAG 1.4.3. Solved against all three surfaces it can sit on; `--surface-2` is the binding constraint in both themes (4.55:1 / 4.60:1). |
 | `--fern` | `#2F7D5C` | `#5FBF8F` | Brand — primary buttons, links, active nav |
 | `--fern-hover` | `#256549` | `#79CFA3` | Primary button hover |
 | `--fern-on` | `#FFFFFF` | `#10201A` | Text **on** a fern background |
-| `--fern-wash` | `#E9F3ED` | `#1E2E27` | Active nav pill, success note, badge fill |
+| `--fern-wash` | `#ECF6F0` | `#1E2E27` | Active nav pill, success note, badge fill. **Light re-derived in PORT-052** — `text-fern` on the prototype's `#E9F3ED` measured 4.40:1. The wash moved rather than `--fern`, which is a button ground, focus ring or hover border in 29 places and text-on-wash in only two. Dark was already 6.33:1 and is unchanged. |
 | `--coral` | `#D2543A` | `#F08670` | Error **border** (`aria-invalid` on `Input`/`Textarea`), status dot accent — non-text UI only |
 | `--coral-wash` | `#FBEBE6` | `#33221D` | Error note background |
 | `--coral-text` | `#B74932` | `#F08670` (= `--coral`) | Error message **text**, required-field marks — the only two coral *text* uses on the site |
@@ -474,6 +474,8 @@ Rules for anything in `components/`:
 - **`sr-only` hides from eyes, not from assistive tech — and that is the whole point of it.** It exists to keep content available to screen readers while removing it visually, so it is the wrong tool for anything that must be absent from the a11y tree entirely (a honeypot, a decorative duplicate). And do not reach for `aria-hidden` on the element instead: `aria-hidden` on a **focusable** control is an ARIA violation on its own. Hide the wrapper with `aria-hidden`, take the control out of the tab order with `tabIndex={-1}`, and move it off-canvas with real CSS (PORT-041).
 - **A CSS rule in `globals.css` beats an arbitrary value in a `className`.** §1 forbids `left-[-9999px]` and the escape hatch is not to smuggle it in anyway — it is a named class next to the other global rules, where the reason it exists can be written down. One class with one caller is fine when the alternative is a magic number in JSX (PORT-041's `.honeypot-field`).
 - **A control that is disabled, dimmed and relabelled still needs its spinner if the AC asks for one.** Text alone reads as a state; motion reads as *work in progress*. Note what `prefers-reduced-motion` does to a spinner here: the global block sets `animation-duration: 0.01ms`, which **freezes** it rather than hiding it — fine when the label carries the meaning, but know that those users see a static mark, not nothing.
+- **Solve a text token against every surface it can land on, and identify the worst case rather than assuming it.** PORT-052 re-derived `--faint` twice because the first solve picked the wrong background: `--ground` is off-white `#FBFAF7`, so it is *darker* than pure-white `--surface` and therefore harder for dark text — the reverse of the intuition. The real binding constraint was `--surface-2` in both themes, and dark's intermediate value sat at 4.09:1 there while axe reported zero violations, because no dark page happens to put `text-faint` on that surface **yet**. A token that passes only where it is currently used is a latent failure waiting for the next component.
+- **A heading level is a property of where a component sits, not of what it is.** `ProjectCard` renders `h3` under `/`'s "Featured work" `<h2>` and must render `h2` under `/projects`, where it follows the page `<h1>` directly — same component, two correct answers, so the level is a prop with a sensible default. **A WCAG-tagged axe run does not catch this**: `heading-order` is enabled by default but tagged `best-practice`, not `wcag2a`/`wcag2aa`, so the usual `withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])` filter drops it and a skipped level passes a zero-violation audit (verified against `axe-core`'s own rule metadata, not assumed). Walk the heading list per route separately, or add `best-practice` to the tag list.
 - **Measure contrast, do not eyeball it — and check the measurement itself.** Both faults above survived a passing assertion. `getComputedStyle` returns `lab()` unresolved in Chromium, so regexing its numbers reads lab components as RGB and reports full-strength fern at 1.15:1. Composite the element over its ground on a 1×1 canvas and read the pixel back; a number that agrees with the code is not the same as a number that is right.
 
 ---
