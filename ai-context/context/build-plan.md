@@ -612,7 +612,7 @@ Resend integration plus `lib/env.ts`.
 - [x] `opengraph-image.tsx` generates a default card via `next/og`
 - [x] Project pages generate per-project OG images — one prerendered card per slug
 - [x] `lib/seo.ts` holds the builders — no page hand-assembles an OG object
-- [ ] **Cards verified in a link preview debugger** — *genuinely unmet and left unticked.* A debugger needs a public URL, which does not exist until this is pushed. Everything a local check can prove is proven (200 image/png at every advertised URL, correct 1200×630, cards read by eye); the debugger step is Vernel's, listed in progress.md.
+- [x] **Cards verified in a link preview debugger** — **met 2026-09-06.** Vernel pasted <https://vernel-portfolio.vercel.app> into a preview debugger after PORT-051 pushed and confirmed a card renders. The live deploy was re-checked in the same pass: `/robots.txt` and `/sitemap.xml` (10 URLs) serve correctly from the production origin, and the JSON-LD carries the right schema types with zero placeholder leakage on all four routes sampled.
 
 **Amendment — generated cards everywhere, including `/about` and the project pages.** Two calls put to Vernel rather than defaulted (2026-09-05). PORT-033 had deliberately shipped `/about` with **no** `og:image` rather than share the "PHOTO PENDING" placeholder; that reason is gone, because the generated card is typography and brand colour and never touches `site.photo`, so PORT-058 no longer has anything to do here. The project pages previously advertised `project.cover ?? project.thumbnail`, which are all four still PORT-012 placeholders — the generated card carries the real title instead.
 
