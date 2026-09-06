@@ -654,7 +654,7 @@ Resend integration plus `lib/env.ts`.
 - [ ] LCP < 1.8s, CLS < 0.05
 - [ ] All images WebP/AVIF, correctly sized, with `priority` **only** on the LCP image
 - [ ] Fonts self-hosted via `next/font`, `display: swap`, no layout shift
-- [ ] `next build` confirms every page is static; client JS limited to the theme toggle, filter, and form
+- [ ] `next build` confirms every page is static **except `/projects`, which is `ƒ` dynamic by design** (PORT-031 reads `searchParams` to filter server-side — amended 2026-09-06, see §9); client JS limited to the theme toggle, filter, and form
 - [ ] No render-blocking third-party resources
 
 ---
@@ -799,6 +799,8 @@ Closed. Reopening one requires a written reason in [progress.md](progress.md).
 | D8 | No global state manager | [architecture.md](architecture.md) §2 A6 |
 | D9 | Three layers: content → lib → components | [architecture.md](architecture.md) §2 A7 |
 | D10 | Deploy on Vercel | First-class Next.js target |
+| D11 | **`/projects` stays `ƒ` dynamic; PORT-053's AC was amended, not the route** (2026-09-06) | Two closed decisions collided: PORT-031 deliberately reads `searchParams` so the tag filter runs server-side, and PORT-053's AC asked that every page be static. The route gives nothing up by being dynamic — there is no database, and content is TS literals already in memory, so an on-demand render is an array filter, not I/O. Making it static would push filtering into client JS and force `useSearchParams` + a Suspense boundary, i.e. more client JS to satisfy a criterion whose *purpose* is less client JS. **Forecloses:** `/projects` cannot be served from a CDN as prerendered HTML, and any future ticket asserting "all routes are `○`" must name this exception. |
+| D12 | **Lighthouse installed as a devDependency** (2026-09-06) | PORT-052's "Accessibility = 100" and three of PORT-053's six criteria both need it, so it was settled as one decision covering both rather than twice. A devDependency keeps the version pinned in the lockfile and the run reproducible and scriptable, which a hand-run DevTools panel is not — and it never reaches the shipped bundle. **Forecloses:** audits now depend on a local Chrome/Chromium that CI does not currently install, so the `audit` script stays out of `verify` and out of `ci.yml`. |
 
 ## 10. Deferred
 

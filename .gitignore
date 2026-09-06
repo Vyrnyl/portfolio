@@ -43,3 +43,6 @@ next-env.d.ts
 
 # local machine state
 .claude/settings.local.json
+
+# lighthouse reports
+/.lighthouse
