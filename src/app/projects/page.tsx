@@ -42,7 +42,12 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
       <ProjectFilter tags={tags} activeTag={tag} className="mt-8 mb-8" />
 
-      <ProjectGrid projects={projects} emptyState={emptyState} cardHeadingLevel="h2" />
+      <ProjectGrid
+        projects={projects}
+        emptyState={emptyState}
+        cardHeadingLevel="h2"
+        priorityCount={3}
+      />
     </Section>
   );
 }

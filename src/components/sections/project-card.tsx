@@ -15,6 +15,14 @@ type ProjectCardProps = {
    * caller's to declare because only the caller knows what precedes it.
    */
   headingLevel?: "h2" | "h3";
+  /**
+   * Eager-loads the thumbnail. Like headingLevel, this belongs to the slot,
+   * not the component: a card near the top of / or /projects is the page's
+   * LCP element on mobile, and next/image lazy-loads by default — which
+   * defers the very image the metric is measuring. Only the caller knows
+   * whether this card is above the fold, so only the caller can set it.
+   */
+  priority?: boolean;
   className?: string;
 };
 
@@ -27,6 +35,7 @@ type ProjectCardProps = {
 export function ProjectCard({
   project,
   headingLevel = "h3",
+  priority = false,
   className,
 }: ProjectCardProps) {
   const Heading = headingLevel;
@@ -54,6 +63,7 @@ export function ProjectCard({
             alt={project.thumbnail.alt}
             fill
             sizes="(min-width: 1000px) 33vw, (min-width: 760px) 50vw, 100vw"
+            priority={priority}
             className="object-cover"
           />
         </div>

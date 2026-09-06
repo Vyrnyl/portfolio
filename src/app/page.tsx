@@ -34,8 +34,12 @@ export default function HomePage() {
       <Section heading="Featured work">
         {featuredProjects.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.map((project) => (
-              <ProjectCard key={project.slug} project={project} />
+            {featuredProjects.map((project, index) => (
+              <ProjectCard
+                key={project.slug}
+                project={project}
+                priority={index < 3}
+              />
             ))}
           </div>
         ) : (
