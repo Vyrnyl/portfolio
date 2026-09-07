@@ -50,9 +50,17 @@ function NavCard({ project, direction }: { project: Project; direction: Directio
   const isNext = direction === "next";
 
   return (
+    /*
+     * No aria-label, for the reason ProjectCard records: one replaces the
+     * accessible name rather than adding to it. "Next project: <title>" also
+     * reordered the words against the visible "Next <title>", which is the
+     * WCAG 2.5.3 (Label in Name) failure Lighthouse reports — the visible
+     * label has to be contained in the accessible name, in order. The card's
+     * own text already reads "Next" then the title, so computing the name
+     * from the content says the right thing without restating it.
+     */
     <Link
       href={`/projects/${project.slug}`}
-      aria-label={`${DIRECTION_TEXT[direction]} project: ${project.title}`}
       className={cn(
         "group block rounded-lg",
         "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",

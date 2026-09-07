@@ -31,6 +31,18 @@ type ProjectCardProps = {
  * tags. The whole card is a single <Link> to /projects/[slug] — everything
  * inside it, including the tags, is deliberately non-interactive, because a
  * link cannot contain another link without breaking.
+ *
+ * The link carries no aria-label on purpose. One would *replace* the card's
+ * accessible name with just the title, so a screen reader would announce
+ * "CICT Project Gate, link" while sighted visitors read the year, summary
+ * and tags too — a WCAG 2.5.3 (Label in Name) failure, and a worse card for
+ * the people the name exists to serve. Letting the name compute from the
+ * content announces exactly what is on screen, in the order it is read.
+ *
+ * The thumbnail is decorative *here* for the same reason: its alt text would
+ * lead the computed name ("Placeholder graphic standing in for…") and push
+ * the title behind it. The alt is not dead — /projects/[slug] renders the
+ * same image standing alone, where it carries the description.
  */
 export function ProjectCard({
   project,
@@ -43,7 +55,6 @@ export function ProjectCard({
   return (
     <Link
       href={`/projects/${project.slug}`}
-      aria-label={project.title}
       className={cn(
         "group block rounded-lg",
         "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
@@ -60,7 +71,8 @@ export function ProjectCard({
         <div className="aspect-thumbnail relative w-full">
           <Image
             src={project.thumbnail.src}
-            alt={project.thumbnail.alt}
+            alt=""
+            aria-hidden
             fill
             sizes="(min-width: 1000px) 33vw, (min-width: 760px) 50vw, 100vw"
             priority={priority}
