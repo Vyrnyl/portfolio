@@ -131,23 +131,17 @@ export default function GalleryPage() {
             name="gallery-email-error"
             label="Email"
             required
+            hint="So I have somewhere to reply."
             error="Enter a valid email address."
           >
             {(props) => <Input {...props} type="email" defaultValue="not-an-email" />}
           </Field>
 
           <Field name="gallery-message-hint" label="Message" hint="Markdown is not supported.">
-            {(props) => (
-              <Textarea {...props} rows={4} placeholder="What would you like to say?" />
-            )}
+            {(props) => <Textarea {...props} rows={4} placeholder="What would you like to say?" />}
           </Field>
 
-          <Field
-            name="gallery-message-error"
-            label="Message"
-            required
-            error="Message is required."
-          >
+          <Field name="gallery-message-error" label="Message" required error="Message is required.">
             {(props) => <Textarea {...props} rows={4} />}
           </Field>
 

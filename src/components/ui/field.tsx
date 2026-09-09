@@ -31,6 +31,20 @@ export function Field({ name, label, hint, error, required, className, children 
   const id = `field-${name}`;
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
+
+  /*
+   * Hint id first, then error: aria-describedby is read in the order given,
+   * so a visitor hears what the field wants before what went wrong with it.
+   *
+   * This list and the paragraphs below MUST agree. They did not until
+   * 2026-09-09: the hint was rendered only when `!error`, while its id stayed
+   * in this join unconditionally, so an errored field with a hint pointed at
+   * an element that no longer existed. Chrome happens to skip a dangling id
+   * when computing the description, which is why the error still announced
+   * correctly and why axe reported nothing — but the behaviour is unspecified
+   * for other AT, and the visitor lost the hint at the exact moment they were
+   * being asked to correct the field.
+   */
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
 
   return (
@@ -50,7 +64,7 @@ export function Field({ name, label, hint, error, required, className, children 
         "aria-invalid": error ? true : undefined,
         required,
       })}
-      {hint && !error && (
+      {hint && (
         <p id={hintId} className="text-sm text-faint">
           {hint}
         </p>
