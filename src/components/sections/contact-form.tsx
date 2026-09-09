@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
@@ -49,10 +49,25 @@ export function ContactForm({ className }: Props) {
    */
   const [formKey, setFormKey] = useState(0);
 
+  /**
+   * PORT-060. False on the very first mount, true for every remount that
+   * "Send another" causes — which is exactly the difference between "the
+   * visitor just arrived on /contact" and "the visitor asked for a fresh
+   * form". Only the second should steal focus.
+   *
+   * Autofocusing on arrival would be a real regression: it would skip the
+   * page's heading and intro for a screen-reader user, and yank a sighted
+   * visitor past the contact methods sitting above the form. The remount is
+   * the only case where the visitor has just pressed a button whose entire
+   * meaning is "give me the form back".
+   */
+  const isReset = formKey > 0;
+
   return (
     <ContactFormFields
       key={formKey}
       className={className}
+      autoFocusFirstField={isReset}
       onReset={() => setFormKey((n) => n + 1)}
     />
   );
@@ -60,9 +75,11 @@ export function ContactForm({ className }: Props) {
 
 function ContactFormFields({
   className,
+  autoFocusFirstField,
   onReset,
 }: {
   className?: string;
+  autoFocusFirstField: boolean;
   onReset: () => void;
 }) {
   /**
@@ -109,21 +126,7 @@ function ContactFormFields({
     state?.ok === false ? (state.fieldErrors ?? FIELD_ERRORS_EMPTY) : FIELD_ERRORS_EMPTY;
 
   if (state?.ok) {
-    return (
-      <div
-        className={cn("border-fern bg-surface-2 rounded-lg border p-6", className)}
-        role="status"
-        aria-live="polite"
-      >
-        <h2 className="text-h-sm text-ink">Message sent</h2>
-        <p className="text-muted mt-2 text-sm">
-          Thanks — it reached my inbox. I usually reply within a couple of days.
-        </p>
-        <Button variant="outline" size="sm" className="mt-6" onClick={onReset}>
-          Send another
-        </Button>
-      </div>
-    );
+    return <SuccessPanel className={className} onReset={onReset} />;
   }
 
   return (
@@ -134,7 +137,15 @@ function ContactFormFields({
         authoritative errors never render.
       */}
       <Field name="name" label="Name" required error={fieldErrors.name?.[0]}>
-        {(props) => <Input {...props} type="text" autoComplete="name" placeholder="Your name" />}
+        {(props) => (
+          <Input
+            {...props}
+            type="text"
+            autoComplete="name"
+            placeholder="Your name"
+            autoFocus={autoFocusFirstField}
+          />
+        )}
       </Field>
 
       <Field
@@ -248,6 +259,77 @@ function ContactFormFields({
 
       <SubmitButton />
     </form>
+  );
+}
+
+/**
+ * The confirmation, and the thing focus lands on (PORT-060).
+ *
+ * ITS OWN COMPONENT SO THAT MOUNT IS THE TRIGGER. Focusing from an effect
+ * inside ContactFormFields would mean a `state?.ok` dependency and a guard
+ * against re-firing; here the component only exists when the panel exists, so
+ * an empty dep array says precisely "once, when this appeared" and cannot fire
+ * twice.
+ *
+ * THE LIVE REGION IS DELIBERATELY GONE. PORT-036 wrapped this in
+ * role="status" + aria-live="polite" because nothing else announced the
+ * success. Now that focus moves onto the heading, the focus move itself IS the
+ * announcement — and a live region firing alongside it makes a screen reader
+ * say "Message sent" twice in a row. The ticket warned against stacking
+ * role="alert" on top of the live region; this is the same collision one step
+ * further along. Exactly one mechanism announces this panel, and it is the one
+ * that also tells the visitor where they now are.
+ */
+function SuccessPanel({ className, onReset }: { className?: string; onReset: () => void }) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
+
+  return (
+    <div className={cn("border-fern bg-surface-2 rounded-lg border p-6", className)}>
+      {/*
+        tabIndex={-1} makes the heading focusable programmatically while
+        keeping it out of the tab order — Tab still goes straight to "Send
+        another" from here, so the sequence PORT-052 measured is unchanged.
+
+        `focus:` RATHER THAN `focus-visible:`, and this is the one place in the
+        project that breaks that convention. focus-visible is the browser's
+        guess about whether the user is navigating by keyboard, and a
+        programmatic .focus() on a tabIndex={-1} element usually does not
+        satisfy it — so the conventional ring would render nothing at the exact
+        moment we need it, and a sighted keyboard user would be left with no
+        indication of where focus went. Because this element is unreachable by
+        Tab and is not focused by clicking, the ONLY way it ever holds focus is
+        the move above, which is precisely the case focus-visible would hide.
+
+        `inline-block` IS PART OF THE FOCUS INDICATOR, not layout tidying. An
+        h2 is display:block, so it spans the full panel width — 567px of box
+        around 110px of text — and the ring then traces a rectangle that is
+        four-fifths empty, running parallel to the panel border 25px outside
+        it. Measured, that ring is present and correctly coloured; read on the
+        page, it looks like the PANEL is selected rather than like the heading
+        is where you are standing. Shrinking the box to the words is what makes
+        the indicator point at something.
+      */}
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className={cn(
+          "text-h-sm text-ink inline-block rounded-md",
+          "focus:ring-ring focus:ring-offset-surface-2 focus:ring-2 focus:ring-offset-2 focus:outline-none",
+        )}
+      >
+        Message sent
+      </h2>
+      <p className="text-muted mt-2 text-sm">
+        Thanks — it reached my inbox. I usually reply within a couple of days.
+      </p>
+      <Button variant="outline" size="sm" className="mt-6" onClick={onReset}>
+        Send another
+      </Button>
+    </div>
   );
 }
 

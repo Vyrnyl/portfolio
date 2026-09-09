@@ -69,7 +69,7 @@ Six sprints. A "sprint" here is a coherent chunk of work, not a fixed calendar b
 | **4** | Contact wiring | PORT-040 → 044 | ~7h | A real message lands in your inbox |
 | **5** | Production | PORT-050 → 056 | ~11h | Deployed to a custom domain, targets met, CI green |
 
-**Total: ~57h of focused work**, 40 tickets. Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
+**Total: ~57h of focused work**, 41 tickets (PORT-057 → 060 are follow-ups added during the build, tracked after the Sprint 5 block). Sprints 0–2 feel slow and produce little visible progress; Sprint 3 then goes fast *because* of them. That trade is the point — resist the urge to jump to Sprint 3.
 
 ### Build order rationale
 
@@ -636,13 +636,13 @@ Resend integration plus `lib/env.ts`.
 **Depends on:** all pages
 
 **Acceptance criteria**
-- [ ] axe DevTools: **zero violations** on all seven routes
-- [ ] Full keyboard walkthrough of every page and the form — no traps, focus always visible
-- [ ] Tested with a screen reader (NVDA or Narrator on Windows) on home, project detail, and contact
-- [ ] One `<h1>` per page; no skipped heading levels
-- [ ] Contrast measured in both themes
-- [ ] `prefers-reduced-motion` honored — verify by enabling it in the OS
-- [ ] Lighthouse Accessibility = 100 on every route
+- [x] axe DevTools: **zero violations** on all seven routes — **0 across all 14 route × theme combinations**, run with `best-practice` in the tag list so `heading-order` is genuinely checked. `/contact` also audited *after* an empty submit, because axe audits the page as loaded and the error state only exists post-submit.
+- [x] Full keyboard walkthrough of every page and the form — no traps, focus always visible
+- [x] Tested with a screen reader (NVDA or Narrator on Windows) on home, project detail, and contact — **run by Vernel 2026-09-09 against a fresh production build.** Announcements matched the strings extracted from the AX tree beforehand, including the one that mattered: the errored email field announces **hint and error together**, confirming the 2026-09-09 `Field` fix works for its actual users. One non-blocking observation recorded as **PORT-060**.
+- [x] One `<h1>` per page; no skipped heading levels — verified independently of axe on all seven routes in both themes, because an audit that can be misconfigured should not be its own only witness.
+- [x] Contrast measured in both themes
+- [x] `prefers-reduced-motion` honored — verify by enabling it in the OS — **0 elements animating >50ms** under emulated `reduce`.
+- [x] Lighthouse Accessibility = 100 on every route — met on all seven, measured across every Lighthouse run PORT-053 made. **The score alone is not the evidence**: `label-content-name-mismatch` is weighted zero, so two real WCAG 2.5.3 failures once sat under a perfect 100. The failing-audit list is what counts.
 
 ---
 
@@ -776,6 +776,28 @@ Two further defects worth fixing in the same pass, both cosmetic but both visibl
 **Watch for:** the file is replaced in place at `public/resume.pdf`, so `site.resumePdf` needs no edit — and *because* it needs no edit, nothing in the codebase changes when this ticket lands. `npm run verify` will pass identically before and after. The only proof is reading the new PDF.
 
 **Blocks:** PORT-056.
+
+---
+
+### PORT-060 · Move focus to the success panel after a contact submit `S`
+**Depends on:** 041, 052
+
+Added 2026-09-09, found during PORT-052's screen-reader pass. When `ContactForm` submits successfully the form unmounts and the success panel takes its place, but **nothing catches focus, so it falls to `<body>`**. The same happens in reverse when "Send another" remounts the form.
+
+**This is deliberately NOT a WCAG failure and was not allowed to block PORT-052.** It was measured before it was judged: the panel renders where the form was, so DOM order does the work and **exactly one `Tab` reaches "Send another"** — nothing is stranded, and the tab sequence stays logical, so 2.4.3 Focus Order is satisfied. The panel also sits in an `aria-live="polite"` region, so the confirmation is announced whether or not focus moved. Vernel ran the transition under NVDA on 2026-09-09 and reported it acceptable.
+
+What is lost is position, not information: a screen-reader user is told the message sent, but their place on the page is gone, and a sighted keyboard user sees no focus ring anywhere. The conventional treatment is to move focus to the success heading so the confirmation becomes the thing you are standing on rather than something you overheard.
+
+**Watch for:** the heading needs `tabIndex={-1}` to be focusable, and focus must move in an effect *after* the panel mounts, not in the action handler. Do not add `role="alert"` on top of the existing `aria-live` region — that double-announces. And the same treatment is needed on the "Send another" path, where focus should land on the Name field.
+
+**Acceptance criteria**
+- [x] After a successful submit, focus lands on the success panel's heading, verified in a browser rather than by reading the code — `document.activeElement` is the `h2` (`tabindex=-1`, text "Message sent") in both themes, on a confirmed-fresh production build.
+- [x] After "Send another", focus lands on the Name field — `activeElement.id === "field-name"`, and the form is genuinely blank rather than the old one re-shown.
+- [x] The confirmation is still announced exactly once — **the live region was REMOVED to achieve this, not kept.** Focus moving onto the heading is itself the announcement, so `role="status" aria-live="polite"` on the panel would have been a second one. Verified with a MutationObserver recording every live-region utterance: zero matching "Message sent"/"reached my inbox", and zero live regions remain inside the panel.
+- [x] A visible focus indicator is present at both landing points in both themes — pixel-sampled, not inferred: the heading ring is `rgb(47,125,92)` at **4.52:1** (light) and `rgb(95,191,143)` at **6.42:1** (dark) against the panel, **identical to the "Send another" button's own ring** measured as a control. Both clear WCAG 1.4.11's 3:1 floor. Getting there took two corrections worth carrying: the ring needed `focus:` rather than the project-wide `focus-visible:` (a programmatic `.focus()` on a `tabIndex={-1}` element does not reliably satisfy that heuristic), and `inline-block`, because an `h2` is `display:block` and the ring traced a 567px box around 106px of text — present, correctly coloured, and reading as panel chrome.
+- [ ] Screen-reader confirmation on the full submit → success → send-another cycle — **Vernel's to run.** Everything scriptable is green; this is the bullet a script cannot make.
+
+**Blocks:** nothing.
 
 ---
 
