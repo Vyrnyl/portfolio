@@ -38,11 +38,12 @@ export const skillGroups = [
       "Express.js",
       "RESTful APIs",
       "MySQL",
-      "PostreSQL",
+      "PostgreSQL",
       "HTML5 & CSS3",
       "Git & GitHub",
       "Authentication/Authorization",
       "Role-based access control",
+      "Performance optimization",
     ],
   },
   {
@@ -50,7 +51,15 @@ export const skillGroups = [
     label: "Working knowledge",
     blurb:
       "Built real features with these and can be productive, but I still reach for the documentation on the harder parts.",
-    items: ["Prisma", "SQL", "CI/CD and deployment pipelines"],
+    items: [
+      "CI/CD and deployment pipelines",
+      "Docker",
+      "Jest & React Testing Library",
+      "Database design & optimization",
+      "Web performance optimization",
+      "Error handling & logging",
+      "Environment & configuration management",
+    ],
   },
   {
     tier: "learning",
@@ -58,8 +67,10 @@ export const skillGroups = [
     blurb:
       "Actively working through these, including on this site. Listed rather than hidden, because a skills page that only lists strengths tells you nothing.",
     items: [
-      "React Server Components and the App Router",
+      "AWS and serverless architecture",
       "Design systems and token-driven styling",
+      "System design & scalable architecture",
+      "Advanced database architecture",
     ],
   },
 ] satisfies SkillGroup[];
@@ -111,6 +122,6 @@ export const practices = [
   {
     icon: "BookOpen",
     title: "Learning in the open",
-    body: "Server Components, accessibility to WCAG 2.2 AA, and token-driven design systems are things I am working through right now, and this site is where most of it is happening rather than a private sandbox.",
+    body: "Serverless architecture, system design at scale, and token-driven design systems are things I am working through right now, and this site is where most of it is happening rather than a private sandbox.",
   },
 ] satisfies Practice[];
