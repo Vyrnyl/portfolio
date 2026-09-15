@@ -121,7 +121,7 @@ Git init, first commit, README, `.env.example`, `.nvmrc`, and the folder skeleto
 **Acceptance criteria**
 - [ ] Repo initialized, pushed to GitHub, `main` is the default branch
 - [ ] README states what the project is and how to run it — genuinely useful in six months
-- [ ] `.env.example` lists `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `NEXT_PUBLIC_SITE_URL` with empty values
+- [ ] `.env.example` lists `RESEND_API_KEY` and `CONTACT_TO_EMAIL` with empty values — **amended 2026-09-15:** this originally also named `NEXT_PUBLIC_SITE_URL`, which PORT-042 built and then removed on the same day because nothing read it; the site origin comes from `site.url` in `src/content/site.ts`.
 - [ ] `git status` is clean after a build (nothing generated is untracked)
 
 ---
@@ -677,7 +677,7 @@ Resend integration plus `lib/env.ts`.
 
 **Acceptance criteria**
 - [x] Connected to Vercel; `main` auto-deploys; PRs get preview deploys — live since 2026-08-20, scope `cap1313`.
-- [ ] Production env vars set in Vercel (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `NEXT_PUBLIC_SITE_URL`) — **now genuinely load-bearing:** PORT-042 landed `lib/env.ts`, so without these the live contact form throws on the first submission while still telling the visitor it reached the inbox.
+- [ ] Production env vars set in Vercel — **two, not three: `RESEND_API_KEY` and `CONTACT_TO_EMAIL`** (`NEXT_PUBLIC_SITE_URL` was removed 2026-09-15; the origin lives in `site.url`). **Now genuinely load-bearing:** PORT-042 landed `lib/env.ts`, which throws at module load, so without these the live contact form fails on the first submission while still telling the visitor it reached the inbox.
 - [x] ~~Custom domain live with HTTPS and a `www` → apex redirect~~ — **STRUCK 2026-09-15 by Vernel's decision to stay on the free Vercel subdomain.** `*.vercel.app` cannot be made clean (the name is always project + scope), HTTPS is already provided, and there is no apex to redirect to. This is a deliberate scope reduction, not an unmet criterion — recorded so it is never re-raised as an oversight. Reversing it means buying a domain, pointing DNS, and updating `site.url`; nothing in the code assumes the current origin beyond that one constant.
 - [ ] **Contact form tested on the production URL** — a preview deploy passing is not proof. Unmet: delivery is verified on localhost only.
 - [x] `site.url` matches the real origin so OG images resolve absolutely — `site.ts:21` is `https://vernel-portfolio.vercel.app`, which under the struck bullet above *is* the real origin. `lib/seo.ts` derives `SITE_ORIGIN` from it.

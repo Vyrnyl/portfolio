@@ -99,13 +99,13 @@ function required(name: string): string {
 export const env = {
   RESEND_API_KEY: required("RESEND_API_KEY"),
   CONTACT_TO_EMAIL: required("CONTACT_TO_EMAIL"),
-  SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
 } as const;
 ```
 
 - Never `process.env.X` inline outside this file.
-- `NEXT_PUBLIC_` prefix means **it ships to the browser**. Only `SITE_URL` qualifies.
 - `.env.local` is gitignored. `.env.example` is committed with names and empty values.
+- **There is no `SITE_URL`, and no `NEXT_PUBLIC_` variable at all.** This snippet carried `SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"` until 2026-09-15, and PORT-042 built it that way — then removed it, because **nothing ever read it.** Every URL on the site resolves from `site.url` (`src/content/site.ts`) through `SITE_ORIGIN` in `lib/seo.ts`, which feeds `metadataBase`, `absoluteUrl()` and all five JSON-LD `@id`/`url` values. Two sources of truth for one origin is a trap, and this one pointed the wrong way: changing the Vercel value and redeploying would have changed nothing while looking load-bearing.
+- **If a `NEXT_PUBLIC_` variable is ever added, note what the prefix actually does** — it is a framework contract, not a naming convention. Next inlines the value into the client bundle at build time, so renaming one to drop the prefix does not make it private; it makes `process.env.<NAME>` resolve to `undefined`, usually silently. Nothing in this repo needs one today: the site origin is public by nature (it is the address the browser is already on) but is committed in `site.ts`, where it is reviewable and cannot be silently wrong.
 
 ## 8. Formatting
 
