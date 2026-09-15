@@ -4,51 +4,37 @@ A six-page Next.js portfolio site — home, projects (index + detail), skills, a
 
 ## How this project is worked on
 
-**You author the code. He places it.** This is a deliberate learning build, and the thing being learned is *assembly* — how a project is planned, sequenced, layered and connected — not how to type a `className`. Every file comes from you, complete; every file lands on disk by his hand.
+**You author the code and you place it. He decides and reviews.** This is still a deliberate learning build, and the thing being learned is *assembly* — how a project is planned, sequenced, layered and connected — not how to type a `className`. What changed on **2026-09-15** is only who moves the bytes.
 
 ### The seam
 
 | | Who | What |
 |---|---|---|
-| **Authoring** | **You** | The complete contents of every file — components, `lib/`, content, tokens, config, and the `src/app/` wiring. Delivered in the reply as a full paste-ready file with its path. Never a skeleton with holes. |
-| **Placing** | **He does this** | Creating the file and pasting it in. **You do not write to disk** — not in `src/app/`, not in `components/`, not anywhere under `src/`. Reading is unrestricted. |
+| **Deciding** | **He does this** | Which ticket runs, every judgment call, every tradeoff with a cost. You surface the call with its options and what each forecloses; you do not default one silently. |
+| **Authoring + placing** | **You** | The complete contents of every file, written to disk yourself with Write/Edit — components, `lib/`, content, tokens, config, `src/app/` wiring. |
+| **Reviewing** | **He does this** | Reading `git diff` before it is committed. This is now the moment the code gets read, so your close-out has to tell him what to look for. |
 | **Git** | **He runs this** | Staging, committing, pushing — **straight to `main`, no branches, no PRs** (set 2026-09-03). You may read history freely (`git log`, `git status`, `git diff`) and you hand over the exact commands — you never run one that writes. |
 
-You **may** write directly to the `ai-context/` docs, `CLAUDE.md` and `.claude/` — those are the record, not the build. You **may** run read-only and verification commands yourself: `npm run verify`, `lint`, `typecheck`, `build`, and any file reading or searching.
+You **may** write anywhere in the repo: `src/`, `ai-context/`, `CLAUDE.md`, `.claude/`, config. You **may** run read-only and verification commands yourself: `npm run verify`, `lint`, `typecheck`, `build`, and any file reading or searching.
 
-### How to hand over a file
+**Set 2026-09-15, replacing the author-and-hand-over seam that ran from 2026-08-20.** Under the old rule every file landed by his hand, and pasting it was when he read it. That reading step is now **`git diff` before committing** — it did not disappear, it moved, and it is the reason git stays his. Two things make the trade worth it: he has placed enough files that the mechanical part had stopped teaching him anything, and a shell-mediated paste is itself a documented hazard here (a `Set-Content` rewrite once corrupted 13 em dashes in `layout.tsx` and still compiled green).
 
-Every handover is the same four parts, in this order:
+### What replaces the handover
 
-1. **The command that creates the file**, ready to run. Never ask him to type a path by hand or click through New File — a mistyped path is a wasted debugging session, and the shell cannot misspell it.
+You no longer narrate a paste, so the close-out carries the weight instead:
 
-   ```powershell
-   New-Item -ItemType File src/components/layout/header.tsx; code src/components/layout/header.tsx
-   ```
+1. **Write the files.** Use Write for a new file, Edit for a change to an existing one. Never rewrite a whole existing file when an Edit expresses the change — a targeted edit is now safe, because you are applying it rather than describing where to apply it.
+2. **Name every path you touched**, so he can find them in the diff.
+3. **Say what each file is for, or what changed** — one or two plain sentences. See below; that rule is unchanged.
+4. **Point him at what to review.** Name the specific thing worth his eye — the judgment call, the trap, the line that is load-bearing — not "please review the diff".
 
-   Prefix a `New-Item -ItemType Directory -Force <dir>` when the folder does not exist yet. Use plain `New-Item -ItemType File` with **no `-Force`** — without it the command refuses to touch an existing file, which is exactly the safety you want. For a file that already exists, hand over `code <path>` on its own.
+**Never write a file by redirecting into it** (`>`, `Out-File`, `Set-Content`). PowerShell writes UTF-16 with a BOM, the file will not parse, and a round-trip read can corrupt characters that compile fine. Use Write and Edit, which are UTF-8 and do not round-trip.
 
-   **Never** create a file by redirecting content into it (`>`, `Out-File`, or `Set-Content` without `-Encoding utf8`). PowerShell writes UTF-16 with a BOM and the file will not parse. The shell makes the file empty; the editor puts the content in.
+### Whole file or targeted edit
 
-   When a step creates several files at once, give one command that creates them all, then the blocks in dependency order.
+The old rule was *always the whole file*, because a fragment had to be **located** before it could be applied and locating it was the step that went wrong — stale line numbers after a format-on-save, a near-duplicate block accepting the paste silently, a half-applied multi-hunk edit. **That failure mode is gone**, because you now locate and apply the change yourself with a tool that fails loudly on an ambiguous match.
 
-2. **The path**, named in the prose so he knows which file he is looking at.
-3. **The code** — the complete file, always. See below.
-4. **What it does, or what changed** — **one or two plain sentences.** See below.
-
-### Always the whole file
-
-**Every file is delivered whole — new or existing.** No skeleton, no holes, no `// ...rest unchanged`, no REMOVE/ADD fragments. If one line changes in a 200-line component, he gets the 200-line component back.
-
-This is more to paste, deliberately. A fragment has to be *located* before it can be applied, and locating it is the step that goes wrong:
-
-- Format-on-save reflows the file, so a line number can be stale between writing the handover and pasting it.
-- A near-duplicate block further down the file accepts the paste silently, and the result still compiles.
-- A multi-hunk edit that is half-applied leaves the file in a state neither of you has seen, and the next error message describes a file you are not looking at.
-
-Replacing the whole file has one failure mode — select all, paste — and it is one he can see happen. Showing what changed is `git diff`'s job, not his to reconstruct from instructions.
-
-So: hand over `code <path>`, name the file, give the complete contents, and say in the prose what actually changed and why, so he knows what he is looking for when he reads the diff back.
+So: **prefer a targeted `Edit` for a change to an existing file.** It produces a diff he can actually read — one line changed shows as one line, not as a 200-line rewrite where the real change is invisible. Reach for `Write` on an existing file only when the change genuinely is most of it.
 
 ### Explaining a component — one or two sentences
 
@@ -80,16 +66,16 @@ Wiring gets **numbered steps**, not prose. He is new to the professional workflo
 - End with **what he should see** — the concrete observable result that means the step worked.
 - Never assume a step is trivial. If it needs naming, name it.
 
-### Reviewing what he pastes back
+### Reviewing your own work
 
-Review it honestly against [code-standards.md](ai-context/context/code-standards.md) and [ui-rules.md](ai-context/context/ui-rules.md) §5 — wrong layer, missing empty state, unawaited `params`, `.sort()` mutating shared module state, `components/ui/` reaching into `content/`, a `dark:` variant used for colour. Say it plainly, with the reason. Flag scope creep: "that's PORT-0xx, leave it."
+Nobody is retyping the code any more, so the second pair of eyes has to be yours. Before calling a file done, read it back against [code-standards.md](ai-context/context/code-standards.md) and [ui-rules.md](ai-context/context/ui-rules.md) §5 — wrong layer, missing empty state, unawaited `params`, `.sort()` mutating shared module state, `components/ui/` reaching into `content/`, a `dark:` variant used for colour. Say plainly what you found, with the reason; a fault you fixed silently is one he cannot learn from. Flag your own scope creep too: "that's PORT-0xx, leaving it."
 
 ### When a ticket closes
 
 - Run `npm run verify` **and the browser checks** yourself. Drive the real page with Playwright at the four breakpoints in both themes and report what you *observed*, never what the code implies. A criterion nothing has actually confirmed keeps the ticket `▶`.
 - Hand him only the checks a script genuinely cannot make: a real phone or touch device, a judgment call on whether something *looks* right against the prototype, or a major flow he wants to feel for himself. Ask for those explicitly and wait — do not accept "done" as evidence for them.
 - Update [progress.md](ai-context/context/progress.md), [ui-registry.md](ai-context/context/ui-registry.md) and [ui-rules.md](ai-context/context/ui-rules.md) yourself — those are the record, and they are yours to write.
-- Hand him the git commands. Do not run them.
+- **Hand him the git commands. Do not run them.** He reads `git diff` before committing, and since `main` auto-deploys that is the last checkpoint before the live site.
 
 ### Always
 
@@ -133,7 +119,7 @@ The content layer has started. `src/content/types.ts` (PORT-010) holds 12 types 
 
 **Sprint 3's lesson, three tickets running: clean numbers are not a clean page.** PORT-034 found a two-layout list behind zero overflow, PORT-036 a 128px void behind 454 passing assertions, PORT-037 an invisible dot meter behind an assertion that was itself broken. Reading screenshots caught all three. A fourth trap appeared here and cost a full run: **a stale `next start` kept serving the previous build**, so the numbers described code that no longer existed — kill the port and confirm a new string is in the served HTML before believing a re-run.
 
-**PORT-040 and PORT-041 are closed — Sprint 4 is 2 / 5 and the contact form really submits.** `src/lib/validation/contact.ts` is the one Zod schema (server parse authoritative) and `src/lib/actions/contact.ts` is the endpoint that enforces it. **It does not yet deliver:** a valid submission returns `{ ok: true }` and is written to the server log, so nothing is lost, but no email is sent and the success panel's "it reached my inbox" is not true until PORT-042 wires Resend.
+**PORT-040 and PORT-041 are closed — Sprint 4 is 2 / 5 and the contact form really submits.** `src/lib/validation/contact.ts` is the one Zod schema (server parse authoritative) and `src/lib/actions/contact.ts` is the endpoint that enforces it. **It did not deliver at the time** — a valid submission returned `{ ok: true }` and was written to the server log, nothing lost, but no email was sent. **PORT-042 closed that gap on 2026-09-15**; the success panel's "it reached my inbox" is now true locally, and true in production once the Vercel env vars are set.
 
 **PORT-041's lessons are about the gap between reading code and running it.** PORT-036 promised the wiring would swap `useState` → `useActionState` without touching markup; that held for the swap, and three structural additions were still forced, each found only by driving the page. **"Send another" as a `<Link href="/contact">` was dead** — the visitor is already on `/contact`, so same-route navigation never unmounts the component, `useActionState` (which has no reset) keeps its result, and the form became one-shot per page load; the fix is remounting on a `formKey`. `SubmitButton` had to split out, meeting the `useFormStatus` gotcha this file already records. A `Spinner` had to be written, inline rather than in `lib/icons.ts`, because `IconName` is scoped to content-backed icons.
 
@@ -151,7 +137,13 @@ The At-a-glance table in progress.md was recounted in the same pass and **was ge
 
 **PORT-053's lesson is about the instrument, and it is new in kind.** Localhost Lighthouse measured the same unchanged route at 97, 68, 94, 95, 96, 96, 97, then 68 — identical build, identical bytes — because ten stray headless Chrome processes from earlier runs were competing for CPU with the audits measuring CPU. **The tell was structural, not statistical: `/contact` and `/resume` have no project cards and swung 30 points from a change touching only card images.** When a page you did not modify moves, the instrument is moving. Related: **reported LCP read 2.6–3.9s while *observed* LCP was 173–553ms**, because Lighthouse's default simulation projects a slow phone from a fast localhost baseline — neither number alone is honest, and the fix was to measure production via PSI.
 
-Next ticket: **PORT-055** (deploy / custom domain) or **PORT-056** — Vernel's pick, neither has an unmet prerequisite. Every page is built, so it has no unmet prerequisite and no open question in front of it, and PORT-053 depends on it. Most of it is scriptable — axe on seven routes, a keyboard walkthrough, contrast in both themes — but **the screen-reader bullet (NVDA or Narrator on home, project detail and contact) is Vernel's to run.** **PORT-042 is parked by choice, not blocked**, and open question 3 (the sending domain) is still unanswered; do not pull PORT-044 forward, its success copy needs a real send behind it. Still carried: `global-error.tsx` does not exist, so a root-layout failure is uncaught; `/contact` still tells visitors "it reached my inbox" when nothing is sent; and PORT-050 is now fully closed, with the live origin verified serving correct robots, sitemap and JSON-LD.
+**PORT-042 closed 2026-09-15 — the contact form delivers, and Sprint 4 is 4 / 5.** Two new files (`src/lib/env.ts`, `src/lib/email.ts`) plus the wiring in `actions/contact.ts`. **It was unparked by a decision, not by circumstance:** Vernel chose to stay on the free Vercel subdomain, which dissolved open question 3 by removing its subject — no domain means Resend's shared `onboarding@resend.dev`, which delivers **only to the account owner's own address**. That restriction and a contact form's use case coincide, which is the only reason this ships; anything that ever emails the *visitor* will 403 for every visitor. **The trap worth carrying: the Resend SDK does not throw on a rejected send** — it resolves with the failure in `error`, so the action's `try/catch` never fires and the `if (error)` check in `lib/email.ts` is the entire guard. Ignoring it returns success to a visitor whose message went nowhere, the same silent-failure class as PORT-041's honeypot, PORT-043's empty `fieldErrors` and PORT-051's placeholder URL.
+
+**PORT-042's other lesson is about verification, and it cost four runs.** Every one was voided by reasoning from what the code implies instead of measuring what it does: a guessed selector (`#contact-name`; `Field` derives `field-<name>`), a class that matched three different things (`p.text-coral-text` is a field error *and* the required asterisk *and* the form banner — so a rate-limit banner counted as "3 field errors" and the run reported **34/35 green over a form that validated nothing**), a false premise that empty submits are rejected client-side (they are not — all nine reached the server and burned PORT-043's 5-per-15 quota mid-run), and a precondition that checked a freshly-loaded page for a banner a GET can never render. **The fix was procedural: restart the server before a verification run**, because the limiter's Map dies with the process — and note `lib/rate-limit.ts:160` already exports `__resetRateLimits()` for exactly this.
+
+**A PORT-054 prediction was proven wrong in the same pass.** `ci.yml` forecast that CI would go red once `lib/env.ts` threw at module load; `next build` passed green with no `.env.local` at all, because `env.ts` sits behind `"use server"` reached only from a Client Component, and module-scope code there is compiled but never *evaluated* during prerendering. The `env:` block stays as insurance and the file now records the measurement rather than the guess.
+
+Next ticket: **PORT-055**, which is now nearly closable — its custom-domain criterion is **struck by Vernel's decision** (a `*.vercel.app` name cannot be made clean, HTTPS is already provided, there is no apex to redirect to), `site.url` already matches the real origin, and the substantive bullet left is testing the form on the production URL. Then **PORT-044**, which was explicitly blocked on having a real send behind its success copy and now has one. **⚠ Before the next push: set `RESEND_API_KEY`, `CONTACT_TO_EMAIL` and `NEXT_PUBLIC_SITE_URL` in Vercel.** `main` auto-deploys and `env.ts` throws at module load, so the live form will fail on first submission while still claiming "it reached my inbox". Still Vernel's alone: **PORT-060**'s screen-reader pass and the three content gaps (PORT-057/058/059).
 
 ## Documentation map
 

@@ -29,15 +29,19 @@ export const skillGroups = [
     blurb:
       "Shipped working software with these more than once. I can start in them without looking up the basics.",
     items: [
+      "Tailwind CSS",
       "TypeScript",
       "JavaScript",
       "React.js",
+      "Next.js",
       "Node.js",
       "Express.js",
       "RESTful APIs",
       "MySQL",
+      "PostreSQL",
       "HTML5 & CSS3",
       "Git & GitHub",
+      "Authentication/Authorization",
       "Role-based access control",
     ],
   },
@@ -46,7 +50,7 @@ export const skillGroups = [
     label: "Working knowledge",
     blurb:
       "Built real features with these and can be productive, but I still reach for the documentation on the harder parts.",
-    items: ["Next.js", "Tailwind CSS", "Prisma", "SQL", "JWT authentication"],
+    items: ["Prisma", "SQL", "CI/CD and deployment pipelines"],
   },
   {
     tier: "learning",
@@ -55,9 +59,7 @@ export const skillGroups = [
       "Actively working through these, including on this site. Listed rather than hidden, because a skills page that only lists strengths tells you nothing.",
     items: [
       "React Server Components and the App Router",
-      "Web accessibility to WCAG 2.2 AA",
       "Design systems and token-driven styling",
-      "CI/CD and deployment pipelines",
     ],
   },
 ] satisfies SkillGroup[];

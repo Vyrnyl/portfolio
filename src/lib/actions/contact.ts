@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { z } from "zod";
 
+import { sendContactEmail } from "@/lib/email";
 import { checkRateLimit, describeRetryAfter } from "@/lib/rate-limit";
 import { contactSchema, MIN_SUBMIT_MS } from "@/lib/validation/contact";
 
@@ -285,18 +286,32 @@ export async function submitContact(
 
   try {
     /**
-     * PORT-042 replaces this line with `await sendContactEmail(parsed.data)`.
-     * Until then the action is real and the guards are real, but nothing is
-     * delivered — a submission that passes validation returns success and the
-     * message goes nowhere.
-     *
-     * That gap is PORT-041's honest boundary, carried forward: Resend needs an
-     * account and a verified domain that do not exist yet, and PORT-042 is
-     * parked by choice. The success panel still claims the message arrived,
-     * which stays untrue until then — PORT-044 owns that copy.
+     * PORT-042 — delivery. The guards above have already decided this
+     * submission is real; this is the only line here that leaves the process.
      */
-    console.info("[contact] validated submission (delivery lands in PORT-042)", {
-      name: parsed.data.name,
+    const sent = await sendContactEmail(parsed.data);
+
+    /**
+     * A PROVIDER REJECTION IS A FORM-LEVEL FAILURE, so `fieldErrors` is omitted
+     * entirely — nothing the visitor typed is wrong, and the banner that
+     * renders this message carries the mailto: fallback. Returning `{}` here
+     * would reproduce PORT-043's dead form exactly: "please check the fields
+     * below" over three clean fields with nothing marked and no way forward.
+     *
+     * The visitor is told the send failed rather than being shown a success
+     * panel for a message that does not exist. `sent.reason` is already logged
+     * with context in lib/email.ts and is deliberately NOT surfaced here — a
+     * provider's error string can name accounts, quotas or keys, and helps the
+     * visitor with none of it.
+     */
+    if (!sent.ok) {
+      return {
+        ok: false,
+        message: "The message could not be sent — the email service did not respond.",
+      };
+    }
+
+    console.info("[contact] delivered", {
       email: parsed.data.email,
       length: parsed.data.message.length,
       elapsed,

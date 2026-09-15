@@ -8,13 +8,33 @@
 # purpose: `verify` chains them with `&&`, so a type error would mask
 # whether lint also fails. Split out, the GitHub UI names the one that broke.
 #
-# NOTE for PORT-042: this job has no environment variables. `.env*` is
-# gitignored, so the runner never sees RESEND_API_KEY, CONTACT_TO_EMAIL or
-# NEXT_PUBLIC_SITE_URL. That is fine today because nothing reads them at
-# build time. Once `lib/env.ts` throws at module load on a missing var,
-# `next build` will evaluate it and this workflow will go red — add the
-# vars as GitHub repository secrets and an `env:` block on the build step
-# at that point.
+# PORT-042 (2026-09-15) — the env: block below is INSURANCE, not a current
+# requirement, and the distinction was measured rather than assumed.
+#
+# The note that stood here predicted this job would go red once `lib/env.ts`
+# threw at module load. It does throw — but `next build` passed green with no
+# .env.local at all, 21 routes, because of where env.ts sits in the import
+# graph:
+#
+#   env.ts <- email.ts <- lib/actions/contact.ts <- contact-form.tsx ("use client")
+#
+# Module-scope code in a "use server" file reached only from a Client Component
+# is COMPILED but never EVALUATED during prerendering. /contact is ○ static and
+# its page imports <ContactForm>, not the action; the action is a network
+# endpoint invoked on submission. So `required("RESEND_API_KEY")` runs at
+# request time, not at build time, and the prediction was wrong.
+#
+# The block stays anyway because it costs nothing and the graph is one import
+# away from changing: anything on a STATIC path that reads env.ts — lib/seo.ts
+# picking up SITE_URL would do it — makes these vars genuinely required at
+# build time. Keeping them here means that change does not also become a
+# confusing red pipeline.
+#
+# They are GitHub repository secrets, never literals: RESEND_API_KEY is a
+# genuine secret; the other two are not sensitive but live alongside it so
+# there is one place to look. A missing secret substitutes an empty string,
+# which is inert today. A red build reading "Missing required environment
+# variable" means a secret is absent, not that the code is broken.
 
 name: CI
 
@@ -60,4 +80,8 @@ jobs:
         run: npm run lint
 
       - name: Build
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          CONTACT_TO_EMAIL: ${{ secrets.CONTACT_TO_EMAIL }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
         run: npm run build

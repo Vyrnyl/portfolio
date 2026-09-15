@@ -559,13 +559,15 @@ The cause is headroom: `--fern` is only 4.78:1 against the light ground, so ther
 Resend integration plus `lib/env.ts`.
 
 **Acceptance criteria**
-- [ ] `lib/env.ts` throws at module load on a missing required var — **test by removing one**
-- [ ] `lib/email.ts` wraps the Resend client; the action never calls Resend directly
-- [ ] Email includes name, email, message, and a timestamp; the visitor's email is set as `replyTo`
-- [ ] Visitor input appears **only in the body** — never in the subject, headers, or `to` field
-- [ ] Provider failure returns the friendly error state, and the error is logged server-side with context
-- [ ] **A real message arrives in your real inbox**
-- [ ] `RESEND_API_KEY` is in `.env.local`, absent from git, and documented in `.env.example`
+- [x] `lib/env.ts` throws at module load on a missing required var — **tested by actually removing one**: the real module was compiled to JS and imported three ways. Both present → imports clean. `RESEND_API_KEY` removed → throws `Missing required environment variable: RESEND_API_KEY` at import. `CONTACT_TO_EMAIL` removed → same for that name. `SITE_URL` is deliberately **not** `required()` (it falls back to the dev origin) so `next dev` boots without an email key.
+- [x] `lib/email.ts` wraps the Resend client; the action never calls Resend directly — the action calls `sendContactEmail()` and branches on a `SendResult` union.
+- [x] Email includes name, email, message, and a timestamp; the visitor's email is set as `replyTo` — timestamp generated server-side, **not** taken from the client's `startedAt`, which is untrusted by the schema's own note.
+- [x] Visitor input appears **only in the body** — never in the subject, headers, or `to` field. `from` is a constant, `to` comes from env, the subject is a fixed string carrying no input at all, and the body is plain text rather than HTML.
+- [x] Provider failure returns the friendly error state, and the error is logged server-side with context — **and the mechanism is the ticket's sharpest trap: the Resend SDK does NOT throw on a rejected send**, it resolves with the failure in `error`. The action's `try/catch` would never fire on its own, so the `if (error)` check in `lib/email.ts` is the whole guard. Ignoring it would return success to a visitor whose message went nowhere.
+- [x] **A real message arrives in your real inbox** — confirmed by Vernel 2026-09-15. Sent through the real form on a production build, Resend id `38341633-d9a7-4dfb-bbc3-b86a8841f563`, server log `[email] sent`, zero rejections.
+- [x] `RESEND_API_KEY` is in `.env.local`, absent from git, and documented in `.env.example` — `git check-ignore` confirms `.gitignore:34` covers it and `git status` never lists it.
+
+**Amendment — no verified domain, and the sender is a testing address (2026-09-15).** Vernel chose to stay on free Vercel with no custom domain, so there is no domain to verify with Resend and `from` must be the shared `onboarding@resend.dev`. Resend's own Next.js quickstart lists that address under things not to ship in production. The constraint that matters is quoted verbatim in `lib/email.ts` from their errors reference (403): *"You can only send testing emails to your own email address … To send emails to other recipients, please verify a domain at resend.com/domains."* That is survivable here for exactly one reason — **this form emails Vernel, and `CONTACT_TO_EMAIL` is that same owning address.** Anything that ever emails the *visitor* (an acknowledgement copy, say) will 403 for every visitor until a domain is verified. Free tier: 100/day, 3,000/month, and both sent and received count toward the quota.
 
 ---
 
@@ -674,11 +676,11 @@ Resend integration plus `lib/env.ts`.
 **Depends on:** 054, 044
 
 **Acceptance criteria**
-- [ ] Connected to Vercel; `main` auto-deploys; PRs get preview deploys
-- [ ] Production env vars set in Vercel (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `NEXT_PUBLIC_SITE_URL`)
-- [ ] Custom domain live with HTTPS and a `www` → apex redirect
-- [ ] **Contact form tested on the production URL** — a preview deploy passing is not proof
-- [ ] `site.url` matches the real domain so OG images resolve absolutely
+- [x] Connected to Vercel; `main` auto-deploys; PRs get preview deploys — live since 2026-08-20, scope `cap1313`.
+- [ ] Production env vars set in Vercel (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `NEXT_PUBLIC_SITE_URL`) — **now genuinely load-bearing:** PORT-042 landed `lib/env.ts`, so without these the live contact form throws on the first submission while still telling the visitor it reached the inbox.
+- [x] ~~Custom domain live with HTTPS and a `www` → apex redirect~~ — **STRUCK 2026-09-15 by Vernel's decision to stay on the free Vercel subdomain.** `*.vercel.app` cannot be made clean (the name is always project + scope), HTTPS is already provided, and there is no apex to redirect to. This is a deliberate scope reduction, not an unmet criterion — recorded so it is never re-raised as an oversight. Reversing it means buying a domain, pointing DNS, and updating `site.url`; nothing in the code assumes the current origin beyond that one constant.
+- [ ] **Contact form tested on the production URL** — a preview deploy passing is not proof. Unmet: delivery is verified on localhost only.
+- [x] `site.url` matches the real origin so OG images resolve absolutely — `site.ts:21` is `https://vernel-portfolio.vercel.app`, which under the struck bullet above *is* the real origin. `lib/seo.ts` derives `SITE_ORIGIN` from it.
 
 ---
 
