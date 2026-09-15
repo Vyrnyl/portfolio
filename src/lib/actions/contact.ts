@@ -59,10 +59,57 @@ import { contactSchema, MIN_SUBMIT_MS } from "@/lib/validation/contact";
  * `fieldErrors` must be omitted entirely — not sent as an empty object — for
  * any failure no visible field owns. An empty object is the worst of both:
  * "please check the fields below" with nothing marked.
+ *
+ * `values` ECHOES BACK WHAT THE VISITOR TYPED, and it is what makes PORT-044's
+ * "field errors preserve entered values" true. The inputs are uncontrolled, so
+ * a re-render after a failed submit rebuilds them from their `defaultValue` —
+ * without this, every failure handed back three empty fields and the visitor
+ * lost the message they had just written, under the words "Please check the
+ * fields below". Measured before it was fixed, not inferred.
+ *
+ * ONLY THE THREE VISIBLE FIELDS ARE EVER ECHOED. `honeypot` and `startedAt`
+ * are deliberately absent: echoing the honeypot would hand a bot confirmation
+ * that its value survived the round trip, and echoing `startedAt` would let a
+ * stale mount time ride back into the next submission and defeat PORT-043's
+ * minimum-time guard. This carries no security weight of its own — the strings
+ * are rendered as text by React, never as HTML, the same three values
+ * lib/email.ts already puts in a plain-text body — but it is untrusted input
+ * making a round trip, so it is bounded to exactly what the form displays.
+ *
+ * It extends the union code-standards.md §6 specifies verbatim, so §6 was
+ * corrected in the same pass rather than left to disagree with the code.
  */
 export type ActionResult =
   | { ok: true }
-  | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
+  | {
+      ok: false;
+      message: string;
+      fieldErrors?: Record<string, string[]>;
+      values?: { name: string; email: string; message: string };
+    };
+
+/**
+ * The visitor's three visible answers, read straight off the raw FormData so
+ * they survive a failed parse — `parsed.data` does not exist when the parse is
+ * what failed, which is precisely the case that needs them.
+ *
+ * Untrimmed on purpose: the schema trims before validating, so a name of three
+ * spaces fails, and handing back the trimmed empty string would silently erase
+ * what the visitor sees in the box. They get their own text back exactly as
+ * typed, errors and all, which is what lets them fix it rather than retype it.
+ */
+function submittedValues(formData: FormData): {
+  name: string;
+  email: string;
+  message: string;
+} {
+  const read = (key: string): string => {
+    const raw = formData.get(key);
+    return typeof raw === "string" ? raw : "";
+  };
+
+  return { name: read("name"), email: read("email"), message: read("message") };
+}
 
 /**
  * The caller's IP, or a shared fallback key.
@@ -146,6 +193,13 @@ export async function submitContact(
       message: `That is several messages in a short time — please try again ${describeRetryAfter(
         limit.retryAfterSeconds,
       )}.`,
+      /**
+       * Echoed here too, and this is the branch where it matters most: a
+       * throttled visitor has done nothing wrong, and the whole point of the
+       * message is "try again shortly". Handing them an empty form to retype
+       * would make waiting cost them the message as well as the time.
+       */
+      values: submittedValues(formData),
     };
   }
 
@@ -232,12 +286,25 @@ export async function submitContact(
       return {
         ok: false,
         message: "This form could not be verified — please reload the page and try again.",
+        /**
+         * Echoed even though this message asks for a reload: the visitor may
+         * copy their text out before reloading, and a blank box gives them
+         * nothing to copy. The reload is what re-issues a fresh `startedAt`;
+         * the echoed values are never the timing token itself.
+         */
+        values: submittedValues(formData),
       };
     }
 
     return {
       ok: false,
       message: "Please check the fields below.",
+      /**
+       * THE BRANCH PORT-044 EXISTS FOR. Every visible field error lands here,
+       * so this is the return that decides whether "check the fields below"
+       * points at the visitor's own words or at three empty boxes.
+       */
+      values: submittedValues(formData),
       /**
        * v4's top-level `z.flattenError()`, not the deprecated
        * `error.flatten()`. PORT-040 proved by running it that this returns
@@ -308,6 +375,13 @@ export async function submitContact(
       return {
         ok: false,
         message: "The message could not be sent — the email service did not respond.",
+        /**
+         * A provider rejection is the cruellest place to lose the text: the
+         * visitor wrote a valid message and the failure is entirely ours. They
+         * keep their words, and the banner's mailto: fallback gives them
+         * somewhere to paste them.
+         */
+        values: submittedValues(formData),
       };
     }
 
@@ -335,6 +409,7 @@ export async function submitContact(
     return {
       ok: false,
       message: "The message could not be sent — the email service did not respond.",
+      values: submittedValues(formData),
     };
   }
 }

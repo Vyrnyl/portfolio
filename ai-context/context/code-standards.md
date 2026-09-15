@@ -78,12 +78,18 @@ Full contract in [ui-rules.md](ui-rules.md) §5. The short version:
 ```ts
 export type ActionResult =
   | { ok: true }
-  | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
+  | {
+      ok: false;
+      message: string;
+      fieldErrors?: Record<string, string[]>;
+      values?: { name: string; email: string; message: string };
+    };
 ```
 
 - Catch, log server-side with context, return a generic message. Never leak an error object to the browser.
 - **Never swallow an error to make a symptom disappear.** An empty `catch {}` is a bug.
 - Every user-facing failure offers a next step — the contact form's failure state shows a `mailto:` fallback.
+- **A failure returns what the visitor typed.** `values` was added 2026-09-15 by PORT-044, which found that a failed submit re-rendered three empty fields: the inputs are uncontrolled, so a re-render rebuilds them from `defaultValue`, and with nothing echoed back the visitor lost their message under the words "Please check the fields below." Echo only the fields the form actually displays — never a honeypot (it confirms to a bot that its value survived) and never a timing token (a stale one riding back defeats the minimum-time guard). The `values` member is shaped per-action rather than generic, because only the action knows which of its inputs are safe to show again.
 
 ## 7. Environment variables
 

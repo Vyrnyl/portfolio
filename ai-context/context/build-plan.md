@@ -591,11 +591,13 @@ Resend integration plus `lib/env.ts`.
 **Depends on:** 043
 
 **Acceptance criteria**
-- [ ] Success state is reassuring and states an expected response time
-- [ ] The failure state shows a **`mailto:` fallback** — a visitor is never dead-ended by your email provider
-- [ ] Field errors appear inline and preserve entered values
-- [ ] Form is fully usable by keyboard from first field to submitted result
-- [ ] Screen reader announces both success and failure
+- [x] Success state is reassuring and states an expected response time — "Thanks — it reached my inbox. I usually reply within a couple of days." **The response time is a promise to strangers, so the wording is Vernel's to confirm rather than mine to set** (see the note below).
+- [x] The failure state shows a **`mailto:` fallback** — a visitor is never dead-ended by your email provider. Met by construction: the banner renders whenever `fieldErrors` is `undefined`, and all four form-level failures omit it. Measured on the rate-limit branch, banner and `mailto:` both present.
+- [x] Field errors appear inline and preserve entered values — **this was genuinely broken and is the ticket's real content.** Measured empty (all three fields blanked) before the fix, preserved after, across 1440/1024/768/375 × light/dark.
+- [x] Form is fully usable by keyboard from first field to submitted result — 10/10, tab order `name → email → message → submit` with a visible indicator at every stop, and values surviving an Enter-key submit.
+- [ ] Screen reader announces both success and failure — **Vernel's to run**, the same as PORT-052's and PORT-060's. Success is announced by the focus move onto the confirmation heading (PORT-060 deliberately removed the live region so it does not announce twice); failure by each field's `role="alert"`, the banner's `role="alert"`, and the `sr-only aria-live` validation summary.
+
+**Amendment — `ActionResult` grew a `values` member (2026-09-15).** "Preserve entered values" could not be met by the form alone: the inputs are uncontrolled, so the re-render after a failed submit rebuilt them from `defaultValue`, and nothing echoed the submission back. Measured before it was touched — name, email and message all returned empty under the words "Please check the fields below." The action now returns what the visitor typed on **every** failure branch, and code-standards §6 was corrected in the same pass rather than left to disagree with the code. Only the three visible fields are echoed: never the honeypot (it would confirm to a bot that its value survived) and never `startedAt` (a stale timing token riding back would defeat PORT-043's minimum-time guard).
 
 **Sprint 4 exit:** a message sent from the deployed form arrives in your inbox, and the failure paths are all survivable.
 
@@ -677,9 +679,9 @@ Resend integration plus `lib/env.ts`.
 
 **Acceptance criteria**
 - [x] Connected to Vercel; `main` auto-deploys; PRs get preview deploys — live since 2026-08-20, scope `cap1313`.
-- [ ] Production env vars set in Vercel — **two, not three: `RESEND_API_KEY` and `CONTACT_TO_EMAIL`** (`NEXT_PUBLIC_SITE_URL` was removed 2026-09-15; the origin lives in `site.url`). **Now genuinely load-bearing:** PORT-042 landed `lib/env.ts`, which throws at module load, so without these the live contact form fails on the first submission while still telling the visitor it reached the inbox.
+- [x] Production env vars set in Vercel — **set 2026-09-15 by Vernel and confirmed by a real production send.** **Two, not three: `RESEND_API_KEY` and `CONTACT_TO_EMAIL`** (`NEXT_PUBLIC_SITE_URL` was removed 2026-09-15; the origin lives in `site.url`). **Now genuinely load-bearing:** PORT-042 landed `lib/env.ts`, which throws at module load, so without these the live contact form fails on the first submission while still telling the visitor it reached the inbox.
 - [x] ~~Custom domain live with HTTPS and a `www` → apex redirect~~ — **STRUCK 2026-09-15 by Vernel's decision to stay on the free Vercel subdomain.** `*.vercel.app` cannot be made clean (the name is always project + scope), HTTPS is already provided, and there is no apex to redirect to. This is a deliberate scope reduction, not an unmet criterion — recorded so it is never re-raised as an oversight. Reversing it means buying a domain, pointing DNS, and updating `site.url`; nothing in the code assumes the current origin beyond that one constant.
-- [ ] **Contact form tested on the production URL** — a preview deploy passing is not proof. Unmet: delivery is verified on localhost only.
+- [x] **Contact form tested on the production URL** — a preview deploy passing is not proof. **Met 2026-09-15:** one real submission through the deployed form returned HTTP 200 with the confirmation panel rendered, and **Vernel confirmed the message arrived in the inbox** — a 200 alone would not have been proof, since PORT-042 established the Resend SDK resolves with the failure in `error` rather than throwing.
 - [x] `site.url` matches the real origin so OG images resolve absolutely — `site.ts:21` is `https://vernel-portfolio.vercel.app`, which under the struck bullet above *is* the real origin. `lib/seo.ts` derives `SITE_ORIGIN` from it.
 
 ---

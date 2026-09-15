@@ -125,6 +125,19 @@ function ContactFormFields({
   const fieldErrors =
     state?.ok === false ? (state.fieldErrors ?? FIELD_ERRORS_EMPTY) : FIELD_ERRORS_EMPTY;
 
+  /**
+   * What the visitor typed, handed back by the action (PORT-044).
+   *
+   * THE INPUTS ARE UNCONTROLLED, so React rebuilds each one from its
+   * `defaultValue` on the re-render that follows a failed submit. Before this
+   * existed, that meant three empty fields every time — the visitor was told to
+   * check the fields below while the message they had just written was gone.
+   *
+   * `undefined` on a fresh mount and on the success path, which is what leaves
+   * the placeholders showing rather than blanking them to "".
+   */
+  const values = state?.ok === false ? state.values : undefined;
+
   if (state?.ok) {
     return <SuccessPanel className={className} onReset={onReset} />;
   }
@@ -143,6 +156,7 @@ function ContactFormFields({
             type="text"
             autoComplete="name"
             placeholder="Your name"
+            defaultValue={values?.name}
             autoFocus={autoFocusFirstField}
           />
         )}
@@ -156,12 +170,25 @@ function ContactFormFields({
         error={fieldErrors.email?.[0]}
       >
         {(props) => (
-          <Input {...props} type="email" autoComplete="email" placeholder="you@example.com" />
+          <Input
+            {...props}
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            defaultValue={values?.email}
+          />
         )}
       </Field>
 
       <Field name="message" label="Message" required error={fieldErrors.message?.[0]}>
-        {(props) => <Textarea {...props} rows={6} placeholder="What are you working on?" />}
+        {(props) => (
+          <Textarea
+            {...props}
+            rows={6}
+            placeholder="What are you working on?"
+            defaultValue={values?.message}
+          />
+        )}
       </Field>
 
       {/*

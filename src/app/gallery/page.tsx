@@ -141,8 +141,20 @@ export default function GalleryPage() {
             {(props) => <Textarea {...props} rows={4} placeholder="What would you like to say?" />}
           </Field>
 
-          <Field name="gallery-message-error" label="Message" required error="Message is required.">
-            {(props) => <Textarea {...props} rows={4} />}
+          {/*
+            An errored Textarea that KEEPS WHAT WAS TYPED — the PORT-044 state.
+            The errored Input above has carried a value since PORT-023; this
+            half had not, and a state no page renders is a state nothing tests,
+            which is how the 2026-09-09 `Field` hint/error defect survived 202
+            assertions and this very gallery.
+          */}
+          <Field
+            name="gallery-message-error"
+            label="Message"
+            required
+            error="Please write at least a sentence or two."
+          >
+            {(props) => <Textarea {...props} rows={4} defaultValue="too short" />}
           </Field>
 
           <Field name="gallery-disabled" label="Disabled">
