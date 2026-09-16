@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "next-themes";
 
 import { Footer } from "@/components/layout/footer";
@@ -128,6 +129,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </main>
           <Footer />
         </ThemeProvider>
+        {/*
+          Vercel Web Analytics (PORT-056). Page views only — cookieless, so no
+          consent banner is owed and no personal data leaves the visitor.
+
+          OUTSIDE ThemeProvider for the same reason the JSON-LD tags are: it has
+          nothing to do with theming, and nesting it there would only widen that
+          client subtree for no gain. It is itself a Client Component, so this is
+          the first client JS the otherwise-static routes carry — deliberate
+          rather than accidental.
+
+          `@vercel/analytics/next`, not `/react`: the App Router entry tracks
+          route changes through `next/navigation` itself. It is inert off
+          Vercel, so local runs send nothing.
+        */}
+        <Analytics />
       </body>
     </html>
   );

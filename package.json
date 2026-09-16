@@ -12,6 +12,7 @@
     "audit": "node -e \"require('fs').mkdirSync('.lighthouse',{recursive:true})\" && lighthouse http://localhost:3000 --preset=desktop --output=html --output=json --output-path=./.lighthouse/lh --chrome-flags=\"--headless\" --quiet"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.33.0",
     "next": "16.3.1",

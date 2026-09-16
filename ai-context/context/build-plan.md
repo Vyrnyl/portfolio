@@ -689,13 +689,15 @@ Resend integration plus `lib/env.ts`.
 ### PORT-056 · Launch checklist `S`
 **Depends on:** 055
 
+> **▶ IN PROGRESS 2026-09-16 — the scriptable half is verified locally; four bullets need production or a human.** Analytics was **built, not struck**: Vernel chose `@vercel/analytics` (see D14). Two real defects were found and fixed in the pass, both in metadata that only a shared link exposes — see the decisions log and progress.md.
+
 **Acceptance criteria**
-- [ ] Every route loads on production, on a real phone as well as a desktop
-- [ ] All external links resolve; resume PDF downloads
-- [ ] OG cards render correctly when the URL is pasted into Slack/LinkedIn/X
-- [ ] Analytics recording page views
-- [ ] 404 and error pages verified live
-- [ ] Content proofread — typos on a portfolio cost more than they do anywhere else
+- [ ] Every route loads on production, on a real phone as well as a desktop — **all 15 checked locally (12 × 200, `/gallery` + unknown slug × 404); production + real phone still owed**
+- [x] All external links resolve; resume PDF downloads — **PDF 200 `application/pdf` 157KB; GitHub 200; LinkedIn resolves (its `999` to curl is a bot-block — the browser lands on an authwall carrying the correct profile in `sessionRedirect`)**. ⚠ **`https://example.com` is NOT a broken link but a working link to the wrong site** — it is the "Live site" and "Source code" button on `/projects/opalusph-website`, and it is PORT-012's placeholder, accepted as the shipping state on 2026-09-15
+- [ ] OG cards render correctly when the URL is pasted into Slack/LinkedIn/X — **tags corrected and verified in the served HTML; the paste test is Vernel's, as in PORT-050**
+- [x] Analytics recording page views — `@vercel/analytics/next` in the root layout, **confirmed in a real browser**: the script injects, `window.va` is a live function, and it survives client-side navigation. ⚠ **`/_vercel/insights/script.js` 404s off Vercel by design**, so the count itself is only confirmable on the deployed site
+- [x] 404 and error pages verified live — unknown route → 404 rendering "This page does not exist"; unknown project slug → real HTTP 404 from the segment's own `not-found.tsx`
+- [ ] Content proofread — typos on a portfolio cost more than they do anywhere else — **no typos found in the written prose; `/about`, `/skills`, `/resume`, `/contact` are placeholder-free.** Unticked because **12 placeholder strings are visibly rendered** across `/`, `/projects` and the two OpalusPH detail pages (the closed-by-decision PORT-012 gap), including a `TBC — confirm stack` chip that reads as a technology on all four project pages
 - [ ] [progress.md](progress.md) marked complete; [ui-registry.md](ui-registry.md) fully populated
 
 ---
@@ -711,12 +713,14 @@ Added 2026-08-22. PORT-012 shipped with **placeholder copy and placeholder image
 
 One caveat on the first criterion: the grep also catches **one hit in `src/content/site.ts`** — `photo.alt` — which belongs to **PORT-058**, not this ticket. Neither ticket can close while the grep is non-empty, so whichever lands second gets a clean run; do not "fix" the other's hit to make the check pass here.
 
+> **CLOSED 2026-09-15 by Vernel's decision — criteria NOT met, accepted as the shipping state.** His reasoning: this is an update of his own data, and it can be redone whenever the underlying projects change. Every bullet below is left unticked on purpose, because each one is verifiably false today, not merely unverified. See the decisions log.
+
 **Acceptance criteria**
-- [ ] `Select-String -Pattern "Placeholder|TBC" src/content/` returns **nothing** (the `site.ts` hit is PORT-058's to clear)
-- [ ] Every `.webp` in `public/images/projects/` is a real capture — zero placeholders remain
+- [ ] `Select-String -Pattern "Placeholder|TBC" src/content/` returns **nothing** (the `site.ts` hit is PORT-058's to clear) — **24 hits remain in `projects.ts`**
+- [ ] Every `.webp` in `public/images/projects/` is a real capture — zero placeholders remain — **all 8 are generated stand-ins**
 - [ ] `year`, `status`, `tags`, `stack`, `role`, `duration` replaced with verified values
 - [ ] Every `liveUrl`/`repoUrl` is a real URL that resolves — no `https://example.com` survives
-- [ ] `problem`/`approach`/`outcome` are real prose with no invented metrics
+- [ ] `problem`/`approach`/`outcome` are real prose with no invented metrics — **true of the two academic projects, not the two OpalusPH sites**
 - [ ] Each `width`/`height` in `src/content/projects.ts` matches the new file's real intrinsic size
 - [ ] Each file is WebP and ≤ 200KB
 - [ ] Every `alt` still describes what the *new* image actually shows — the placeholder alt text will not survive the swap
@@ -735,13 +739,15 @@ Added 2026-08-25. PORT-033 shipped `/about` with a **generated stand-in portrait
 
 This is a three-line edit plus a file, not a rewrite. `site.photo` already carries `src`/`alt`/`width`/`height`, and `SiteConfig.photo` is **required**, so nothing can render `/about` with the field missing.
 
+> **CLOSED 2026-09-15 by Vernel's decision — criteria NOT met, accepted as the shipping state.** Same reasoning as PORT-057: his own data, swappable later. The stand-in still reads `PHOTO PENDING` on its face, so `/about` shows a pending slot rather than a broken one — which is why this is acceptable to ship and was never acceptable to hide. See the decisions log.
+
 **Acceptance criteria**
-- [ ] `public/images/profile-placeholder.webp` deleted, replaced by a real photo under `public/images/`
+- [ ] `public/images/profile-placeholder.webp` deleted, replaced by a real photo under `public/images/` — **the placeholder is still on disk**
 - [ ] `site.photo.alt` describes the actual photo — the "Placeholder graphic standing in for…" string does not survive
 - [ ] `site.photo.width`/`height` match the new file's real intrinsic size
 - [ ] WebP, ≤ 200KB
 - [ ] `/about` checked at all four breakpoints in both themes — a different aspect ratio must not break the intro grid
-- [ ] Decide at the same time whether `/about` now earns an `og:image`; PORT-033 deliberately ships none while the portrait is a placeholder
+- [ ] Decide at the same time whether `/about` now earns an `og:image`; PORT-033 deliberately ships none while the portrait is a placeholder — **still ships none, so the decision stands deferred with the ticket**
 
 **Watch for:** the placeholder is **4:5 portrait** (1000×1250). A photo at a different ratio changes the height of the intro's right-hand column — it will not overflow, but it will shift where the text centres against it.
 
@@ -769,13 +775,15 @@ The email divergence is the part with real consequences: a reader who takes the 
 
 Two further defects worth fixing in the same pass, both cosmetic but both visible to a recruiter: the skills block reads **"Langauges"**, and the PDF's Projects section lists two academic projects (Grades Repository System, CICT Project Gate) that are not the two OpalusPH sites `projects.ts` carries — so the PDF and `/projects` currently describe different bodies of work. Deciding which projects belong on the one-page resume is a judgment call for Vernel, not a defect to silently fix.
 
+> **CLOSED 2026-09-15 by Vernel's decision — criteria NOT met, accepted as the shipping state.** Same reasoning as PORT-057 and PORT-058. **This one carries a cost the other two do not, and closing it does not remove the cost:** a `PHOTO PENDING` graphic and a placeholder thumbnail announce themselves, while a stale PDF looks exactly like a current one. `/resume` still offers a download that omits the OpalusPH internship and gives a different email address than the page above it. See the decisions log.
+
 **Acceptance criteria**
-- [ ] `public/resume.pdf` contains the OpalusPH internship with the same dates and title as `jobs[0]`
-- [ ] Every email address in the PDF matches `site.email` exactly
+- [ ] `public/resume.pdf` contains the OpalusPH internship with the same dates and title as `jobs[0]` — **absent; file unchanged since 2026-08-19**
+- [ ] Every email address in the PDF matches `site.email` exactly — **PDF says `aquinovern0@`, site says `vernaquino73@`**
 - [ ] "Langauges" typo corrected
 - [ ] The PDF's projects and `projects.ts` tell a consistent story — same projects, or a deliberate documented subset
 - [ ] `pdftotext -layout public/resume.pdf -` diffed by eye against `/resume` — no fact appears in one and contradicts the other
-- [ ] The download still opens in a new tab and the file is not corrupted after replacement
+- [ ] The download still opens in a new tab and the file is not corrupted after replacement — **unaffected; no file was replaced**
 
 **Watch for:** the file is replaced in place at `public/resume.pdf`, so `site.resumePdf` needs no edit — and *because* it needs no edit, nothing in the codebase changes when this ticket lands. `npm run verify` will pass identically before and after. The only proof is reading the new PDF.
 
@@ -827,6 +835,7 @@ Closed. Reopening one requires a written reason in [progress.md](progress.md).
 | D10 | Deploy on Vercel | First-class Next.js target |
 | D11 | **`/projects` stays `ƒ` dynamic; PORT-053's AC was amended, not the route** (2026-09-06) | Two closed decisions collided: PORT-031 deliberately reads `searchParams` so the tag filter runs server-side, and PORT-053's AC asked that every page be static. The route gives nothing up by being dynamic — there is no database, and content is TS literals already in memory, so an on-demand render is an array filter, not I/O. Making it static would push filtering into client JS and force `useSearchParams` + a Suspense boundary, i.e. more client JS to satisfy a criterion whose *purpose* is less client JS. **Forecloses:** `/projects` cannot be served from a CDN as prerendered HTML, and any future ticket asserting "all routes are `○`" must name this exception. |
 | D13 | **PORT-053's LCP threshold amended from < 1.8s to < 2.5s** (2026-09-06) | The deployed site measures 1.8–2.5s: over the ticket's own bar, inside Google's "Good" band. The 1.8s figure was written into the AC before anything had been measured and has no external authority behind it; **2.5s is the Core Web Vitals threshold that actually affects ranking and reflects real user experience.** The remaining time was traced on the live site rather than assumed — the LCP image is preloaded with `fetchpriority`, the mobile candidate is 2.8KB of WebP, and the cost is a cold-cache optimizer MISS (~740ms) that warms to a HIT (~165ms). No code change removes it; chasing 1.8s would mean adding complexity (blur placeholders, pre-warmed variants, or dropping the optimizer) to beat a number we invented, on a page already scoring 98. **Forecloses:** the site is no longer held to a self-imposed bar stricter than the industry one, so a future regression between 1.8s and 2.5s will not trip this criterion. |
+| D14 | **Analytics is built rather than struck: `@vercel/analytics`** (2026-09-16) | PORT-056's "Analytics recording page views" was the board's last unbuilt criterion — nothing in the repo wired any provider — so it was a dependency decision, and D12's precedent makes that Vernel's call rather than a default. He chose to build it. `@vercel/analytics` over Plausible or a third party because the site already deploys to Vercel: zero config, no paid plan, no external `<script>` host to weigh against the Best-Practices score, and **cookieless — so no consent banner is owed.** It is the first client JS the otherwise-static routes carry, which is the real cost and is deliberate. **Forecloses:** the numbers live in Vercel's dashboard rather than anywhere queryable from the repo, and the free tier caps retained events; **and the confirmation is only fully makeable on production**, because `/_vercel/insights/script.js` is served by Vercel's edge and 404s on localhost by design. |
 | D12 | **Lighthouse installed as a devDependency** (2026-09-06) | PORT-052's "Accessibility = 100" and three of PORT-053's six criteria both need it, so it was settled as one decision covering both rather than twice. A devDependency keeps the version pinned in the lockfile and the run reproducible and scriptable, which a hand-run DevTools panel is not — and it never reaches the shipped bundle. **Forecloses:** audits now depend on a local Chrome/Chromium that CI does not currently install, so the `audit` script stays out of `verify` and out of `ci.yml`. |
 
 ## 10. Deferred
