@@ -18,9 +18,30 @@ type Props = {
   className?: string;
 };
 
+/*
+ * Every Section carries this marker, and the rule that reads it lives in
+ * globals.css: `.section + .section { padding-top: 0 }`.
+ *
+ * Padding sits on both edges so a lone Section breathes on both sides, but
+ * that means every ADJACENT PAIR stacks two paddings and the visible gap is
+ * double what either section asked for — measured before the fix at 208px
+ * between two `default` sections at 1440, 168px for default+tight, 128px for
+ * tight+tight. PORT-036 hit this on /contact and fixed it locally by merging
+ * two sections into one; this fixes the cause, so no page has to know.
+ *
+ * The rule is a real CSS rule rather than a Tailwind `[&+&]` arbitrary
+ * variant. That variant does compile, but it keys on the literal class string,
+ * so it collapses `tight + tight` and `default + default` while silently
+ * MISSING `default + tight` — the exact pair /about uses. One marker class
+ * cannot have that bug.
+ *
+ * Only the top is removed: the pair keeps the FOLLOWING section's rhythm, and
+ * the first section on a page keeps its full top padding because nothing
+ * precedes it.
+ */
 const SPACING = {
-  default: "py-section",
-  tight: "py-section-tight",
+  default: "section py-section",
+  tight: "section py-section-tight",
 } as const;
 
 /**

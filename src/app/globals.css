@@ -287,6 +287,34 @@
   overflow: hidden;
 }
 
+/* ---------------------------------------------------------------------------
+   SECTION RHYTHM — collapse the doubled gap between adjacent sections.
+
+   `<Section>` pads both edges so a lone section breathes on both sides. The
+   consequence is that every ADJACENT PAIR stacks two paddings, making the
+   visible gap twice what either section asked for. Measured before this rule,
+   at 1440: 208px between two `default` sections, 168px for default+tight,
+   128px for tight+tight — against a `--spacing-section` that is 104px.
+
+   PORT-036 met this on /contact and solved it locally by merging two sections
+   into one. That worked, but left the cause in place for every other page to
+   rediscover; /about, /resume and /projects/[slug] all had it.
+
+   Deliberately NOT a Tailwind `[&+&]` arbitrary variant. That compiles and
+   generates `.[&+&]\:pt-0 + .[&+&]\:pt-0`, which keys on the literal class
+   string — so it collapses tight+tight and default+default while silently
+   MISSING default+tight, the exact pair /about uses. A shared marker class
+   cannot have that bug.
+
+   The top is what gets removed, so a pair keeps the FOLLOWING section's
+   rhythm, and the first section on a page keeps its full top padding because
+   nothing precedes it.
+--------------------------------------------------------------------------- */
+
+.section + .section {
+  padding-top: 0;
+}
+
 
 @media (prefers-reduced-motion: reduce) {
   *,

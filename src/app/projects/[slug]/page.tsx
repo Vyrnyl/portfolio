@@ -106,7 +106,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       */}
       <script {...jsonLdScriptProps(buildProjectSchema(project))} />
 
-      <Section>
+      {/* `tight` like every section below it. As `default` its 104px bottom
+          padding was the widest gap on the page, and it fell between the
+          header and the case study — the two halves that belong together. */}
+      <Section spacing="tight">
         <ProjectHeader project={project} />
       </Section>
 
