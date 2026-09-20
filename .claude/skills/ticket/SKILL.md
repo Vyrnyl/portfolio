@@ -2,7 +2,7 @@
 
 Work one ticket from [build-plan.md](../../../ai-context/context/build-plan.md).
 
-> **You author every file. He places every one of them.** (CLAUDE.md → How this project is worked on.) Nothing you write in this skill goes to disk under `src/` — components, `lib/`, content and the `src/app/` wiring alike are handed over for him to place, always as the complete file, new or existing. The `ai-context/` docs are the exception: those are the record, and you write them yourself.
+> **You author and place every file. He decides and reviews.** (CLAUDE.md → How this project is worked on, set 2026-09-15.) You write to disk yourself with Write/Edit — components, `lib/`, content, tokens, config and the `src/app/` wiring alike, and the `ai-context/` docs too. **Git stays his**: you hand over the stage/commit/push commands and never run one that writes. `git diff` before committing is now the moment the code gets read, so the close-out has to tell him what to look for.
 
 ## 1. Orient
 
@@ -26,37 +26,32 @@ Before handing over any file, give him:
 
 If it builds a component, **check [ui-registry.md](../../../ai-context/context/ui-registry.md) first** and say whether something existing should be reused or extended instead.
 
-## 3. Hand over the files
+## 3. Write the files
 
-One file at a time, each as **create command → path → complete fenced block → what it does**.
+**Write for a new file, Edit for a change to an existing one.**
 
-Always give the PowerShell command that creates the file. He never types a path by hand:
+**Prefer a targeted `Edit`.** The old rule was always-the-whole-file, because a fragment had to be *located* before it could be applied and locating it was the step that went wrong — stale line numbers after a format-on-save, a near-duplicate block accepting a paste silently, a half-applied multi-hunk edit. That failure mode is gone: you locate and apply the change yourself with a tool that fails loudly on an ambiguous match. A targeted edit also produces a diff he can read — one line changed shows as one line, not as a 200-line rewrite hiding the real change. Reach for `Write` on an existing file only when the change genuinely is most of it.
 
-```powershell
-New-Item -ItemType File src/components/ui/button.tsx; code src/components/ui/button.tsx
-```
+**A new file is written whole** — no `// ...rest unchanged`, no `{/* fill this in */}`, no holes.
 
-Prefix `New-Item -ItemType Directory -Force <dir>` when the folder is new. No `-Force` on the file — it must refuse to overwrite. For an existing file, `code <path>` alone. Never redirect content into a file with `>` / `Out-File` / bare `Set-Content`: PowerShell writes UTF-16 + BOM and it will not parse. One command for a batch, then the blocks in dependency order.
+**Never write a file by redirecting into it** (`>`, `Out-File`, `Set-Content`). PowerShell writes UTF-16 with a BOM and the file will not parse — and `-Encoding utf8` does not save you, because `Get-Content` has already misread the file on the way in. That round trip once corrupted 13 em dashes in `layout.tsx` and still compiled green. Write and Edit are UTF-8 and do not round-trip.
 
-**A new file is delivered whole** — no `// ...rest unchanged`, no `{/* fill this in */}`, no holes.
+Then, for each file you touched, say **what it is for** (new) or **what changed** (edit), in **one or two plain sentences**:
 
-**An existing file is delivered whole too, not as a fragment.** Give the path and the complete new contents — no REMOVE/ADD blocks, no line-number targets, no `// ...rest unchanged`. A fragment has to be located before it can be applied, and that is the step that goes wrong: format-on-save moves line numbers, a near-duplicate block accepts the paste silently, and a half-applied multi-hunk edit leaves a file neither of you has seen. Select-all-and-paste has one failure mode and it is visible. Say in the prose what changed and why, so he knows what to look for in `git diff`.
+- What job the piece does on the page, or what moved and why.
+- A real trap, and only when it would actually bite — a hydration rule, an ordering requirement, a dependency on something else existing.
 
-**What it does** describes the piece's role, not its stylesheet:
+Do **not** give a prop-by-prop tour, and do **not** narrate class names or token mappings. The props are readable in the file, and the detail belongs in [ui-registry.md](../../../ai-context/context/ui-registry.md) and [ui-rules.md](../../../ai-context/context/ui-rules.md), both of which you update at close. Name a class only when it is the gotcha itself.
 
-- What it is and what job it does on the page.
-- What it exports, its props, and what each prop is *for*.
-- Where it belongs and what it expects to be given.
-- What visibly breaks if it is wired wrong or left out.
-- Any real trap — a hydration rule, an ordering requirement, a dependency on something else existing.
+> The test: if it runs past two sentences without naming a trap, it is a registry entry wearing a handover's clothes.
 
-Do **not** narrate class names or token mappings. That is what [ui-rules.md](../../../ai-context/context/ui-rules.md) and [ui-registry.md](../../../ai-context/context/ui-registry.md) are for, and you update both at close. Mention a class only when it is a genuine gotcha.
+## 3b. Review your own work
 
-> The altitude test: if the explanation would still be useful to someone who never opens the CSS, it is right.
+Nobody is retyping the code any more, so the second pair of eyes has to be yours. Before calling a file done, read it back against [code-standards.md](../../../ai-context/context/code-standards.md) and [ui-rules.md](../../../ai-context/context/ui-rules.md) §5 — wrong layer, missing empty state, unawaited `params`, `.sort()` mutating shared module state, `components/ui/` reaching into `content/`, a `dark:` variant used for colour. **Say plainly what you found, with the reason; a fault you fixed silently is one he cannot learn from.** Flag your own scope creep too: "that's PORT-0xx, leaving it."
 
-## 4. Guide the wiring
+## 4. Wire it, and guide only what he does himself
 
-Anything in `src/app/` gets **numbered steps**, not prose:
+You wire `src/app/` yourself. Numbered steps are for **what he has to do at a keyboard you are not driving** — setting an env var in a dashboard, checking something on a real device, a click path in DevTools. Where that applies, give steps, not prose:
 
 - One action per step.
 - Name the exact file to create or open, and the exact command to run.
@@ -65,11 +60,7 @@ Anything in `src/app/` gets **numbered steps**, not prose:
 - End each step with **what he should see** — the observable result that means it worked.
 - Never assume a step is trivial.
 
-Then review what he reports back against [code-standards.md](../../../ai-context/context/code-standards.md) and [ui-rules.md](../../../ai-context/context/ui-rules.md) §5 — tokens only, `className` accepted, correct client/server boundary, real semantic elements, no `any`.
-
-Common wiring faults: unawaited `params`/`searchParams`, `.sort()` mutating the shared imported array, a missing empty state, an optional content field with no rendering branch, `components/ui/` reaching into `content/`, a `dark:` variant used for colour.
-
-Flag scope creep: "that's PORT-0xx, leave it."
+Common wiring faults to check your own work for: unawaited `params`/`searchParams`, `.sort()` mutating the shared imported array, a missing empty state, an optional content field with no rendering branch, `components/ui/` reaching into `content/`, a `dark:` variant used for colour.
 
 If the ticket is genuinely blocked, mark it `⚠` with the symptom and pull the next `Ready` one rather than half-finishing it.
 
@@ -94,11 +85,14 @@ Then update, yourself:
 - [ui-registry.md](../../../ai-context/context/ui-registry.md) — any component built: real path, exact classes, status `built`, change-log entry
 - [ui-rules.md](../../../ai-context/context/ui-rules.md) — any new token or styling pattern
 
-Finish with the git commands for him to run. Do not run them.
+Then close out. **Name every path you touched**, so he can find them in the diff, say what each is for or what changed, and **point him at what to review** — the judgment call, the trap, the load-bearing line, not "please review the diff".
+
+Finish with the git commands for him to run. **Do not run them.** He reads `git diff` before committing, and since `main` auto-deploys that is the last checkpoint before the live site.
 
 ## Hard rules
 
-- Never write a file to disk under `src/`. Hand it over.
+- Never run a git command that writes. Hand him the commands.
+- Never write a file by shell redirection. Write and Edit only.
 - Never implement a ticket that was not asked for.
 - Never mark a ticket done with an unmet acceptance criterion.
 - Never build a component without checking the registry.
