@@ -42,7 +42,7 @@ export const jobs = [
     company: "Freelance",
     role: "Web Developer",
     start: "2024-08",
-    end: "2024-12",
+    end: null,
     location: "Catanduanes, Philippines",
     bullets: [
       "Delivered a full-stack web application solo and on schedule, owning it from database schema through to the interface.",
@@ -50,7 +50,18 @@ export const jobs = [
       "Turned client requirements directly into working features, with no separate spec hand-off between design and build.",
       "Designed the database schema and the API contract together, which kept data consistent as new features were added on top.",
     ],
-    stack: ["React.js", "Node.js", "Express.js", "MySQL"],
+    stack: [
+      "Tailwind CSS",
+      "TypeScript",
+      "JavaScript",
+      "React.js",
+      "Next.js",
+      "Node.js",
+      "Express.js",
+      "MySQL",
+      "PostgreSQL",
+      "Prisma",
+    ],
   },
 ] satisfies Job[];
 

@@ -1,5 +1,6 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import type { Project, ProjectStatus } from "@/content/types";
@@ -52,6 +53,28 @@ export function ProjectHeader({ project, className }: ProjectHeaderProps) {
 
   return (
     <header className={cn(className)}>
+      {/*
+        A real <Link> to /projects, never router.back(). History is not a
+        reliable map of where the visitor came from: a shared link, a search
+        result or an opened-in-new-tab card all land here with nothing to go
+        back to, and back() would either do nothing or leave the site. The
+        index is the true parent of this page regardless of the route taken.
+
+        Styled as a quiet text link rather than a Button on purpose — the 404
+        and error pages use a Button because it is their only exit, whereas
+        here it sits directly above the <h1> and must not compete with it.
+      */}
+      <Link
+        href="/projects"
+        className={cn(
+          "text-muted hover:text-fern mb-6 inline-flex items-center gap-1.5 rounded-md text-sm font-medium transition-colors",
+          "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+        )}
+      >
+        <ArrowLeft size={14} strokeWidth={1.9} aria-hidden />
+        All projects
+      </Link>
+
       <p className="text-eyebrow text-faint mb-4 font-mono uppercase">
         {project.year} · {STATUS_TEXT[project.status]}
       </p>
