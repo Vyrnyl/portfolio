@@ -17,8 +17,11 @@ import type { Project } from "./types";
    No metric anywhere below was invented. Where an outcome has no measurement,
    it says so — that is deliberate and should survive editing.
 
-   PORT-057 gate: neither "Placeholder" nor "TBC" appears in this file, and no
-   image in public/images/projects/ still reads "SCREENSHOT PENDING".
+   PORT-057 gate: neither "Placeholder" nor "TBC" appears in this file, no
+   image in public/images/projects/ still reads "SCREENSHOT PENDING", and
+   no "example.com" URL remains. That third clause is NOT redundant — a
+   placeholder URL contains no marker word, so the first clause passes over
+   it entirely. Grep for all three.
 
    Field coverage is intentional — do not "tidy" it:
      grades-repository-system      cover + gallery + highlights
@@ -42,6 +45,17 @@ export const projects = [
     featured: true,
     tags: ["school-project", "full-stack", "ai", "access-control"],
     stack: ["GPT-4", "Vector embeddings", "TBC — confirm stack"],
+    // PLACEHOLDER URLs, and the filter that matters is not the text one.
+    // `isPlaceholder` matches WORDS, so "https://example.com" sails straight
+    // through it — that is exactly how a stand-in URL once reached a JSON-LD
+    // `sameAs`, the field asserting this project IS that address.
+    // `isPlaceholderUrl` (lib/seo.ts) guards both surfaces: JSON-LD omits the
+    // value, and ProjectHeader renders "Live site — PENDING" as inert text
+    // rather than a clickable link. Replace with the real URLs and both
+    // surfaces light up on their own; no code change needed.
+    liveUrl: "https://example.com",
+    repoUrl: "https://example.com",
+
     // No `cover`: with a real screenshot there is no second crop to serve, so
     // the page header falls back to this exact file — the documented fallback
     // in types.ts, used here on purpose rather than duplicating one image
@@ -98,6 +112,8 @@ export const projects = [
     featured: true,
     tags: ["school-project", "full-stack", "access-control"],
     stack: ["RESTful APIs", "TBC — confirm stack"],
+    liveUrl: "https://example.com",
+    repoUrl: "https://example.com",
     thumbnail: {
       src: "/images/projects/grades-repository-system.webp",
       alt: "Placeholder graphic standing in for a screenshot of the Grades Repository System.",

@@ -67,6 +67,35 @@ export function isPlaceholder(text: string): boolean {
 }
 
 /**
+ * The URL-shaped twin of `isPlaceholder`, and it has to be separate.
+ *
+ * A word-matching predicate cannot see that `https://example.com` is a
+ * stand-in: it contains no "TBC", "pending" or "placeholder". That is exactly
+ * how a placeholder URL once reached a JSON-LD `sameAs` — the field asserting
+ * this project IS the thing at that address — through a filter that was
+ * working correctly on every surface it was designed for.
+ *
+ * MOVED HERE 2026-09-20, from a private copy in `lib/structured-data.ts`, for
+ * the same reason `isPlaceholder` moved here in PORT-051: it now has a second
+ * caller. `ProjectHeader` needs it to avoid rendering a visible "Live site"
+ * link that goes nowhere.
+ *
+ * That second caller also corrects the argument the original comment made.
+ * It reasoned that filtering was needed for JSON-LD but not for the page,
+ * because "on the page itself the same link is visible in context on a site
+ * that is plainly unfinished". A visitor does not see context — they see a
+ * button labelled "Live site", click it, and land on an IANA example page.
+ * A dead link is worse than an absent one, because it looks real until it is
+ * clicked; absent is simply the truth that there is no public URL yet.
+ *
+ * `example.com`/`.org`/`.net` are RFC 2606 reserved names, so this can never
+ * match a real destination. Deleted by PORT-057 along with the rest.
+ */
+export function isPlaceholderUrl(url: string): boolean {
+  return /(^|\/\/|\.)example\.(com|org|net)(\/|$|:)/i.test(url);
+}
+
+/**
  * The description a project shows to a machine when its own summary is still
  * a placeholder.
  *

@@ -1,6 +1,12 @@
 import type { Project } from "@/content/types";
 import { site } from "@/content/site";
-import { absoluteUrl, isPlaceholder, projectDescription, SITE_ORIGIN } from "@/lib/seo";
+import {
+  absoluteUrl,
+  isPlaceholder,
+  isPlaceholderUrl,
+  projectDescription,
+  SITE_ORIGIN,
+} from "@/lib/seo";
 
 /* ---------------------------------------------------------------------------
    JSON-LD builders. Spec: build-plan.md PORT-051, architecture.md §8.
@@ -31,28 +37,6 @@ export const PERSON_ID = `${SITE_ORIGIN}/#person`;
 
 /** Schema.org's `@id` for the site itself. Referenced by the Person's `url`. */
 export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
-
-/**
- * A URL that is still a PORT-012 stand-in rather than a real destination.
- *
- * THIS EXISTS BECAUSE `isPlaceholder` DID NOT CATCH IT, and the gap is worth
- * recording. That predicate matches marker WORDS — "TBC", "placeholder",
- * "pending" — which is right for prose written by us. A placeholder URL carries
- * no such word: `projects.ts` holds `https://example.com` for both of the
- * OpalusPH links, and it sailed through the text filter into a `sameAs` on the
- * first build of this file.
- *
- * `sameAs` is the strongest claim in the node — it asserts this project IS the
- * thing at that URL — so an unfiltered placeholder publishes a fabricated
- * attribution to a search index. On the page itself the same link is visible in
- * context on a site that is plainly unfinished; in JSON-LD it travels alone.
- *
- * `example.com`/`.org`/`.net` are RFC 2606 reserved names, so this can never
- * match a real destination. Deleted by PORT-057 along with the rest.
- */
-function isPlaceholderUrl(url: string): boolean {
-  return /(^|\/\/|\.)example\.(com|org|net)(\/|$|:)/i.test(url);
-}
 
 /**
  * The `Person` node, emitted once in the root layout.
@@ -126,8 +110,9 @@ export function buildWebSiteSchema() {
  * visible chip on a generated card once.
  *
  * `sameAs` needs a DIFFERENT filter, which is the one this file got wrong
- * first: see `isPlaceholderUrl`. A word-matching predicate cannot see that
- * `https://example.com` is a stand-in.
+ * first: see `isPlaceholderUrl` in `lib/seo.ts` — it lived here until
+ * 2026-09-20, when `ProjectHeader` became its second caller. A word-matching
+ * predicate cannot see that `https://example.com` is a stand-in.
  *
  * Deliberately NOT emitted:
  *   - `datePublished` — `year` is a number inferred from the graduation
