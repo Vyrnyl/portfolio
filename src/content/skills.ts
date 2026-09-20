@@ -53,8 +53,6 @@ export const skillGroups = [
       "Built real features with these and can be productive, but I still reach for the documentation on the harder parts.",
     items: [
       "CI/CD and deployment pipelines",
-      "Docker",
-      "Jest & React Testing Library",
       "Database design & optimization",
       "Web performance optimization",
       "Error handling & logging",
@@ -71,6 +69,8 @@ export const skillGroups = [
       "Design systems and token-driven styling",
       "System design & scalable architecture",
       "Advanced database architecture",
+      "Jest & React Testing Library",
+      "Docker",
     ],
   },
 ] satisfies SkillGroup[];

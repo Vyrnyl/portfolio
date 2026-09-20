@@ -10,7 +10,9 @@ import type { Project } from "./types";
      - year, status          inferred from the graduation timeline, not stated
      - stack "TBC" entries   the resume lists no per-project stack
      - liveUrl / repoUrl     omitted rather than invented; add if they exist
-     - every image           all eight files still read "SCREENSHOT PENDING"
+     - most images           cict-project-gate now carries REAL screenshots of
+                             the running app (2026-09-20); the other three
+                             projects' files still read "SCREENSHOT PENDING"
 
    No metric anywhere below was invented. Where an outcome has no measurement,
    it says so — that is deliberate and should survive editing.
@@ -20,8 +22,9 @@ import type { Project } from "./types";
 
    Field coverage is intentional — do not "tidy" it:
      grades-repository-system      cover + gallery + highlights
-     cict-project-gate             cover + highlights, no gallery
-     opalusph-website              role + duration + both URLs
+     cict-project-gate             gallery + highlights, NO cover (2026-09-20:
+                                   it exercises the cover -> thumbnail fallback)
+     opalusph-website              role + duration + both URLs, no gallery
      construction-company-website  no optional fields at all
    Every optional field is present on at least one entry and absent on at least
    one, and all three ProjectStatus values appear. That is what forces every
@@ -39,17 +42,15 @@ export const projects = [
     featured: true,
     tags: ["school-project", "full-stack", "ai", "access-control"],
     stack: ["GPT-4", "Vector embeddings", "TBC — confirm stack"],
+    // No `cover`: with a real screenshot there is no second crop to serve, so
+    // the page header falls back to this exact file — the documented fallback
+    // in types.ts, used here on purpose rather than duplicating one image
+    // under two names.
     thumbnail: {
       src: "/images/projects/cict-project-gate.webp",
-      alt: "Placeholder graphic standing in for a screenshot of CICT Project Gate.",
-      width: 1600,
-      height: 1000,
-    },
-    cover: {
-      src: "/images/projects/cict-project-gate-cover.webp",
-      alt: "Placeholder graphic standing in for a wide header screenshot of CICT Project Gate.",
-      width: 2400,
-      height: 1000,
+      alt: "The title submission screen in CICT Project Gate, with the duplicate check reporting the proposed title as 100% similar to an existing one and advising a revision.",
+      width: 1919,
+      height: 869,
     },
 
     problem:
@@ -64,6 +65,27 @@ export const projects = [
       "GPT-4 integrated as a decision support system that recommends and refines titles, with approval left to people.",
       "Three-role access model — students submit, faculty review and comment, administrators manage the system.",
       "Similarity checking runs at submission time, ahead of human review rather than after it.",
+    ],
+
+    gallery: [
+      {
+        src: "/images/projects/cict-project-gate-gallery-1.webp",
+        alt: "The student dashboard, with a welcome panel, a notifications count and a table of recently submitted capstone titles.",
+        width: 1115,
+        height: 550,
+      },
+      {
+        src: "/images/projects/cict-project-gate-gallery-2.webp",
+        alt: "The capstone archive, listing previously approved titles with their block, program and submission date, above a search field.",
+        width: 1112,
+        height: 532,
+      },
+      {
+        src: "/images/projects/cict-project-gate-gallery-3.webp",
+        alt: "A submitted title's detail view, showing its description, a faculty comment, and controls to download the result or allow a transfer request.",
+        width: 1116,
+        height: 532,
+      },
     ],
   },
   {
@@ -154,7 +176,7 @@ export const projects = [
     year: 2025,
     status: "in-progress",
     featured: false,
-    tags: ["internship", "marketing-site", "cms"],
+    tags: ["internship", "marketing-site", "cms", "sa"],
     stack: ["TBC — confirm stack"],
     thumbnail: {
       src: "/images/projects/construction-company-website.webp",

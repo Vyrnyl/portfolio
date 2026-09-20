@@ -123,14 +123,20 @@ export function ProjectHeader({ project, className }: ProjectHeaderProps) {
         </ul>
       ) : null}
 
+      {/*
+        Capped at max-w-figure rather than filling the shell. A real screenshot
+        is a dense UI, not a hero band: at the full 1120px it dominated the
+        page and pushed the case study below the fold. `sizes` has to track the
+        cap or the browser downloads a 1120px-wide candidate for an 800px slot.
+      */}
       <Image
         src={cover.src}
         alt={cover.alt}
         width={cover.width}
         height={cover.height}
-        sizes="(min-width: 1000px) 1120px, 100vw"
+        sizes="(min-width: 1000px) 800px, 100vw"
         priority
-        className="border-border mt-12 h-auto w-full rounded-lg border"
+        className="border-border mt-12 h-auto w-full max-w-figure rounded-lg border"
       />
     </header>
   );

@@ -129,6 +129,13 @@
   --container-shell: 1120px;
   --container-measure: 680px;
 
+  /* max-w-figure — a screenshot inside a page, not a hero band. Sits between
+     the prose measure and the full shell: wide enough to read a UI in, narrow
+     enough that the image does not become the page. Added 2026-09-20 when
+     /projects/[slug] started carrying real screenshots, which are far busier
+     than the placeholders the full-bleed header was designed against. */
+  --container-figure: 800px;
+
   /* px-gut, gap-gut, ... */
   --spacing-gut: var(--gut);
 

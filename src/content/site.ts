@@ -20,7 +20,7 @@ export const site = {
   // custom domain, and OG images resolve against it — so no trailing slash.
   url: "https://vernel-portfolio.vercel.app",
   email: "vernaquino73@gmail.com",
-  location: "Philippines",
+  location: "Bicol, Philippines",
   // PLACEHOLDER, and it says so on its own face: the file reads "PHOTO PENDING".
   // 1000×1250 are the real intrinsic dimensions of the real file on disk, so
   // next/image reserves the correct box and the swap introduces no layout

@@ -36,7 +36,7 @@ export const jobs = [
       "Built assigned sections of two company websites in Next.js, turning handed-over designs into working pages.",
       "Delivered frontend-only work inside an existing team, implementing designs authored by someone else rather than making the visual decisions.",
     ],
-    stack: ["Next.js"],
+    stack: ["React.js", "Next.js"],
   },
   {
     company: "Freelance",
