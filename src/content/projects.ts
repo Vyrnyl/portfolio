@@ -3,16 +3,19 @@ import type { Project } from "./types";
 /* ---------------------------------------------------------------------------
    MIXED CONTENT — read this before editing.
 
-   The two academic projects carry REAL copy, written from public/resume.pdf.
-   The two OpalusPH sites are still placeholders.
+   2026-09-22: the two OpalusPH placeholder entries were REPLACED by gsp-mis
+   and presyo-serbisyo, both written from Vernel's own project notes. Those
+   two are fully real — real copy, real screenshots of the running apps, real
+   live and repo URLs, and stacks named rather than "TBC".
 
-   Still unverified even on the real two — replace in PORT-057:
+   The two academic projects carry REAL copy written from public/resume.pdf,
+   but are still unverified on the points below — replace in PORT-057:
      - year, status          inferred from the graduation timeline, not stated
      - stack "TBC" entries   the resume lists no per-project stack
-     - liveUrl / repoUrl     omitted rather than invented; add if they exist
-     - most images           cict-project-gate now carries REAL screenshots of
-                             the running app (2026-09-20); the other three
-                             projects' files still read "SCREENSHOT PENDING"
+     - liveUrl / repoUrl     still "https://example.com" on both
+     - images                cict-project-gate carries REAL screenshots
+                             (2026-09-20); grades-repository-system's four
+                             files still read "SCREENSHOT PENDING"
 
    No metric anywhere below was invented. Where an outcome has no measurement,
    it says so — that is deliberate and should survive editing.
@@ -24,14 +27,24 @@ import type { Project } from "./types";
    it entirely. Grep for all three.
 
    Field coverage is intentional — do not "tidy" it:
-     grades-repository-system      cover + gallery + highlights
+     grades-repository-system      cover + gallery + highlights, no role/duration
      cict-project-gate             gallery + highlights, NO cover (2026-09-20:
                                    it exercises the cover -> thumbnail fallback)
-     opalusph-website              role + duration + both URLs, no gallery
-     construction-company-website  no optional fields at all
-   Every optional field is present on at least one entry and absent on at least
-   one, and all three ProjectStatus values appear. That is what forces every
-   branch AND its fallback to get built in PORT-021 / 031 / 032.
+     gsp-mis                       gallery + highlights + role + duration, no cover
+     presyo-serbisyo               gallery + highlights + role + duration, no cover
+   Every optional field is still present on at least one entry, and `cover` is
+   still absent on three — that is what forces every branch AND its fallback to
+   stay built in PORT-021 / 031 / 032.
+
+   TWO COVERAGE GAPS opened on 2026-09-22 when the OpalusPH entries went, and
+   they are recorded rather than quietly accepted:
+     - NO entry now has zero optional fields. construction-company-website was
+       the minimum-Project case proving components render it without a stray
+       separator. /gallery does not cover this either.
+     - NO entry is status "in-progress". STATUS_TEXT in project-header.tsx is
+       a Record<ProjectStatus, string>, so the case cannot vanish without
+       failing the build — but nothing RENDERS it, and this repo's own lesson
+       is that a state no page renders is a state nothing tests.
 --------------------------------------------------------------------------- */
 
 export const projects = [
@@ -156,54 +169,137 @@ export const projects = [
     ],
   },
   {
-    slug: "opalusph-website",
-    title: "OpalusPH Company Website",
+    slug: "gsp-mis",
+    title: "GSP Management Information System",
     summary:
-      "Placeholder summary for the OpalusPH company site — real copy pending.",
-    year: 2025,
+      "Role-based platform replacing the Girl Scouts council's paper records with one system.",
+    year: 2026,
     status: "live",
     featured: true,
-    tags: ["internship", "marketing-site"],
-    stack: ["TBC — confirm stack"],
+    tags: ["full-stack", "access-control", "dashboard"],
+    stack: [
+      "Next.js 15",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS",
+      "Node.js",
+      "Express",
+      "Prisma",
+      "PostgreSQL",
+      "Chart.js",
+      "Vitest",
+    ],
     thumbnail: {
-      src: "/images/projects/opalusph-website.webp",
-      alt: "Placeholder graphic standing in for a screenshot of the OpalusPH company website.",
-      width: 1600,
-      height: 1000,
+      src: "/images/projects/gsp-mis.webp",
+      alt: "The GSP dashboard showing active councils, troops and member counts beside a membership growth chart and a members-by-status breakdown.",
+      width: 1917,
+      height: 912,
     },
-    liveUrl: "https://example.com",
-    repoUrl: "https://example.com",
+    liveUrl: "https://gsp-mis-web.vercel.app/login",
+    repoUrl: "https://github.com/Vyrnyl/gsp-mis",
 
     problem:
-      "Placeholder copy — the real problem statement goes here. This entry has no cover image, so the detail page must fall back to the thumbnail exactly as the type comment promises.",
+      "The Girl Scouts of the Philippines Catanduanes Council tracks thousands of scouts across troops and schools — registrations, event attendance, badge progress, membership fees. Handled on paper and in spreadsheets, that work is slow to update, error-prone and nearly impossible to report on. A council officer asking which troops were falling behind on attendance had no way to answer without manually collating records.",
     approach:
-      "Placeholder copy — the real approach goes here. Two to four sentences in the finished version.",
+      "Sixteen backend domain modules, each paired with its own screens: membership, events and attendance, badges, finance, reporting and analytics. Permissions are fully relational — roles come from a user_roles join table and capabilities from role_permissions, with no role column on the user record — so access is a question the data answers rather than a flag someone remembered to check. Every protected route carries RBAC middleware, and the dashboard reads its role from the session token server-side, never from a client parameter.",
     outcome:
-      "Placeholder copy — the real outcome goes here. Numbers if honest ones exist; plain description if not.",
+      "All 21 planned features across four phases are complete end to end and deployed against a live PostgreSQL database, with 325 automated tests passing. Three roles are enforced server-side, and six report types export to real PDF and Excel with persisted history — so the attendance question that used to need manual collation is now a report.",
 
-    role: "Placeholder role — pending",
-    duration: "Placeholder duration",
+    role: "Solo developer",
+    duration: "4 phases",
+
+    highlights: [
+      "39 Prisma models, 21 web pages and 67 BFF handlers in an npm-workspaces monorepo.",
+      "Relational RBAC — no role column on the user record, so permissions cannot drift out of the data.",
+      "Six report types exported to real PDF and Excel, with generation history persisted.",
+      "Seven analytics tabs, each broken down by school, level, troop or category.",
+    ],
+    gallery: [
+      {
+        src: "/images/projects/gsp-mis-gallery-1.webp",
+        alt: "The report generation screen offering six report types, with a date range, troop filter and a generate preview action.",
+        width: 1917,
+        height: 917,
+      },
+      {
+        src: "/images/projects/gsp-mis-gallery-2.webp",
+        alt: "Financial tracking showing total income, expenses and council balance above an income-versus-expense chart and an expenses-by-category breakdown.",
+        width: 1917,
+        height: 916,
+      },
+      {
+        src: "/images/projects/gsp-mis-gallery-3.webp",
+        alt: "The councils and troops registry listing five troops with their codes, leaders and member counts, two flagged as having no leader.",
+        width: 1917,
+        height: 915,
+      },
+    ],
   },
   {
-    slug: "construction-company-website",
-    title: "Construction Company Website",
+    slug: "presyo-serbisyo",
+    title: "PresyoSerbisyo",
     summary:
-      "Placeholder summary — real copy pending, sized mid-range for the card grid.",
-    year: 2025,
-    status: "in-progress",
+      "Price monitoring and forecasting for DTI Catanduanes, with a public transparency surface.",
+    year: 2026,
+    status: "live",
     featured: false,
-    tags: ["internship", "marketing-site", "cms", "sa"],
-    stack: ["TBC — confirm stack"],
+    tags: ["full-stack", "access-control", "dashboard", "forecasting"],
+    stack: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS",
+      "Node.js",
+      "Express",
+      "Prisma",
+      "PostgreSQL",
+      "Chart.js",
+      "ARIMA",
+    ],
     thumbnail: {
-      src: "/images/projects/construction-company-website.webp",
-      alt: "Placeholder graphic standing in for a screenshot of the construction company website.",
-      width: 1600,
-      height: 1000,
+      src: "/images/projects/presyo-serbisyo.webp",
+      alt: "The public PresyoSerbisyo landing page headlined Monitor Commodity Prices in Real-Time, noting prices collected by DTI field officers.",
+      width: 1897,
+      height: 913,
     },
+    liveUrl: "https://price-service-v2.vercel.app/",
+    repoUrl: "https://github.com/Vyrnyl/price-service-v2",
 
     problem:
-      "Placeholder copy — the real problem statement goes here. This entry carries no optional fields at all: no cover, no gallery, no highlights, no role, no duration, no links. It is the minimum a Project can be, and every component must render it without a gap or a stray separator.",
-    approach: "Placeholder copy — the real approach goes here.",
-    outcome: "Placeholder copy — the real outcome goes here.",
+      "DTI Catanduanes monitors commodity prices across stores in the province — officers visit shops, write observed prices on paper forms, and someone later compares each figure by hand against the official Suggested Retail Price to spot violations. That work is slow, error-prone and produces no usable history. An officer asking which stores were overpricing, and by how much, had to collate a stack of forms by hand — and consumers had no visibility into any of it.",
+    approach:
+      "Twelve backend domain modules covering the commodity catalog, effective-dated SRP reference data, a store registry and field price capture. Price records run their SRP comparison at write time, so Compliant / Above SRP / Below SRP is computed once rather than re-derived per screen, and store compliance reads that same status instead of defining compliance a second way. Authorization is deliberately two-layer: route-level middleware gates who may call a route, while per-module scope helpers gate whose rows they see — a route guard alone leaks other officers' data, and scoping alone lets the wrong role reach the handler.",
+    outcome:
+      "All 71 planned features across eight phases are complete and deployed against a live PostgreSQL database, with 132 automated tests passing. ARIMA forecasting projects next-week prices with confidence scored from the series' own volatility and data support, and an unauthenticated public namespace exposes current prices against SRP — so the transparency the paper process could not offer is now the default view.",
+
+    role: "Solo developer",
+    duration: "8 phases",
+
+    highlights: [
+      "Automatic SRP comparison at write time — compliance computed once, never redefined per screen.",
+      "Two-layer authorization: route-level role guards plus unit-tested per-module scope helpers.",
+      "ARIMA forecasting with confidence derived from volatility, data support and horizon.",
+      "A public, unauthenticated transparency surface with no PUBLIC role in the permission model.",
+    ],
+    gallery: [
+      {
+        src: "/images/projects/presyo-serbisyo-gallery-1.webp",
+        alt: "The admin market insights dashboard showing a 30-day market price trend line with a tooltip reading 82.15 pesos on August 29.",
+        width: 1900,
+        height: 911,
+      },
+      {
+        src: "/images/projects/presyo-serbisyo-gallery-2.webp",
+        alt: "Price trends and forecasts for one commodity, showing current price, latest SRP with an Above SRP status, and a forecast for next week.",
+        width: 1901,
+        height: 917,
+      },
+      {
+        src: "/images/projects/presyo-serbisyo-gallery-3.webp",
+        alt: "The commodity catalog listing 318 monitored goods across 33 categories, with filters for name, category and active status.",
+        width: 1897,
+        height: 912,
+      },
+    ],
   },
 ] satisfies Project[];

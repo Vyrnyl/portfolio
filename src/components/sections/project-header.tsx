@@ -29,9 +29,12 @@ type ProjectHeaderProps = {
  *
  * Four of the things it renders are optional in the content model — `role`,
  * `duration`, `liveUrl`, `repoUrl` — and a fifth, `cover`, has a documented
- * fallback. Every one of them is a real branch here, because at least one
- * project in src/content/projects.ts is missing it and one project
- * (construction-company-website) is missing all of them at once.
+ * fallback. Every one is still a real branch here, because at least one
+ * project in src/content/projects.ts is missing it.
+ *
+ * 2026-09-22: no project is missing ALL of them at once any more. That case
+ * was construction-company-website, replaced in the same pass; the gap is
+ * recorded in projects.ts's header rather than quietly accepted.
  */
 export function ProjectHeader({ project, className }: ProjectHeaderProps) {
   // types.ts promises this fallback: "Wide image for the detail page header.
