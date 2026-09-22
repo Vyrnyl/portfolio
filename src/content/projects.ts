@@ -59,7 +59,7 @@ export const projects = [
     status: "archived",
     featured: true,
     tags: ["school-project", "full-stack", "ai", "access-control"],
-    stack: ["GPT-4", "Vector embeddings", "TBC — confirm stack"],
+    stack: ["React.js", "Node.js", "Express", "MySQL", "Prisma", "Vector embeddings"],
     // PLACEHOLDER URLs, and the filter that matters is not the text one.
     // `isPlaceholder` matches WORDS, so "https://example.com" sails straight
     // through it — that is exactly how a stand-in URL once reached a JSON-LD
@@ -83,11 +83,11 @@ export const projects = [
     },
 
     problem:
-      "Capstone and thesis titles are approved one at a time, by people reading them one at a time. Nobody holds every title already submitted in their head, so two groups can spend weeks on topics that turn out to be near-duplicates of each other — and the overlap surfaces at panel review, which is the most expensive possible moment to find it. The hard part is that duplicates are rarely worded alike; the same idea arrives phrased three different ways.",
+      "Capstone titles get approved one at a time, and nobody can remember every title already submitted. So two groups can spend weeks on the same idea without knowing it. The clash usually shows up at panel review, which is the worst time to find out. What makes it hard is that matching topics are rarely worded the same way.",
     approach:
-      "A submission and approval platform that compares a proposed title against everything already in the system before a human ever reviews it. Matching is done on vector embeddings with cosine similarity rather than keyword overlap, because the problem is semantic — two titles can share almost no words and still be the same project. GPT-4 sits on top as a decision support layer, suggesting and refining titles rather than deciding anything. Around that, role-based access separates the three groups: students submit, faculty review and comment, administrators manage users and settings.",
+      "The system checks a new title against every existing one before a person reviews it. It compares meaning instead of matching words, so it still catches two titles that describe the same project in different language. GPT-4 helps students suggest and improve titles, but never decides anything. Each group gets its own access: students submit, faculty review and comment, admins manage users and settings.",
     outcome:
-      "Near-duplicate topics are caught at submission instead of at panel review, and reviewers see a similarity signal alongside each title rather than having to recall the archive themselves. This was an academic build, so there are no production usage figures to quote.",
+      "Repeated topics get caught at submission instead of at panel review, and reviewers see a similarity score next to each title. This was a school project, so there are no real usage numbers to show.",
 
     highlights: [
       "Semantic duplicate detection using vector embeddings and cosine similarity, not keyword matching.",
@@ -143,11 +143,11 @@ export const projects = [
     },
 
     problem:
-      "Students, faculty and administrators all need the same grade records, but for different reasons and with very different rights over them. A student needs to read their own results across several semesters. Faculty need to assign and revise them. Administrators need to manage the whole set. Serving all three from one system makes access control the central design problem rather than a feature added at the end — get it wrong once and a student sees somebody else's transcript.",
+      "Students, faculty and admins all need the same grade records, but they need to do different things with them. Students read their own results. Faculty enter and correct grades. Admins manage everything. Putting all three in one system makes access the main thing to get right — one mistake and a student sees someone else's grades.",
     approach:
-      "A single records system with role-based access deciding what each group can read and change, enforced in one place instead of re-checked screen by screen. Faculty were given workflows for assigning, updating and managing grades; students were given read access scoped to their own results across multiple semesters. The data layer got the most attention: RESTful APIs over queries written to hold up as the number of records grows, since a grades table only ever gets longer.",
+      "One records system where each role gets its own level of access, checked in a single place instead of on every screen. Faculty can assign and update grades. Students can only read their own, across all their semesters. The data side got the most care: the APIs and queries were written to stay fast as records pile up, since a grades table only ever grows.",
     outcome:
-      "The three groups work from one record set instead of coordinating across separate ones, and every permission decision lives in a single layer that can be reasoned about on its own. As an academic project it was never run at institutional scale, so there are no performance numbers from real load.",
+      "All three groups now work from the same records instead of keeping separate copies, and every access rule lives in one place. It was a school project, so it never ran at full school scale and there are no real performance numbers.",
 
     highlights: [
       "One records system serving students, faculty and administrators from a single source.",
@@ -180,8 +180,7 @@ export const projects = [
     featured: true,
     tags: ["full-stack", "access-control", "dashboard"],
     stack: [
-      "Next.js 15",
-      "React 19",
+      "Next.js",
       "TypeScript",
       "Tailwind CSS",
       "Node.js",
@@ -189,7 +188,6 @@ export const projects = [
       "Prisma",
       "PostgreSQL",
       "Chart.js",
-      "Vitest",
     ],
     thumbnail: {
       src: "/images/projects/gsp-mis.webp",
@@ -201,11 +199,11 @@ export const projects = [
     repoUrl: "https://github.com/Vyrnyl/gsp-mis",
 
     problem:
-      "The Girl Scouts of the Philippines Catanduanes Council tracks thousands of scouts across troops and schools — registrations, event attendance, badge progress, membership fees. Handled on paper and in spreadsheets, that work is slow to update, error-prone and nearly impossible to report on. A council officer asking which troops were falling behind on attendance had no way to answer without manually collating records.",
+      "The Girl Scouts council in Catanduanes keeps track of thousands of scouts across troops and schools — sign-ups, event attendance, badges and fees. All of it lived on paper and in spreadsheets, which is slow to update and easy to get wrong. If an officer wanted to know which troops were falling behind on attendance, the only way to find out was to go through the records by hand.",
     approach:
-      "Sixteen backend domain modules, each paired with its own screens: membership, events and attendance, badges, finance, reporting and analytics. Permissions are fully relational — roles come from a user_roles join table and capabilities from role_permissions, with no role column on the user record — so access is a question the data answers rather than a flag someone remembered to check. Every protected route carries RBAC middleware, and the dashboard reads its role from the session token server-side, never from a client parameter.",
+      "Sixteen parts of the system, each with its own screens: members, events and attendance, badges, money, reports and charts. Permissions are stored as data rather than as a setting on each user, so what someone can do is always looked up, never assumed. Every protected page checks the user's role on the server, so it can't be faked from the browser.",
     outcome:
-      "All 21 planned features across four phases are complete end to end and deployed against a live PostgreSQL database, with 325 automated tests passing. Three roles are enforced server-side, and six report types export to real PDF and Excel with persisted history — so the attendance question that used to need manual collation is now a report.",
+      "All 21 planned features are finished and running on a live database, with 325 automated tests passing. Three roles are enforced on the server, and six kinds of reports export to real PDF and Excel files that are saved for later. The attendance question that used to mean digging through paper is now just a report.",
 
     highlights: [
       "39 Prisma models, 21 web pages and 67 BFF handlers in an npm-workspaces monorepo.",
@@ -265,11 +263,11 @@ export const projects = [
     repoUrl: "https://github.com/Vyrnyl/price-service-v2",
 
     problem:
-      "DTI Catanduanes monitors commodity prices across stores in the province — officers visit shops, write observed prices on paper forms, and someone later compares each figure by hand against the official Suggested Retail Price to spot violations. That work is slow, error-prone and produces no usable history. An officer asking which stores were overpricing, and by how much, had to collate a stack of forms by hand — and consumers had no visibility into any of it.",
+      "DTI Catanduanes checks commodity prices in stores around the province. Officers visit shops, write prices on paper forms, and someone later compares each one by hand against the official Suggested Retail Price to spot overpricing. It is slow, easy to get wrong, and leaves no history worth using. Asking which stores were overpricing meant going through a stack of forms — and shoppers could not see any of it.",
     approach:
-      "Twelve backend domain modules covering the commodity catalog, effective-dated SRP reference data, a store registry and field price capture. Price records run their SRP comparison at write time, so Compliant / Above SRP / Below SRP is computed once rather than re-derived per screen, and store compliance reads that same status instead of defining compliance a second way. Authorization is deliberately two-layer: route-level middleware gates who may call a route, while per-module scope helpers gate whose rows they see — a route guard alone leaks other officers' data, and scoping alone lets the wrong role reach the handler.",
+      "Twelve parts of the system cover the list of goods, the official prices, the stores and the prices officers record in the field. When a price is saved, the system immediately compares it to the official price and marks it as within, above or below — worked out once and reused everywhere, so no screen can disagree with another. Access is checked twice on purpose: once for who is allowed to open a page, and again for whose records they are allowed to see. Either check on its own leaves a hole.",
     outcome:
-      "All 71 planned features across eight phases are complete and deployed against a live PostgreSQL database, with 132 automated tests passing. ARIMA forecasting projects next-week prices with confidence scored from the series' own volatility and data support, and an unauthenticated public namespace exposes current prices against SRP — so the transparency the paper process could not offer is now the default view.",
+      "All 71 planned features are finished and running on a live database, with 132 automated tests passing. The system predicts next week's prices and says how confident it is based on how steady the prices have been. Anyone can view current prices against the official ones without logging in — the openness the paper process never allowed is now the default.",
 
     highlights: [
       "Automatic SRP comparison at write time — compliance computed once, never redefined per screen.",
