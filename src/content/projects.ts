@@ -27,19 +27,21 @@ import type { Project } from "./types";
    it entirely. Grep for all three.
 
    Field coverage is intentional — do not "tidy" it:
-     grades-repository-system      cover + gallery + highlights, no role/duration
+     grades-repository-system      cover + gallery + highlights
      cict-project-gate             gallery + highlights, NO cover (2026-09-20:
                                    it exercises the cover -> thumbnail fallback)
-     gsp-mis                       gallery + highlights + role + duration, no cover
-     presyo-serbisyo               gallery + highlights + role + duration, no cover
-   Every optional field is still present on at least one entry, and `cover` is
-   still absent on three — that is what forces every branch AND its fallback to
-   stay built in PORT-021 / 031 / 032.
+     gsp-mis                       gallery + highlights, no cover
+     presyo-serbisyo               gallery + highlights, no cover
+   `cover` is absent on three, which keeps the fallback branch exercised in
+   PORT-021 / 031 / 032.
 
-   TWO COVERAGE GAPS opened on 2026-09-22 when the OpalusPH entries went, and
-   they are recorded rather than quietly accepted:
-     - NO entry now has zero optional fields. construction-company-website was
-       the minimum-Project case proving components render it without a stray
+   THREE COVERAGE GAPS, recorded rather than quietly accepted:
+     - NO entry sets `role` or `duration` (removed 2026-09-22 at Vernel's
+       request — the values read as filler on solo projects). ProjectHeader
+       still branches on both and its <dl> now renders empty on every project,
+       so that code path is live but unexercised.
+     - NO entry has zero optional fields. construction-company-website was the
+       minimum-Project case proving components render it without a stray
        separator. /gallery does not cover this either.
      - NO entry is status "in-progress". STATUS_TEXT in project-header.tsx is
        a Record<ProjectStatus, string>, so the case cannot vanish without
@@ -205,9 +207,6 @@ export const projects = [
     outcome:
       "All 21 planned features across four phases are complete end to end and deployed against a live PostgreSQL database, with 325 automated tests passing. Three roles are enforced server-side, and six report types export to real PDF and Excel with persisted history — so the attendance question that used to need manual collation is now a report.",
 
-    role: "Solo developer",
-    duration: "4 phases",
-
     highlights: [
       "39 Prisma models, 21 web pages and 67 BFF handlers in an npm-workspaces monorepo.",
       "Relational RBAC — no role column on the user record, so permissions cannot drift out of the data.",
@@ -271,9 +270,6 @@ export const projects = [
       "Twelve backend domain modules covering the commodity catalog, effective-dated SRP reference data, a store registry and field price capture. Price records run their SRP comparison at write time, so Compliant / Above SRP / Below SRP is computed once rather than re-derived per screen, and store compliance reads that same status instead of defining compliance a second way. Authorization is deliberately two-layer: route-level middleware gates who may call a route, while per-module scope helpers gate whose rows they see — a route guard alone leaks other officers' data, and scoping alone lets the wrong role reach the handler.",
     outcome:
       "All 71 planned features across eight phases are complete and deployed against a live PostgreSQL database, with 132 automated tests passing. ARIMA forecasting projects next-week prices with confidence scored from the series' own volatility and data support, and an unauthenticated public namespace exposes current prices against SRP — so the transparency the paper process could not offer is now the default view.",
-
-    role: "Solo developer",
-    duration: "8 phases",
 
     highlights: [
       "Automatic SRP comparison at write time — compliance computed once, never redefined per screen.",
