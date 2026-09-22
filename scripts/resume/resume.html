@@ -29,7 +29,6 @@
   .name {
     font-size: 19pt;
     font-weight: 700;
-    letter-spacing: -0.015em;
     line-height: 1.08;
   }
 
@@ -52,20 +51,26 @@
 
   /* ---- Sections -------------------------------------------------------- */
 
+  /*
+   * NO letter-spacing here. Chromium bakes tracking into the PDF as real
+   * inter-glyph offsets, and pdftotext — like an ATS parser — reads them back
+   * as literal spaces: "EDUCATION" extracted as "E D U C AT I O N", which no
+   * section-heading matcher will find. Measured, not assumed; the other three
+   * headings happened to survive and this one did not.
+   */
   h2 {
-    font-size: 9.6pt;
+    font-size: 9.8pt;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.09em;
     color: #1a1a1a;
     border-bottom: 0.8pt solid #d4d4d4;
     padding-bottom: 2.5pt;
-    margin: 8.5pt 0 5pt;
+    margin: 7pt 0 4pt;
   }
 
   /* An entry must never be split across the page break with its heading
      stranded at the foot of page one. */
-  .entry { margin-bottom: 6.5pt; break-inside: avoid; }
+  .entry { margin-bottom: 5.4pt; break-inside: avoid; }
   .entry:last-child { margin-bottom: 0; }
 
   .entry-head {
@@ -97,7 +102,7 @@
   li {
     position: relative;
     padding-left: 10pt;
-    margin-bottom: 1.6pt;
+    margin-bottom: 1.2pt;
   }
 
   /* A real glyph rather than list-style, so the indent is identical in
@@ -111,7 +116,14 @@
     top: -0.2pt;
   }
 
-  .skills-row { margin-bottom: 2pt; }
+  /*
+   * Each skills row is its own <p> AND carries real vertical separation.
+   * Element type alone was not enough: pdftotext (and ATS parsers built the
+   * same way) group text by vertical proximity, not by source element, so
+   * five <p>s 2.6pt apart still extracted as ONE run-on line. 4.2pt is the
+   * measured threshold at which they come back as five labelled rows.
+   */
+  .skills-row { margin-bottom: 4.2pt; }
 
   .skills-label {
     font-weight: 700;
@@ -137,7 +149,7 @@
       <div class="entry-title">Frontend Developer Intern <span class="entry-org">· OpalusPH</span></div>
       <div class="entry-meta">Feb 2026 – May 2026</div>
     </div>
-    <div class="entry-sub">Philippines</div>
+    <p class="entry-sub">Philippines</p>
     <ul>
       <li>Built assigned sections of two company websites in Next.js, turning handed-over designs into working, responsive pages.</li>
       <li>Delivered frontend work inside an existing team, implementing designs authored by someone else and matching an established codebase's conventions.</li>
@@ -149,7 +161,7 @@
       <div class="entry-title">Web Developer <span class="entry-org">· Freelance</span></div>
       <div class="entry-meta">Aug 2024 – Present</div>
     </div>
-    <div class="entry-sub">Catanduanes, Philippines</div>
+    <p class="entry-sub">Catanduanes, Philippines</p>
     <ul>
       <li>Delivered a full-stack web application solo and on schedule, owning it from database schema through to the interface.</li>
       <li>Shipped authentication with role-based access control, so each type of user reached only the data they were entitled to.</li>
@@ -165,7 +177,7 @@
       <div class="entry-title">CICT Project Gate</div>
       <div class="entry-meta">2026</div>
     </div>
-    <div class="entry-sub">Capstone title submission and review platform · GPT-4, vector embeddings</div>
+    <p class="entry-sub">Capstone title submission and review platform · GPT-4, vector embeddings</p>
     <ul>
       <li>Built a capstone title submission and approval system with automatic similarity detection, warning students about duplicate or closely related topics at the point of submission rather than after review.</li>
       <li>Integrated GPT-4 as a decision support system that recommends and refines project title suggestions.</li>
@@ -179,7 +191,7 @@
       <div class="entry-title">Personal Portfolio</div>
       <div class="entry-meta">2026</div>
     </div>
-    <div class="entry-sub">Next.js, TypeScript, Tailwind CSS, Zod, Vercel · vernel-portfolio.vercel.app</div>
+    <p class="entry-sub">Next.js, TypeScript, Tailwind CSS, Zod, Vercel · vernel-portfolio.vercel.app</p>
     <ul>
       <li>Designed and built a seven-page portfolio with a typed content layer validated at compile time, so malformed content fails the build rather than the page.</li>
       <li>Measured 98–100 Lighthouse Performance across every route with a cumulative layout shift of 0.000.</li>
@@ -193,7 +205,7 @@
       <div class="entry-title">Grades Repository System</div>
       <div class="entry-meta">2025</div>
     </div>
-    <div class="entry-sub">Academic information system · RESTful APIs</div>
+    <p class="entry-sub">Academic information system · RESTful APIs</p>
     <ul>
       <li>Built a centralized academic records system serving students, faculty and administrators from one source of grade data.</li>
       <li>Enabled students to view grades across multiple semesters behind role-based access control.</li>
@@ -209,16 +221,16 @@
       <div class="entry-title">BS Information Technology <span class="entry-org">· Catanduanes State University</span></div>
       <div class="entry-meta">2022 – Jun 2026</div>
     </div>
-    <div class="entry-sub">College of Information Technology · Coursework: Web Development, Data Structures &amp; Algorithms, Database Systems</div>
+    <p class="entry-sub">College of Information Technology · Coursework: Web Development, Data Structures &amp; Algorithms, Database Systems</p>
   </div>
 
   <h2>Skills</h2>
 
-  <div class="skills-row"><span class="skills-label">Languages:</span> TypeScript, JavaScript, SQL, HTML5, CSS3</div>
-  <div class="skills-row"><span class="skills-label">Frontend:</span> React.js, Next.js, Tailwind CSS</div>
-  <div class="skills-row"><span class="skills-label">Backend:</span> Node.js, Express.js, RESTful APIs</div>
-  <div class="skills-row"><span class="skills-label">Databases:</span> MySQL, PostgreSQL, Prisma</div>
-  <div class="skills-row"><span class="skills-label">Practices:</span> Git &amp; GitHub, authentication &amp; authorization, role-based access control, CI/CD pipelines, database design, accessibility (WCAG 2.1 AA), web performance optimization</div>
+  <p class="skills-row"><span class="skills-label">Languages:</span> TypeScript, JavaScript, SQL, HTML5, CSS3</p>
+  <p class="skills-row"><span class="skills-label">Frontend:</span> React.js, Next.js, Tailwind CSS</p>
+  <p class="skills-row"><span class="skills-label">Backend:</span> Node.js, Express.js, RESTful APIs</p>
+  <p class="skills-row"><span class="skills-label">Databases:</span> MySQL, PostgreSQL, Prisma</p>
+  <p class="skills-row"><span class="skills-label">Practices:</span> Git &amp; GitHub, authentication &amp; authorization, role-based access control, CI/CD pipelines, database design, accessibility (WCAG 2.1 AA), web performance optimization</p>
 
 </body>
 </html>
