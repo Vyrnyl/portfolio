@@ -55,15 +55,37 @@ export function AboutIntro({ className }: AboutIntroProps) {
         </ul>
       </div>
 
-      <Image
-        src={site.photo.src}
-        alt={site.photo.alt}
-        width={site.photo.width}
-        height={site.photo.height}
-        sizes="(min-width: 1000px) 320px, (min-width: 460px) 288px, 70vw"
-        priority
-        className="border-border mx-auto h-auto w-full max-w-2xs rounded-lg border lg:mx-0 lg:max-w-none"
-      />
+      {/*
+        The photo keeps its NATIVE ratio and the container fits around it —
+        no `aspect-*` box, no `object-contain`, nothing scaled to a shape it
+        is not. The image is laid out from its own intrinsic width/height
+        (`h-auto w-full`), and the padded frame simply takes whatever height
+        that produces.
+
+        This is the opposite of ProjectGallery's fixed box, on purpose. A
+        grid of screenshots needs uniform cells so the rows align; a single
+        portrait has nothing to align WITH, so forcing it into 4:5 only
+        letterboxes a photo that was already the right shape.
+      */}
+      <div className="border-border bg-surface-2 mx-auto w-full max-w-2xs rounded-lg border p-3 lg:mx-0 lg:max-w-none">
+        <Image
+          src={site.photo.src}
+          alt={site.photo.alt}
+          width={site.photo.width}
+          height={site.photo.height}
+          /*
+             Measured, not guessed: the rendered slot is 289px wide at lg.
+             An understated `sizes` had the optimizer serving a 174px file
+             stretched to 289px — the whole frame was there, just upscaled
+             and soft. These values keep the smallest srcSet candidate at or
+             above the real slot width on a 1x display, and let a 2x display
+             pick a larger one.
+          */
+          sizes="(min-width: 1000px) 384px, (min-width: 460px) 320px, 90vw"
+          priority
+          className="h-auto w-full rounded-sm"
+        />
+      </div>
     </header>
   );
 }

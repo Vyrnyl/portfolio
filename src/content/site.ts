@@ -21,15 +21,21 @@ export const site = {
   url: "https://vernel-portfolio.vercel.app",
   email: "vernaquino73@gmail.com",
   location: "Bicol, Philippines",
-  // PLACEHOLDER, and it says so on its own face: the file reads "PHOTO PENDING".
-  // 1000×1250 are the real intrinsic dimensions of the real file on disk, so
-  // next/image reserves the correct box and the swap introduces no layout
-  // shift. 4:5 is now the ratio a real photo should be cropped to. PORT-058.
+  // REAL PHOTO as of 2026-09-22, closing the PORT-058 gap the placeholder
+  // tracked. scripts/portrait/build.mjs converts Vernel's source image to a
+  // warm duotone keyed to --ink and --ground, and does NOTHING else: no crop,
+  // no padding, so these are the photo's own dimensions at its own ratio.
+  //
+  // These dimensions are load-bearing: AboutIntro lays the photo out from
+  // them and the padded frame fits around whatever height results, so the
+  // photo keeps its native shape and is never letterboxed or cropped. A
+  // replacement photo needs these two numbers updated to its real intrinsic
+  // size — the script prints them.
   photo: {
-    src: "/images/profile-placeholder.webp",
-    alt: "Placeholder graphic standing in for a photo of Vernel Aquino.",
-    width: 1000,
-    height: 1250,
+    src: "/images/profile.webp",
+    alt: "Vernel Aquino, in a monochrome portrait.",
+    width: 1049,
+    height: 1400,
   },
   nav: [
     { label: "Home", href: "/" },

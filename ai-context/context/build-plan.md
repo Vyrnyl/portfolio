@@ -742,11 +742,11 @@ This is a three-line edit plus a file, not a rewrite. `site.photo` already carri
 > **CLOSED 2026-09-15 by Vernel's decision — criteria NOT met, accepted as the shipping state.** Same reasoning as PORT-057: his own data, swappable later. The stand-in still reads `PHOTO PENDING` on its face, so `/about` shows a pending slot rather than a broken one — which is why this is acceptable to ship and was never acceptable to hide. See the decisions log.
 
 **Acceptance criteria**
-- [ ] `public/images/profile-placeholder.webp` deleted, replaced by a real photo under `public/images/` — **the placeholder is still on disk**
-- [ ] `site.photo.alt` describes the actual photo — the "Placeholder graphic standing in for…" string does not survive
-- [ ] `site.photo.width`/`height` match the new file's real intrinsic size
-- [ ] WebP, ≤ 200KB
-- [ ] `/about` checked at all four breakpoints in both themes — a different aspect ratio must not break the intro grid
+- [x] `public/images/profile-placeholder.webp` deleted, replaced by a real photo under `public/images/` — **met 2026-09-22**: `profile.webp`, a real photo processed to warm monochrome, and the placeholder is gone from disk
+- [x] `site.photo.alt` describes the actual photo — **met 2026-09-22**: now "Vernel Aquino, in a monochrome portrait."
+- [x] `site.photo.width`/`height` match the new file's real intrinsic size — **met 2026-09-22**: 1000×1250, deliberately unchanged, so the swap caused no layout shift
+- [x] WebP, ≤ 200KB — **met 2026-09-22**: 66KB
+- [x] `/about` checked at all four breakpoints in both themes — **met 2026-09-22**: ratio is unchanged at 4:5, portrait loads with real alt in both themes, no overflow
 - [ ] Decide at the same time whether `/about` now earns an `og:image`; PORT-033 deliberately ships none while the portrait is a placeholder — **still ships none, so the decision stands deferred with the ticket**
 
 **Watch for:** the placeholder is **4:5 portrait** (1000×1250). A photo at a different ratio changes the height of the intro's right-hand column — it will not overflow, but it will shift where the text centres against it.
