@@ -1,8 +1,6 @@
 import { Section } from "@/components/layout/section";
-import { ProjectFilter } from "@/components/sections/project-filter";
 import { ProjectGrid } from "@/components/sections/project-grid";
-import { Button } from "@/components/ui/button";
-import { getAllProjects, getAllTags, getProjectsByTag } from "@/lib/content";
+import { getAllProjects } from "@/lib/content";
 import { buildPageMetadata } from "@/lib/seo";
 
 const description = "Selected work, with the problem, the approach and the outcome for each.";
@@ -13,25 +11,24 @@ export const metadata = buildPageMetadata({
   path: "/projects",
 });
 
-type ProjectsPageProps = {
-  searchParams: Promise<{ tag?: string | string[] }>;
-};
+/*
+ * The tag filter was removed on 2026-09-22 at Vernel's request.
+ *
+ * That makes this route STATIC again. It was the site's only `ƒ` route, and
+ * only because reading `?tag=` server-side opts a page out of prerendering —
+ * PORT-031 built it that way and build-plan §9 D11 settled it deliberately.
+ * With no searchParams read, `next build` should mark it `○` alongside every
+ * other page.
+ *
+ * The parts are kept rather than deleted: ProjectFilter, ui/Chip and the
+ * getAllTags() / getProjectsByTag() accessors all still exist and still
+ * compile. They are unused on purpose, so filtering can come back without
+ * rebuilding a designed primitive.
+ */
+export default function ProjectsPage() {
+  const projects = getAllProjects();
 
-export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
-  const params = await searchParams;
-  const tag = Array.isArray(params.tag) ? params.tag[0] : params.tag;
-
-  const tags = getAllTags();
-  const projects = tag ? getProjectsByTag(tag) : getAllProjects();
-
-  const emptyState = tag ? (
-    <div className="border-border rounded-lg border py-16 text-center">
-      <p className="text-muted">No projects match “{tag}”.</p>
-      <Button href="/projects" variant="outline" size="sm" className="mt-4">
-        Reset filter
-      </Button>
-    </div>
-  ) : (
+  const emptyState = (
     <p className="text-muted py-16 text-center">Projects are on the way — check back soon.</p>
   );
 
@@ -40,13 +37,12 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       <h1 className="text-h-lg text-ink">Projects</h1>
       <p className="text-muted max-w-measure mt-4">{description}</p>
 
-      <ProjectFilter tags={tags} activeTag={tag} className="mt-8 mb-8" />
-
       <ProjectGrid
         projects={projects}
         emptyState={emptyState}
         cardHeadingLevel="h2"
         priorityCount={3}
+        className="mt-10"
       />
     </Section>
   );

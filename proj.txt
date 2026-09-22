@@ -1,0 +1,95 @@
+GSP Management Information System
+A full-stack, role-based web platform for the Girl Scouts of the Philippines (Catanduanes Council) that replaces paper records and spreadsheets with one centralized system — membership, events, attendance, badges, finance, reporting and executive analytics.
+
+Status: All 21 planned features across 4 phases are complete end-to-end, deployed, and running against a live PostgreSQL database. 325 automated tests passing.
+
+The problem
+GSP's provincial councils track thousands of scouts across troops and schools — registrations, event attendance, badge progress, membership fees. Handled on paper and in spreadsheets, that work is slow to update, error-prone, and nearly impossible to report on. A council officer asking "which troops are falling behind on attendance?" had no way to answer without manually collating records.
+
+What it does
+Sixteen backend domain modules, each paired with its own screens:
+
+Authentication — JWT access/refresh tokens with rotation, bcrypt hashing, password reset over real SMTP, signup approval gate
+Membership — registry with server-side pagination and filtering, profiles, renewals, archive/restore, plus an Executive Council approval queue
+Dashboard — role-aware landing page; each role gets a different aggregation
+Organization — councils, troops, schools, scout levels, badge and activity categories as managed reference data
+Events & Attendance — scheduling with list and calendar views, registration, per-event attendance capture
+Activity Reports — troop leaders file post-event reports, gated on the event having actually completed
+Badges — catalog with requirements, per-member progress, leader verification before an achievement is recorded
+Notifications & Announcements — in-app plus email, with optional expiry
+Finance — fee types, payment collection, expense tracking by category and attribution, period summaries
+Reports — six report types generated on demand, exported to real PDF and Excel, with persisted history
+Analytics — seven tabs of charts, each broken down by school, level, troop or category, with per-tab filters
+Administration & Profile — system settings, user/access management, filterable audit log, backups, self-service profile
+Roles
+Three roles, enforced server-side: Administrator (unrestricted), Executive Council (oversight, approvals, analytics), Troop Leader (their own troop's members, events, attendance, badges).
+
+Permissions are fully relational — roles come from a user_roles join table, capabilities from role_permissions, with no role column on the user record. Every protected route carries RBAC middleware, and the dashboard reads its role from the session token server-side, never from a client parameter.
+
+Tech stack
+Frontend (apps/web) — Next.js 15 (App Router) · React 19 · TypeScript 5.7 strict · Tailwind CSS 3.4 · Chart.js 4 via react-chartjs-2 · react-icons · clsx + tailwind-merge · Vitest + Testing Library
+
+Backend (apps/api) — Node.js 20 · Express 4 · TypeScript 5.7 strict · Prisma 7 with the adapter-pg driver adapter · PostgreSQL (Neon) · Zod validation · jsonwebtoken + bcryptjs · helmet + express-rate-limit · PDFKit + ExcelJS for exports · nodemailer/Gmail API · Vitest + Supertest
+
+Architecture — npm-workspaces monorepo · controller → service → repository on the API · Next.js BFF route handlers for sessions · 39 Prisma models · 21 web pages · 67 BFF handlers
+
+Delivery — Render (API) · Neon serverless Postgres · Prisma Migrate on deploy · ESLint + Prettier + tsc · Playwright for browser verification
+
+https://gsp-mis-web.vercel.app/login
+https://github.com/Vyrnyl/gsp-mis
+
+
+
+
+
+PresyoSerbisyo
+A full-stack, role-based price monitoring and decision-support platform for the Department of Trade and Industry (DTI) Catanduanes that replaces paper monitoring forms with one centralized system — commodity and SRP reference data, store registry, field price capture, automatic violation detection, forecasting, reporting, and a public price transparency surface.
+
+Status: All 71 planned features across 8 phases are complete end-to-end, deployed, and running against a live PostgreSQL database. 132 automated tests passing.
+
+The problem
+DTI Catanduanes monitors commodity prices across stores in the province — officers visit shops, write observed prices on paper monitoring forms, and someone later compares each figure by hand against the official Suggested Retail Price to spot violations. Handled on paper, that work is slow to update, error-prone, and produces no usable history. An officer asking "which stores are overpricing, and by how much?" had no way to answer without manually collating a stack of forms — and consumers had no visibility into any of it.
+
+What it does
+Twelve backend domain modules, each paired with its own screens:
+
+Authentication — JWT access tokens in httpOnly cookies with refresh-token rotation, bcrypt hashing, login rate limiting, and a Next.js BFF layer that keeps the token out of client JavaScript
+
+Commodity catalog — 300+ monitored goods with categories, status classification, and duplicate-name protection, managed by field officers
+
+SRP reference data — effective-dated Suggested Retail Prices per commodity, validated against an agreed date window, supplying the reference value for every compliance check
+
+Store registry — monitored retail stores with location and visit tracking, scoped to the officer who registered them
+
+Price records — field-captured price observations with automatic SRP comparison at write time, producing Compliant / Above SRP / Below SRP without any manual step
+
+Dashboard — role-aware landing page; market status, recent activity, and per-store violation aggregation
+
+Store compliance — violation counts per store over selectable date ranges, derived from the already-computed record status rather than a second definition of compliance
+
+Price trends — historical charts across week / month / 3M / 6M / 1Y / custom windows, with a downsample cap so a one-year range stays legible
+
+Forecasting — ARIMA time-series prediction over historical records, with confidence scoring derived from the series' own volatility, data support, and forecast horizon
+
+Reports — three report types (Monthly, SRP Compliance, Trend) generated on demand, exported to real PDF, Excel and CSV, filtered by date range, category and specific stores, with bytes persisted in Postgres and served through an access-controlled download route
+
+Audit log — filterable trail of critical actions: logins, user create/update/delete, SRP create/update, price record deletion
+
+Public access — unauthenticated transparency surface: current prices against SRP, per-store price ranges, trend charts, and consumer guidance
+
+Roles
+Two account roles plus unauthenticated public access, enforced server-side: Administrator (users, SRP, reports, audit log, system-wide visibility) and Monitoring Officer (commodity catalog, own stores, own price records). There is deliberately no PUBLIC role — public access is unauthenticated through a separate /api/public/* namespace.
+
+Authorization is two-layer by design. Route-level authorize(...roles) middleware gates who may call a route; per-module scope helpers gate whose rows they see. Neither substitutes for the other — a route guard alone leaks other officers' data, and scoping alone lets the wrong role reach the handler. Scope helpers are pure functions, unit-tested independently, and applied to writes as well as reads.
+
+Tech stack
+Frontend (frontend) — Next.js 16 (App Router) · React 19 · TypeScript 5 strict · Tailwind CSS v4 with Material 3 design tokens · Chart.js 4 via react-chartjs-2 · react-icons · react-hook-form + Zod resolvers · jose
+
+Backend (backend) — Node.js · Express 4 · TypeScript 6 strict · Prisma 7 with the adapter-pg driver adapter · PostgreSQL (Neon) · Zod validation · jsonwebtoken + bcryptjs · helmet + express-rate-limit · PDFKit + ExcelJS for exports · arima · Node test runner via tsx
+
+Architecture — controller → service → repository → ORM on the API · Next.js BFF route handlers with a catch-all proxy that absorbs backend version changes · 10 Prisma models · 25 web pages · 56 API endpoints · 16 migrations
+
+Delivery — Vercel (web) · Render (API) · Neon serverless Postgres · Prisma Migrate on deploy · ESLint + Prettier + tsc · Playwright for browser verification
+
+https://price-service-v2.vercel.app/
+https://github.com/Vyrnyl/price-service-v2

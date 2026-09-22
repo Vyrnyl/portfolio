@@ -55,7 +55,7 @@ export const projects = [
     title: "CICT Project Gate",
     summary:
       "Capstone title submission with GPT-4 assistance and embedding-based duplicate detection.",
-    year: 2026,
+    year: 2025,
     status: "archived",
     featured: true,
     tags: ["school-project", "full-stack", "ai", "access-control"],
@@ -122,7 +122,7 @@ export const projects = [
     title: "Grades Repository System",
     summary:
       "Centralized academic records for students, faculty and admins, with role-based access throughout.",
-    year: 2025,
+    year: 2024,
     status: "archived",
     featured: true,
     tags: ["school-project", "full-stack", "access-control"],
