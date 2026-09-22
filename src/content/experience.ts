@@ -16,10 +16,14 @@ import type { Education, Job } from "./types";
      - education.start "2022-08"    correct.
 
    jobs[0] carries TWO bullets where the other role carries four, and that is
-   deliberate. The work was frontend-only, to designs authored by someone
-   else, across parts of two sites — a third bullet would have had to invent
-   something. Nothing here is quantified, because no measurable outcome was
-   available; the work is described instead.
+   deliberate. The work was frontend-only, to the team's designs, across parts
+   of two sites — a third bullet would have had to invent something. Nothing
+   here is quantified, because no measurable outcome was available; the work
+   is described instead.
+
+   "the team's designs" replaced "designs authored by someone else" on
+   2026-09-22: same fact, but it names who the designs came from instead of
+   pointing at an absence, which read as a hedge.
 
    jobs[1].location comes from the resume's page header, the only place it
    appears.
@@ -34,7 +38,7 @@ export const jobs = [
     location: "Philippines",
     bullets: [
       "Built assigned sections of two company websites in Next.js, turning handed-over designs into working pages.",
-      "Delivered frontend-only work inside an existing team, implementing designs authored by someone else rather than making the visual decisions.",
+      "Delivered frontend-only work inside an existing team, implementing the team's designs rather than making the visual decisions.",
     ],
     stack: ["React.js", "Next.js"],
   },
