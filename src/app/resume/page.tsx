@@ -27,12 +27,9 @@ export const metadata = buildPageMetadata({
  * getting their own prop — a note and a bullet render identically, and a
  * second rendering branch is a second thing to keep in sync.
  *
- * KNOWN GAP, tracked as PORT-059: the PDF at `site.resumePdf` is older than
- * this page and does not contain the OpalusPH internship the timeline above it
- * shows. The download is live anyway by decision (2026-09-02) — the same
- * unblock-and-track move PORT-012 and PORT-033 made — because hiding the
- * button removes the page's main action and leaves nothing tracked on the
- * board.
+ * The PDF at `site.resumePdf` is generated from this same content layer by
+ * `scripts/resume/build.mjs`, so the download and this page cannot drift.
+ * Regenerate it after editing `experience.ts` or `skills.ts`.
  */
 export default function ResumePage() {
   const jobs = getJobs();

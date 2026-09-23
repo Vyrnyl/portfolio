@@ -65,5 +65,5 @@ export const site = {
       label: "Email Vernel Aquino",
     },
   ],
-  resumePdf: "/resume.pdf",
+  resumePdf: "/Vernel-Aquino-Resume.pdf",
 } satisfies SiteConfig;

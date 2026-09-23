@@ -1,5 +1,5 @@
 /**
- * Regenerates public/resume.pdf from resume.html.
+ * Regenerates public/Vernel-Aquino-Resume.pdf from resume.html.
  *
  *   npx playwright@1.63 install chromium   # once, if not already cached
  *   node scripts/resume/build.mjs
@@ -20,7 +20,7 @@ import os from "node:os";
 
 const here = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1"));
 const src = path.join(here, "resume.html");
-const out = path.resolve(here, "../../public/resume.pdf");
+const out = path.resolve(here, "../../public/Vernel-Aquino-Resume.pdf");
 
 async function loadChromium() {
   try {
