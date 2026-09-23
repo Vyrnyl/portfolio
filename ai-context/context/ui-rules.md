@@ -395,12 +395,15 @@ Elevation is **border-first**. `Card` carries no shadow at rest — only `Projec
 | Hero underline | 0.9s `stroke-dashoffset` draw, 0.5s delay, once |
 | Mobile sheet | 0.26s `cubic-bezier(.32,.72,0,1)` slide — `animate-sheet-in` |
 | Mobile scrim | 0.26s `ease-out` opacity fade — `animate-scrim-in` |
+| Scroll reveal | every `.section + .section` fades in and rises 24px across the first **240px** of its `entry` range — `section-reveal`, on `animation-timeline: view()` (2026-09-23, post-board) |
 
 The two sheet animations are **tokens**, not arbitrary values: `--animate-sheet-in` / `--animate-scrim-in` in the static `@theme` block, with their `@keyframes` **inside the same block**. Tailwind will happily emit an `--animate-*` variable whose keyframes were declared outside `@theme` and the animation silently does nothing — check the compiled CSS for both halves, not just the variable.
 
 The sheet slides `translateY(-100%) → 0` and is clipped by an `overflow-hidden` wrapper starting at the header's bottom edge, so it reads as coming out from under the header rather than fading in place.
 
 `prefers-reduced-motion` disables all of it, and pins the hero underline to its drawn state.
+
+**The scroll reveal is scroll-driven CSS, not a time-based animation, and every part of that is deliberate.** No JS, no `"use client"`, no library: a scroll library would put client JS on every route to decorate Server Components. It keys on the same `.section + .section` marker as the padding collapse, so the first section on a page (hero or page header, always above the fold) never animates and no page opts in. Three guards, each load-bearing: `@supports (animation-timeline: view())`, because Firefox has no scroll timeline and would otherwise run the keyframes as a timed animation; `prefers-reduced-motion: no-preference`, so reduced motion gets no reveal at all rather than the global block's 0.01ms squash; and `screen`, because print has no scroll and `/resume` prints. **The hidden state lives only inside the keyframes.** Content is visible by default, a section already in view at load renders at its end state, and an unsupported browser renders it plainly. Never move `opacity: 0` onto the element itself: that is how a reveal turns into a blank page. **The range is a fixed length, not a percentage:** `entry` scales with the element, so `entry 60%` would leave a tall section (a resume timeline) semi-transparent across most of a screen of scrolling. The minifier keeps `animation-timeline` after the `animation` shorthand, which resets it. Check the compiled CSS if this rule is ever rewritten.
 
 ### Signature detail
 

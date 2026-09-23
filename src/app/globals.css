@@ -315,6 +315,47 @@
   padding-top: 0;
 }
 
+/* ---------------------------------------------------------------------------
+   Scroll reveal (2026-09-23, post-board).
+   Every section after the first fades and rises as it scrolls into view. The
+   same `.section + .section` selector as above, so the first section on a
+   page — the hero or page header, always above the fold — never animates.
+
+   Pure CSS on a scroll-driven timeline: no JS, no "use client", no library.
+   The three guards are each load-bearing:
+     - @supports: Firefox has no `animation-timeline` yet. Without the guard it
+       would apply the keyframes on a normal time-based run instead.
+     - no-preference: this is decoration, so reduced-motion gets none of it
+       rather than the global block's 0.01ms squash.
+     - screen: print has no scroll, and /resume prints.
+
+   Content is visible by DEFAULT — the hidden state exists only inside the
+   animation, so a section already in view at load renders at its end state,
+   and a browser without support renders it plainly. Never move the opacity:0
+   onto the element itself; that is how a reveal becomes a blank page.
+
+   The range is a fixed 240px into `entry`, not a percentage: `entry` scales
+   with the element, so a percentage would leave a tall section (a resume
+   timeline) half-transparent for most of a screen of scrolling.
+--------------------------------------------------------------------------- */
+
+@keyframes section-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .section + .section {
+      animation: section-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0 entry 240px;
+    }
+  }
+}
+
 
 @media (prefers-reduced-motion: reduce) {
   *,
