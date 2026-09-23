@@ -27,9 +27,11 @@ export const metadata = buildPageMetadata({
  * getting their own prop — a note and a bullet render identically, and a
  * second rendering branch is a second thing to keep in sync.
  *
- * The PDF at `site.resumePdf` is generated from this same content layer by
- * `scripts/resume/build.mjs`, so the download and this page cannot drift.
- * Regenerate it after editing `experience.ts` or `skills.ts`.
+ * The PDF at `site.resumePdf` is NOT generated from this content layer. Its
+ * source of truth is `scripts/resume/resume.html`, built by
+ * `scripts/resume/build.mjs`, and the two are kept in step by hand — so after
+ * editing `experience.ts`, `skills.ts` or a project's year/stack, make the
+ * same change in resume.html and rerun the build, or the download drifts.
  */
 export default function ResumePage() {
   const jobs = getJobs();

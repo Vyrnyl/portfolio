@@ -4,10 +4,16 @@
  *   npx playwright@1.63 install chromium   # once, if not already cached
  *   node scripts/resume/build.mjs
  *
- * The resume is authored as HTML here rather than in a word processor so the
- * document that ships is diffable and rebuildable. Content is kept in step
- * with src/content/ by hand — this script does not read the content layer,
- * because the resume orders and trims those facts for a different audience.
+ * resume.html is the SOURCE OF TRUTH for the resume; the PDF is only ever
+ * this script's output. Never replace public/Vernel-Aquino-Resume.pdf by
+ * hand or from another tool: on 2026-09-22 a ReportLab-generated file was
+ * committed over this script's output, and the served PDF silently lost all
+ * four links while resume.html kept describing a document that was not the
+ * one shipping. Edit the HTML, rerun this, commit both together.
+ *
+ * Content is kept in step with src/content/ by hand — this script does not
+ * read the content layer, because the resume orders and trims those facts
+ * for a different audience.
  *
  * Playwright is NOT a project dependency (the site does not need it at
  * runtime), so this resolves it from wherever npx cached it and says what to

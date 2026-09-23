@@ -8,10 +8,11 @@ import type { Project } from "./types";
    two are fully real — real copy, real screenshots of the running apps, real
    live and repo URLs, and stacks named rather than "TBC".
 
-   The two academic projects carry REAL copy written from public/resume.pdf,
-   but are still unverified on the points below — replace in PORT-057:
-     - year, status          inferred from the graduation timeline, not stated
-     - stack "TBC" entries   the resume lists no per-project stack
+   The two academic projects carry REAL copy written from the original resume
+   PDF. 2026-09-23: Vernel confirmed their year and stack directly (CICT 2025,
+   Grades 2024), and scripts/resume/resume.html states the same values. Still
+   unverified on the points below — replace in PORT-057:
+     - status                inferred from the graduation timeline, not stated
      - liveUrl / repoUrl     still "https://example.com" on both
      - images                cict-project-gate carries REAL screenshots
                              (2026-09-20); grades-repository-system's four
@@ -59,7 +60,7 @@ export const projects = [
     status: "archived",
     featured: true,
     tags: ["school-project", "full-stack", "ai", "access-control"],
-    stack: ["React.js", "Node.js", "Express", "MySQL", "Prisma", "Vector embeddings"],
+    stack: ["Next.js", "MySQL", "Prisma", "GPT-4", "Vector embeddings"],
     // PLACEHOLDER URLs, and the filter that matters is not the text one.
     // `isPlaceholder` matches WORDS, so "https://example.com" sails straight
     // through it — that is exactly how a stand-in URL once reached a JSON-LD
@@ -126,7 +127,7 @@ export const projects = [
     status: "archived",
     featured: true,
     tags: ["school-project", "full-stack", "access-control"],
-    stack: ["RESTful APIs", "TBC — confirm stack"],
+    stack: ["React.js", "Node.js", "Express", "MySQL"],
     liveUrl: "https://example.com",
     repoUrl: "https://example.com",
     thumbnail: {

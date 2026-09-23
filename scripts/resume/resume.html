@@ -99,9 +99,18 @@
 
   ul { list-style: none; margin-top: 2.5pt; }
 
+  /*
+   * NO positioning anywhere in a bullet. A positioned element is painted in
+   * a later layer than the normal flow, and Chromium writes PDF text in paint
+   * order — so `li { position: relative }` put every bullet's text AFTER the
+   * Skills section in the file. pdftotext -raw (and any ATS reading content
+   * order) got all four sections' headings first and one detached pile of
+   * bullets at the end. The hanging indent below keeps the glyph inline, so
+   * it is drawn — and extracted — right before its own line.
+   */
   li {
-    position: relative;
     padding-left: 10pt;
+    text-indent: -10pt;
     margin-bottom: 1.2pt;
   }
 
@@ -109,11 +118,11 @@
      Chromium's print renderer and on screen. */
   li::before {
     content: "\2022";
-    position: absolute;
-    left: 0;
+    display: inline-block;
+    width: 10pt;
+    text-indent: 0;
     color: #1a1a1a;
     font-size: 9pt;
-    top: -0.2pt;
   }
 
   /*
@@ -137,8 +146,8 @@
     <div class="name">Vernel Aquino</div>
     <div class="role">Full-stack Web Developer</div>
     <div class="contact">
-      Bicol, Philippines<span class="sep">|</span>0995 595 0747<span class="sep">|</span><a href="mailto:vernaquino73@gmail.com">vernaquino73@gmail.com</a><br>
-      <a href="https://vernel-portfolio.vercel.app">vernel-portfolio.vercel.app</a><span class="sep">|</span><a href="https://github.com/Vyrnyl">github.com/Vyrnyl</a><span class="sep">|</span><a href="https://www.linkedin.com/in/vernel-aquino-420446373">linkedin.com/in/vernel-aquino</a>
+      Bicol, Philippines<span class="sep">|</span>+63 995 595 0747<span class="sep">|</span><a href="mailto:vernaquino73@gmail.com">vernaquino73@gmail.com</a><br>
+      <a href="https://vernel-portfolio.vercel.app">vernel-portfolio.vercel.app</a><span class="sep">|</span><a href="https://github.com/Vyrnyl">github.com/Vyrnyl</a><span class="sep">|</span><a href="https://www.linkedin.com/in/vernel-aquino-420446373">linkedin.com/in/vernel-aquino-420446373</a>
     </div>
   </header>
 
@@ -174,20 +183,6 @@
 
   <div class="entry">
     <div class="entry-head">
-      <div class="entry-title">CICT Project Gate</div>
-      <div class="entry-meta">2026</div>
-    </div>
-    <p class="entry-sub">Capstone title submission and review platform · GPT-4, vector embeddings</p>
-    <ul>
-      <li>Built a capstone title submission and approval system with automatic similarity detection, warning students about duplicate or closely related topics at the point of submission rather than after review.</li>
-      <li>Integrated GPT-4 as a decision support system that recommends and refines project title suggestions.</li>
-      <li>Implemented vector embeddings with cosine similarity for text comparison, surfacing near-duplicates that exact-match search misses.</li>
-      <li>Designed a three-role access system: students submit titles, faculty review and comment, administrators manage users and settings.</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-head">
       <div class="entry-title">PresyoSerbisyo</div>
       <div class="entry-meta">2026</div>
     </div>
@@ -202,10 +197,24 @@
 
   <div class="entry">
     <div class="entry-head">
-      <div class="entry-title">Grades Repository System</div>
+      <div class="entry-title">CICT Project Gate</div>
       <div class="entry-meta">2025</div>
     </div>
-    <p class="entry-sub">Academic information system · RESTful APIs</p>
+    <p class="entry-sub">Capstone title submission and review platform · Next.js, MySQL, Prisma, GPT-4, vector embeddings</p>
+    <ul>
+      <li>Built a capstone title submission and approval system with automatic similarity detection, warning students about duplicate or closely related topics at the point of submission rather than after review.</li>
+      <li>Integrated GPT-4 as a decision support system that recommends and refines project title suggestions.</li>
+      <li>Implemented vector embeddings with cosine similarity for text comparison, surfacing near-duplicates that exact-match search misses.</li>
+      <li>Designed a three-role access system: students submit titles, faculty review and comment, administrators manage users and settings.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-head">
+      <div class="entry-title">Grades Repository System</div>
+      <div class="entry-meta">2024</div>
+    </div>
+    <p class="entry-sub">Academic information system · React.js, Node.js, Express, MySQL</p>
     <ul>
       <li>Built a centralized academic records system serving students, faculty and administrators from one source of grade data.</li>
       <li>Enabled students to view grades across multiple semesters behind role-based access control.</li>
@@ -219,7 +228,7 @@
   <div class="entry">
     <div class="entry-head">
       <div class="entry-title">BS Information Technology <span class="entry-org">· Catanduanes State University</span></div>
-      <div class="entry-meta">2022 – Jun 2026</div>
+      <div class="entry-meta">Aug 2022 – Jun 2026</div>
     </div>
     <p class="entry-sub">College of Information Technology · Coursework: Web Development, Data Structures &amp; Algorithms, Database Systems</p>
   </div>
