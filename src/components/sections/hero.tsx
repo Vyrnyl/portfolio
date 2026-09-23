@@ -10,11 +10,17 @@ type HeroProps = {
  * Reads `site` directly — the same content/site.ts carve-out Header and
  * Footer already use (content-model.md §4), since this is config identity,
  * not queryable content that belongs behind lib/content.ts.
+ *
+ * The eyebrow is a lead-in to the name, not `site.role` (changed 2026-09-23).
+ * The role eyebrow repeated the tagline's opening words three lines apart.
+ * The tagline keeps the role because it also stands alone as the meta
+ * description, the OG card and the JSON-LD description, where no eyebrow
+ * precedes it. So the repeat was fixed here rather than there.
  */
 export function Hero({ className }: HeroProps) {
   return (
     <div className={cn(className)}>
-      <p className="text-eyebrow text-faint mb-4 font-mono uppercase">{site.role}</p>
+      <p className="text-eyebrow text-faint mb-4 font-mono uppercase">Hi, I&apos;m</p>
       <h1 className="text-h-xl text-ink">{site.name}</h1>
       <p className="text-lead text-muted mt-6 max-w-measure">{site.tagline}</p>
     </div>
