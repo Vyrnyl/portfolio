@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 import { NavLinks, type NavItem } from "@/components/layout/nav-links";
@@ -9,6 +9,10 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   items: readonly NavItem[];
+  /** Rendered above the links. */
+  profile: ReactNode;
+  /** Rendered below the links, pinned to the bottom of the drawer. */
+  contact: ReactNode;
   className?: string;
 };
 
@@ -35,21 +39,28 @@ const BURGER = cn(
   "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
 );
 
+const CLOSE = cn(
+  "bg-surface-2 border-border text-muted absolute top-4 right-4 inline-flex size-9 cursor-pointer items-center justify-center rounded-sm border transition-colors",
+  "hover:text-ink",
+  "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+);
+
 /**
- * The navigation for viewports below 1000px: a burger in the header that drops
- * a sheet of links over a blurred scrim.
+ * The navigation for viewports below 1000px: a burger in the header that opens
+ * a full-height drawer from the left, over a blurred scrim.
  *
- * Renders the burger in place; the sheet and scrim are portaled to <body>.
+ * Renders the burger in place; the drawer and scrim are portaled to <body>.
  * That is not a stylistic choice — the header carries `backdrop-blur-md`, and
  * an element with a backdrop-filter becomes the containing block for its
  * `position: fixed` descendants. A scrim rendered inside the header would size
  * itself to the 64px header box instead of the viewport.
  *
- * Props: `items` is the same array the desktop nav is given, so both lists
- * always agree. `className` lands on the burger — the header uses it to hide
- * the button at `lg:`.
+ * Props: `items` carries the same links as the desktop nav, so both lists
+ * always agree. `profile` and `contact` are slots the header fills from the
+ * server. `className` lands on the burger — the header uses it to hide the
+ * button at `lg:`.
  */
-export function MobileMenu({ items, className }: Props) {
+export function MobileMenu({ items, profile, contact, className }: Props) {
   const [open, setOpen] = useState(false);
   const burgerRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -89,18 +100,14 @@ export function MobileMenu({ items, className }: Props) {
   useEffect(() => {
     if (!open) return;
 
-    /**
-     * The cycle, in the order the eye reads it: the burger sits above the
-     * sheet, and it is the labelled close control, so it belongs inside.
-     */
-    const focusables = () => {
-      const inSheet = sheetRef.current
+    /* The burger is not part of the cycle: the drawer covers the header, so it
+       sits behind the scrim, and the close button inside takes over its job. */
+    const focusables = () =>
+      sheetRef.current
         ? Array.from(
             sheetRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
           )
         : [];
-      return burgerRef.current ? [burgerRef.current, ...inSheet] : inSheet;
-    };
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -115,10 +122,9 @@ export function MobileMenu({ items, className }: Props) {
       if (nodes.length === 0) return;
 
       // Every Tab is handled here, never handed back to the browser. The sheet
-      // is portaled to the end of <body>, so it sits after the footer in the
-      // DOM while appearing directly under the burger. Native tab order would
-      // walk the burger straight into the page behind the scrim; stepping the
-      // cycle by hand makes the trap independent of where the portal landed.
+      // is portaled to the end of <body>, so native tab order would walk off
+      // its last link and out into the browser chrome; stepping the cycle by
+      // hand makes the trap independent of where the portal landed.
       event.preventDefault();
 
       const index = nodes.indexOf(document.activeElement as HTMLElement);
@@ -158,29 +164,39 @@ export function MobileMenu({ items, className }: Props) {
       <button
         ref={burgerRef}
         type="button"
-        onClick={() => (open ? close() : setOpen(true))}
+        onClick={() => setOpen(true)}
         aria-expanded={open}
         aria-controls={SHEET_ID}
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label="Open menu"
         className={cn(BURGER, className)}
       >
-        {open ? <X size={18} strokeWidth={1.9} /> : <Menu size={18} strokeWidth={1.9} />}
+        <Menu size={18} strokeWidth={1.9} />
       </button>
 
       {open
         ? createPortal(
-            /* Starts at the header's bottom edge and fills the rest of the
-               viewport. `overflow-hidden` is what clips the sheet's slide, so
-               it appears to come out from under the header. */
-            <div className="fixed inset-x-0 top-16 bottom-0 z-50 flex flex-col overflow-hidden">
+            /* Covers the whole viewport, header included. The width follows the
+               phone up to 320px, so the scrim always shows beside the drawer. */
+            <div className="fixed inset-0 z-50 flex overflow-hidden">
               <div
                 id={SHEET_ID}
                 ref={sheetRef}
-                className="bg-surface border-border animate-sheet-in max-h-full overflow-y-auto overscroll-contain border-b"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Menu"
+                className="bg-surface border-border animate-sheet-in relative flex w-3/4 max-w-80 shrink-0 flex-col overflow-y-auto overscroll-contain border-r"
               >
-                <nav aria-label="Main" className="px-gut py-4">
+                <button type="button" onClick={close} aria-label="Close menu" className={CLOSE}>
+                  <X size={18} strokeWidth={1.9} />
+                </button>
+
+                {profile}
+
+                <nav aria-label="Main" className="shrink-0 px-5 py-3.5">
                   <NavLinks items={items} orientation="vertical" onNavigate={close} />
                 </nav>
+
+                {contact}
               </div>
 
               {/* Mouse convenience only — Escape and the burger cover keyboard,
@@ -188,7 +204,7 @@ export function MobileMenu({ items, className }: Props) {
               <div
                 aria-hidden
                 onClick={close}
-                className="bg-ground/60 animate-scrim-in flex-1 backdrop-blur-sm"
+                className="bg-ground/60 animate-scrim-in flex-1 backdrop-blur-md"
               />
             </div>,
             document.body,

@@ -37,13 +37,19 @@ export const site = {
     width: 1049,
     height: 1400,
   },
+  avatar: {
+    src: "/images/avatar.jpg",
+    alt: "Portrait of Vernel Aquino.",
+    width: 200,
+    height: 200,
+  },
   nav: [
-    { label: "Home", href: "/" },
-    { label: "Projects", href: "/projects" },
-    { label: "Skills", href: "/skills" },
-    { label: "About", href: "/about" },
-    { label: "Resume", href: "/resume" },
-    { label: "Contact", href: "/contact" },
+    { label: "Home", href: "/", icon: "LayoutPanelLeft" },
+    { label: "Projects", href: "/projects", icon: "Layers" },
+    { label: "Skills", href: "/skills", icon: "Code2" },
+    { label: "About", href: "/about", icon: "User" },
+    { label: "Resume", href: "/resume", icon: "FileText" },
+    { label: "Contact", href: "/contact", icon: "MessageSquare" },
   ],
   // `label` is the accessible name, not the visible text. The footer shows a
   // shorter word and puts these on aria-label, so each one has to *contain*

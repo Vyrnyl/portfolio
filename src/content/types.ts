@@ -44,6 +44,11 @@ export interface Link {
 
 // ---------- site ----------
 
+/** A site.nav entry. Required `icon`, so a new page cannot join the menu without one. */
+export interface NavLink extends Link {
+  icon: IconName;
+}
+
 export interface SocialLink {
   platform: "github" | "linkedin" | "email" | "x" | "dribbble";
   href: string;
@@ -67,8 +72,10 @@ export interface SiteConfig {
    * generated placeholder that says so on its face. PORT-058 swaps it.
    */
   photo: ImageAsset;
+  /** The square headshot at the top of the mobile menu. */
+  avatar: ImageAsset;
   /** Order here is the order in the header nav. */
-  nav: Link[];
+  nav: NavLink[];
   socials: SocialLink[];
   /** Path to the downloadable CV under /public, e.g. "/resume.pdf". */
   resumePdf: string;
@@ -159,14 +166,19 @@ export type IconName =
   | "BookOpen"
   | "Briefcase"
   | "Code2"
+  | "FileText"
   | "GraduationCap"
+  | "Layers"
+  | "LayoutPanelLeft"
   | "Lightbulb"
   | "Mail"
   | "MapPin"
   | "MessageCircle"
+  | "MessageSquare"
   | "Rocket"
   | "ShieldCheck"
   | "Target"
+  | "User"
   | "Users";
 
 /** A practice principle on /skills — how I work, not what I know. */

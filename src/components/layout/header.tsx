@@ -2,8 +2,10 @@ import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
 import { MobileMenu } from "@/components/layout/mobile-menu";
+import { MenuContact, MenuProfile } from "@/components/layout/mobile-menu-parts";
 import { NavLinks } from "@/components/layout/nav-links";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { Icon } from "@/components/ui/icon";
 import { site } from "@/content/site";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +27,11 @@ type Props = {
  * two lists cannot drift apart.
  */
 export function Header({ className }: Props) {
+  const menuItems = site.nav.map((item) => ({
+    ...item,
+    glyph: <Icon name={item.icon} className="shrink-0" aria-hidden />,
+  }));
+
   return (
     <header
       className={cn(
@@ -49,7 +56,12 @@ export function Header({ className }: Props) {
             <NavLinks items={site.nav} />
           </nav>
           <ThemeToggle />
-          <MobileMenu items={site.nav} className="lg:hidden" />
+          <MobileMenu
+            items={menuItems}
+            profile={<MenuProfile />}
+            contact={<MenuContact />}
+            className="lg:hidden"
+          />
         </div>
       </Container>
     </header>

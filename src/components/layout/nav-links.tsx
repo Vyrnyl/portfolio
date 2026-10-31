@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 export type NavItem = {
   href: string;
   label: string;
+  /** Rendered before the label. A rendered node, so no icon code ships to the client. */
+  glyph?: ReactNode;
 };
 
 type Orientation = "horizontal" | "vertical";
@@ -30,12 +33,12 @@ type Props = {
 
 const LIST: Record<Orientation, string> = {
   horizontal: "flex items-center gap-1",
-  vertical: "flex flex-col items-stretch gap-1",
+  vertical: "flex flex-col items-stretch gap-0.5",
 };
 
 const ITEM: Record<Orientation, string> = {
-  horizontal: "px-3 py-1.5 text-sm",
-  vertical: "px-4 py-3 text-base",
+  horizontal: "rounded-full px-3 py-1.5 text-sm",
+  vertical: "flex items-center gap-3 rounded-md px-2 py-3 text-base",
 };
 
 /**
@@ -65,7 +68,7 @@ export function NavLinks({ items, orientation = "horizontal", onNavigate, classN
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "block rounded-full transition-colors",
+                "block transition-colors",
                 ITEM[orientation],
                 "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
                 active
@@ -73,6 +76,7 @@ export function NavLinks({ items, orientation = "horizontal", onNavigate, classN
                   : "text-muted hover:text-ink hover:bg-surface-2",
               )}
             >
+              {item.glyph}
               {item.label}
             </Link>
           </li>

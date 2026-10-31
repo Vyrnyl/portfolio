@@ -2,14 +2,19 @@ import {
   BookOpen,
   Briefcase,
   Code2,
+  FileText,
   GraduationCap,
+  Layers,
+  LayoutPanelLeft,
   Lightbulb,
   Mail,
   MapPin,
   MessageCircle,
+  MessageSquare,
   Rocket,
   ShieldCheck,
   Target,
+  User,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -44,6 +49,12 @@ export const ICONS: Record<IconName, LucideIcon> = {
   // Contact — /contact
   Mail,
   MapPin,
+  // Navigation — site.nav, shown in the mobile menu (Skills reuses Code2)
+  FileText,
+  Layers,
+  LayoutPanelLeft,
+  MessageSquare,
+  User,
 };
 
 export type { IconName };
