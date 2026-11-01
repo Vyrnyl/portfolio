@@ -57,10 +57,9 @@ export function getAllProjects(): Project[] {
 /**
  * The projects promoted to the home page grid, newest first.
  *
- * @param limit hard cap on how many come back. The home grid is designed for
- *   exactly three, so the cap means a fourth `featured: true` slipping into the
- *   content file cannot break that layout — it simply does not appear. Fewer
- *   than three is a content problem the home page must still render sanely.
+ * @param limit hard cap on how many come back. The home page asks for one, the
+ *   newest, so a second `featured: true` cannot crowd out its Latest work tile.
+ *   None at all is a content problem the home page must still render sanely.
  */
 export function getFeaturedProjects(limit = 3): Project[] {
   return getAllProjects()

@@ -1,23 +1,16 @@
-import Link from "next/link";
-
 import { Section } from "@/components/layout/section";
 import { AboutIntro } from "@/components/sections/about-intro";
+import { BackgroundList } from "@/components/sections/background-list";
 import { Cta } from "@/components/sections/cta";
-import { Badge } from "@/components/ui/badge";
-import { Prose } from "@/components/ui/prose";
-import { getSkillGroups } from "@/lib/content";
+import { StackStrip } from "@/components/sections/stack-strip";
+import type { TimelineEntry } from "@/components/sections/timeline";
+import { site } from "@/content/site";
+import { getEducation, getJobs } from "@/lib/content";
 import { buildPageMetadata } from "@/lib/seo";
 
 /**
- * /about now ships an OG card, reversing PORT-033's deliberate opt-out.
- *
- * That opt-out was correct at the time and its reason has gone: the card would
- * have been `site.photo`, which is still the "PHOTO PENDING" placeholder, and a
- * shared link is the worst place for a stand-in image. PORT-050's card is
- * typography and brand colour only — it never touches `site.photo` — so the
- * placeholder cannot leak into a shared link, and there is no longer a reason
- * for this page to be the one that shares as a bare title. Decided with Vernel
- * 2026-09-05; PORT-058 no longer has anything to do here.
+ * /about ships PORT-050's typographic OG card, reversing PORT-033's opt-out.
+ * Decided with Vernel 2026-09-05.
  */
 export const metadata = buildPageMetadata({
   title: "About",
@@ -27,113 +20,41 @@ export const metadata = buildPageMetadata({
   type: "profile",
 });
 
-
-
-/**
- * /about — intro, bio, what I work with, and the way out to the resume and the
- * contact form.
- *
- * The bio is JSX rather than a content file: it carries an inline link, appears
- * exactly once, and putting markup inside a typed content string would mean
- * either a markdown renderer or HTML in content — both ruled out (build-plan
- * §9, "no blog, no MDX").
- *
- * Every factual claim below is traceable to something already in the repo:
- *   ¶1  education[0] (BSIT, Catanduanes State University) + site.location;
- *       the full-stack framing is jobs[1].bullets, the freelance role.
- *   ¶2  role-based access in jobs[1].bullets, projects "grades-repository-
- *       system" and "cict-project-gate" — the three separate builds.
- *   ¶3  projects "cict-project-gate": embeddings + cosine similarity, GPT-4 as
- *       decision support with approval left to people.
- *   ¶4  jobs[0] (OpalusPH, Feb–May 2026) and jobs[1] (Freelance, 2024). NOTE:
- *       jobs[0].bullets are still placeholder, so nothing is claimed about what
- *       that role achieved — only that it happened.
- *   ¶5  skillGroups "learning" tier, verbatim in substance.
- * Nothing here was invented. The voice is a first draft and Vernel's to rewrite;
- * the facts are the part that must not drift.
- *
- * The skills block is the COMPACT treatment — tier label, what the tier means,
- * then the items as badges. The full /skills page with dot weight and swatch
- * saturation is PORT-037's SkillTier, which this must not grow into.
- */
+/** /about: a short bio and background, in the same tiles as the home page. */
 export default function AboutPage() {
-  const skillGroups = getSkillGroups();
+  const background: TimelineEntry[] = [
+    ...getJobs().map((job) => ({
+      id: `${job.company}-${job.start}`,
+      title: job.role,
+      org: job.company,
+      start: job.start,
+      end: job.end,
+    })),
+    ...getEducation().map((entry) => ({
+      id: `${entry.institution}-${entry.start}`,
+      title: entry.credential,
+      org: entry.institution,
+      start: entry.start,
+      end: entry.end,
+    })),
+  ];
 
   return (
-    <>
-      <Section spacing="tight">
-        <AboutIntro />
-      </Section>
+    <Section spacing="tight" className="pt-7">
+      <div className="grid gap-3 md:gap-4 lg:grid-cols-12">
+        <AboutIntro className={background.length > 0 ? "lg:col-span-7" : "lg:col-span-12"} />
+        <BackgroundList entries={background} className="lg:col-span-5" />
 
-      <Section spacing="tight">
-        <Prose>
-          <p>
-            I&apos;m a full-stack web developer based in the Philippines, finishing a BS in
-            Information Technology at Catanduanes State University. Most of what I&apos;ve built has
-            been full-stack rather than front-of-house only — a schema, an API over it, the rules
-            deciding who may see what, and then the interface on top.
-          </p>
-          <p>
-            The thread running through it is access control. I&apos;ve built role-based permissions
-            three separate times — for a freelance client&apos;s application, for a grades repository
-            serving students, faculty and administrators, and for a capstone submission platform —
-            and each time the interesting part was the same: deciding a permission once, in one
-            layer, instead of re-checking it screen by screen.
-          </p>
-          <p>
-            The most recent of those, CICT Project Gate, compares a proposed capstone title against
-            every title already submitted using vector embeddings and cosine similarity rather than
-            keyword matching, because near-duplicate topics are rarely worded alike. GPT-4 sits on
-            top as a decision-support layer that suggests and refines titles; approving them stays
-            with people. There is more on that one, and the rest, in{" "}
-            <Link href="/projects">my projects</Link>.
-          </p>
-          <p>
-            Outside coursework I worked as a frontend developer at OpalusPH from February to May
-            2026, and in 2024 I delivered a full-stack application for a freelance client on my own
-            — schema, API and interface — on schedule.
-          </p>
-          <p>
-            Right now I&apos;m working through React Server Components and the App Router,
-            accessibility to WCAG 2.2 AA, and token-driven design systems. This site is where most of
-            that is happening. I&apos;d rather list those as things I&apos;m learning than claim them
-            outright.
-          </p>
-        </Prose>
-      </Section>
+        <StackStrip items={site.stack} className="lg:col-span-12" />
 
-      <Section heading="What I work with">
-        {skillGroups.length > 0 ? (
-          <div className="grid gap-10 lg:grid-cols-3">
-            {skillGroups.map((group) => (
-              <div key={group.tier}>
-                <h3 className="text-h-sm text-ink">{group.label}</h3>
-                <p className="text-muted mt-2 text-sm">{group.blurb}</p>
-                {group.items.length > 0 ? (
-                  <ul className="mt-4 flex flex-wrap gap-2">
-                    {group.items.map((item) => (
-                      <li key={item}>
-                        <Badge>{item}</Badge>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted">The skills list is being written up — check back soon.</p>
-        )}
-      </Section>
-
-      <Section>
         <Cta
-          heading="Want the short version?"
+          heading="Want the full picture?"
           body="The resume has the dates, the stack and the coursework on one page. If you would rather just talk, the contact form reaches my inbox directly."
           primary={{ label: "Read my resume", href: "/resume" }}
           secondary={{ label: "Get in touch", href: "/contact" }}
+          className="lg:col-span-12"
         />
-      </Section>
-    </>
+      </div>
+    </Section>
   );
 }

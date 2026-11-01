@@ -1,9 +1,12 @@
 import { Section } from "@/components/layout/section";
 import { Cta } from "@/components/sections/cta";
 import { Hero } from "@/components/sections/hero";
-import { ProjectCard } from "@/components/sections/project-card";
+import { HeroPortrait } from "@/components/sections/hero-portrait";
+import { LatestWork } from "@/components/sections/latest-work";
+import { StackStrip } from "@/components/sections/stack-strip";
+import { StatRow } from "@/components/sections/stat-row";
 import { site } from "@/content/site";
-import { getFeaturedProjects } from "@/lib/content";
+import { getFeaturedProjects, getSkillGroups } from "@/lib/content";
 import { buildPageMetadata, DEFAULT_OG_IMAGE, OG_IMAGE_SIZE } from "@/lib/seo";
 
 /**
@@ -48,38 +51,33 @@ export const metadata = {
 };
 
 export default function HomePage() {
-  const featuredProjects = getFeaturedProjects();
+  const [latestProject] = getFeaturedProjects(1);
+  const learning = getSkillGroups().find((group) => group.tier === "learning")?.items[0];
 
   return (
-    <>
-      <Section>
-        <Hero />
-      </Section>
+    <Section spacing="tight" className="pt-7">
+      <div className="grid gap-3 md:gap-4 lg:grid-cols-12">
+        {/* The portrait leads on small screens, but the <h1> stays first in the
+            DOM, so reading order and search engines still start with the name. */}
+        <Hero className="lg:col-span-7" />
+        <HeroPortrait className="order-first lg:order-none lg:col-span-5" />
 
-      <Section heading="Featured work">
-        {featuredProjects.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.map((project, index) => (
-              <ProjectCard
-                key={project.slug}
-                project={project}
-                priority={index < 3}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted">Projects are on the way — check back soon.</p>
-        )}
-      </Section>
+        <StatRow
+          stats={site.stats}
+          className={latestProject ? "lg:col-span-5" : "lg:col-span-12"}
+        />
+        {latestProject ? <LatestWork project={latestProject} className="lg:col-span-7" /> : null}
 
-      <Section>
+        <StackStrip items={site.stack} learning={learning} className="lg:col-span-12" />
+
         <Cta
           heading="Have a project in mind?"
           body="I'm open to new opportunities — reach out and let's talk about what you're building."
           primary={{ label: "Get in touch", href: "/contact" }}
           secondary={{ label: "See my work", href: "/projects" }}
+          className="lg:col-span-12"
         />
-      </Section>
-    </>
+      </div>
+    </Section>
   );
 }

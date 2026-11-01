@@ -21,28 +21,27 @@ export const site = {
   url: "https://vernel-portfolio.vercel.app",
   email: "vernaquino73@gmail.com",
   location: "Bicol, Philippines",
-  // REAL PHOTO as of 2026-09-22, closing the PORT-058 gap the placeholder
-  // tracked. scripts/portrait/build.mjs converts Vernel's source image to a
-  // warm duotone keyed to --ink and --ground, and does NOTHING else: no crop,
-  // no padding, so these are the photo's own dimensions at its own ratio.
-  //
-  // These dimensions are load-bearing: AboutIntro lays the photo out from
-  // them and the padded frame fits around whatever height results, so the
-  // photo keeps its native shape and is never letterboxed or cropped. A
-  // replacement photo needs these two numbers updated to its real intrinsic
-  // size — the script prints them.
-  photo: {
-    src: "/images/profile.webp",
-    alt: "Vernel Aquino, in a monochrome portrait.",
-    width: 1049,
-    height: 1400,
-  },
   avatar: {
     src: "/images/avatar.jpg",
     alt: "Portrait of Vernel Aquino.",
     width: 200,
     height: 200,
   },
+  heroPortrait: {
+    src: "/images/hero-portrait.webp",
+    alt: "Vernel Aquino taking a mirror selfie, in black and white.",
+    width: 1000,
+    height: 893,
+  },
+  status: "Open to new opportunities",
+  // Hand-kept totals, because the source figures live in project prose.
+  // 92 = 21 (gsp-mis) + 71 (presyo-serbisyo). A new live project changes it.
+  // 2024 is the start of the freelance role in experience.ts.
+  stats: [
+    { value: "92", label: "Features shipped" },
+    { value: "2024", label: "Building since" },
+  ],
+  stack: ["TypeScript", "React", "Next.js", "Node.js", "PostgreSQL"],
   nav: [
     { label: "Home", href: "/", icon: "LayoutPanelLeft" },
     { label: "Projects", href: "/projects", icon: "Layers" },

@@ -44,6 +44,13 @@ export interface Link {
 
 // ---------- site ----------
 
+/** One figure in the home page's "At a glance" tile. */
+export interface Stat {
+  /** A string so a year renders as written, never as "2,024". */
+  value: string;
+  label: string;
+}
+
 /** A site.nav entry. Required `icon`, so a new page cannot join the menu without one. */
 export interface NavLink extends Link {
   icon: IconName;
@@ -66,14 +73,16 @@ export interface SiteConfig {
   url: string;
   email: string;
   location: string;
-  /**
-   * The About page portrait. Required rather than optional, so there is never a
-   * "no photo" branch to design: what stands in until a real photo exists is a
-   * generated placeholder that says so on its face. PORT-058 swaps it.
-   */
-  photo: ImageAsset;
   /** The square headshot at the top of the mobile menu. */
   avatar: ImageAsset;
+  /** The transparent cutout on the home page's portrait tile. */
+  heroPortrait: ImageAsset;
+  /** Short availability line on the home page, e.g. "Open to new opportunities". */
+  status: string;
+  /** The "At a glance" figures on the home page. */
+  stats: Stat[];
+  /** The short stack named on the home page. /skills holds the full list. */
+  stack: string[];
   /** Order here is the order in the header nav. */
   nav: NavLink[];
   socials: SocialLink[];

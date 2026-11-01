@@ -47,6 +47,12 @@
   --coral-text: oklch(0.5486 0.1478 33.5);
   --ring: var(--fern);
 
+  /* The home portrait's backdrop. --fern-deep is a darker fern for the panel's
+     falloff. The glow lifts black hair off the dark ground, which is why it is
+     nothing at all in light. */
+  --fern-deep: color-mix(in oklab, var(--fern) 52%, oklch(0.18 0.02 170));
+  --portrait-glow: transparent;
+
   /* Card elevation. rgba(28,36,32) is --ink at full opacity — a warm
      near-black rather than a generic grey shadow. Dark mode does NOT invert
      these: a warm shadow reads as dirt on a dark surface, so dark swaps to
@@ -79,6 +85,8 @@
   --coral-wash: oklch(0.271 0.028 37);
   --coral-text: var(--coral);
   --ring: var(--fern);
+
+  --portrait-glow: color-mix(in oklab, var(--fern) 34%, transparent);
 
   --card-shadow: 0 1px 2px rgb(0 0 0 / 0.24), 0 8px 24px -12px rgb(0 0 0 / 0.45);
   --card-shadow-lift: 0 2px 4px rgb(0 0 0 / 0.32), 0 18px 40px -16px rgb(0 0 0 / 0.55);
@@ -196,6 +204,11 @@
   --text-lead--font-weight: 400;
 
   /* Pair with `font-mono uppercase`. */
+  --text-stat: clamp(2.125rem, 3.4vw, 3rem);
+  --text-stat--line-height: 1;
+  --text-stat--font-weight: 750;
+  --text-stat--letter-spacing: -0.03em;
+
   --text-eyebrow: 11px;
   --text-eyebrow--line-height: 1;
   --text-eyebrow--font-weight: 600;
@@ -218,7 +231,7 @@
 
   @keyframes sheet-in {
     from {
-      transform: translateX(-100%);
+      transform: translateX(100%);
     }
     to {
       transform: translateX(0);
@@ -313,6 +326,33 @@
 
 .section + .section {
   padding-top: 0;
+}
+
+/* Gradients are real rules because each stop is a token, and a Tailwind
+   arbitrary value is off-limits here (ui-rules.md §3). */
+.portrait-panel {
+  background: radial-gradient(ellipse 90% 85% at 38% 25%, var(--fern), var(--fern-deep));
+}
+
+.portrait-glow {
+  background: radial-gradient(closest-side, var(--portrait-glow), transparent);
+}
+
+/* The Cta's grid. The ::after clears the middle so text never crosses a line,
+   and needs its parent to be `relative` with the content above it. */
+.blueprint-sheet {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center;
+}
+
+.blueprint-sheet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 62% 80% at 50% 50%, var(--surface) 42%, transparent 100%);
 }
 
 

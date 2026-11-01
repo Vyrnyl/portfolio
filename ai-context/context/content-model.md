@@ -63,8 +63,18 @@ export interface SiteConfig {
   url: string;
   email: string;
   location: string;
+  /** The square headshot at the top of the mobile menu. */
+  avatar: ImageAsset;
+  /** The transparent cutout on the home page's portrait tile. */
+  heroPortrait: ImageAsset;
+  /** Short availability line on the home page. */
+  status: string;
+  /** The "At a glance" figures on the home page. Hand-kept totals. */
+  stats: Stat[];
+  /** The short stack named on the home page. /skills holds the full list. */
+  stack: string[];
   /** Order here is the order in the header nav. */
-  nav: Link[];
+  nav: NavLink[];
   socials: SocialLink[];
   /** Path to the downloadable CV under /public. */
   resumePdf: string;

@@ -47,7 +47,7 @@ const CLOSE = cn(
 
 /**
  * The navigation for viewports below 1000px: a burger in the header that opens
- * a full-height drawer from the left, over a blurred scrim.
+ * a full-height drawer from the right, over a blurred scrim.
  *
  * Renders the burger in place; the drawer and scrim are portaled to <body>.
  * That is not a stylistic choice — the header carries `backdrop-blur-md`, and
@@ -176,15 +176,16 @@ export function MobileMenu({ items, profile, contact, className }: Props) {
       {open
         ? createPortal(
             /* Covers the whole viewport, header included. The width follows the
-               phone up to 320px, so the scrim always shows beside the drawer. */
-            <div className="fixed inset-0 z-50 flex overflow-hidden">
+               phone up to 320px, so the scrim always shows beside the drawer.
+               Reversed rather than reordered: the drawer stays first in the DOM. */
+            <div className="fixed inset-0 z-50 flex flex-row-reverse overflow-hidden">
               <div
                 id={SHEET_ID}
                 ref={sheetRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Menu"
-                className="bg-surface border-border animate-sheet-in relative flex w-3/4 max-w-80 shrink-0 flex-col overflow-y-auto overscroll-contain border-r"
+                className="bg-surface border-border animate-sheet-in relative flex w-3/4 max-w-80 shrink-0 flex-col overflow-y-auto overscroll-contain border-l"
               >
                 <button type="button" onClick={close} aria-label="Close menu" className={CLOSE}>
                   <X size={18} strokeWidth={1.9} />

@@ -9,16 +9,16 @@ import { cn } from "@/lib/utils";
 type ProjectCardProps = {
   project: Project;
   /**
-   * Heading level for the card title. The card sits under an <h2> section
-   * heading on / ("Featured work"), where h3 is correct, but directly under
-   * the page <h1> on /projects, where h3 skips a level. The level is the
-   * caller's to declare because only the caller knows what precedes it.
+   * Heading level for the card title. Under an <h2> section heading, h3 is
+   * correct; directly under the page <h1> on /projects, h3 skips a level. The
+   * level is the caller's to declare because only the caller knows what
+   * precedes it.
    */
   headingLevel?: "h2" | "h3";
   /**
    * Eager-loads the thumbnail. Like headingLevel, this belongs to the slot,
-   * not the component: a card near the top of / or /projects is the page's
-   * LCP element on mobile, and next/image lazy-loads by default — which
+   * not the component: a card near the top of /projects is the page's LCP
+   * element on mobile, and next/image lazy-loads by default — which
    * defers the very image the metric is measuring. Only the caller knows
    * whether this card is above the fold, so only the caller can set it.
    */

@@ -1,5 +1,19 @@
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+/*
+ * Every custom --text-* step in globals.css must be listed here. twMerge cannot
+ * see the stylesheet, so an unknown `text-badge` reads as a COLOUR, and the
+ * next real colour (`text-muted`) silently removes it. The element then falls
+ * back to 16px at normal weight with no error anywhere.
+ */
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      text: ["h-xl", "h-lg", "h-md", "h-sm", "lead", "stat", "eyebrow", "badge"],
+    },
+  },
+});
 
 /**
  * Merge Tailwind classes so a caller's `className` always wins.

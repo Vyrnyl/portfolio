@@ -326,6 +326,8 @@ Neutrals carry a slight green bias so they read as chosen rather than inherited.
 | `--fern-hover` | `#256549` | `#79CFA3` | Primary button hover |
 | `--fern-on` | `#FFFFFF` | `#10201A` | Text **on** a fern background |
 | `--fern-wash` | `#ECF6F0` | `#1E2E27` | Active nav pill, success note, badge fill. **Light re-derived in PORT-052** — `text-fern` on the prototype's `#E9F3ED` measured 4.40:1. The wash moved rather than `--fern`, which is a button ground, focus ring or hover border in 29 places and text-on-wash in only two. Dark was already 6.33:1 and is unchanged. |
+| `--fern-deep` | mix of `--fern` | mix of `--fern` | Falloff of the home portrait's `.portrait-panel`. Decorative: no text sits on it. |
+| `--portrait-glow` | `transparent` | `--fern` at 34% | Haze behind the head, which separates black hair from the dark ground. |
 | `--coral` | `#D2543A` | `#F08670` | Error **border** (`aria-invalid` on `Input`/`Textarea`), status dot accent — non-text UI only |
 | `--coral-wash` | `#FBEBE6` | `#33221D` | Error note background |
 | `--coral-text` | `#B74932` | `#F08670` (= `--coral`) | Error message **text**, required-field marks — the only two coral *text* uses on the site |
@@ -354,9 +356,12 @@ The identity is the **contrast** between the two: large headlines at tight track
 | `h-md` (section) | `1.3rem` | 650 | `-0.02em` |
 | `h-sm` (card title) | `1.0625rem` | 650 | `-0.012em` |
 | `lead` | `clamp(1.0625rem, 1.7vw, 1.25rem)` | 400 | — |
+| `stat` (home figures) | `clamp(2.125rem, 3.4vw, 3rem)` | 750 | `-0.03em` |
 | body | `1rem` / 1.65 | 400 | — |
 | `eyebrow` | `11px` mono, uppercase | 600 | `+0.14em` |
 | `badge` | `12px` mono | 400 | — |
+
+**A new `--text-*` step must also be added to the list in `src/lib/utils.ts`.** `twMerge` cannot read the stylesheet, so an unlisted `text-badge` counts as a colour, the next real colour removes it, and the element falls back to 16px with no error.
 
 Headings get `text-wrap: balance`; body copy gets `text-wrap: pretty`; running text stays near 65ch via `.measure`.
 

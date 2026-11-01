@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Section } from "@/components/layout/section";
+import { BackgroundList } from "@/components/sections/background-list";
+import { Cta } from "@/components/sections/cta";
+import { HeroPortrait } from "@/components/sections/hero-portrait";
+import { LatestWork } from "@/components/sections/latest-work";
 import { ProjectCard } from "@/components/sections/project-card";
+import { StackStrip } from "@/components/sections/stack-strip";
+import { StatRow } from "@/components/sections/stat-row";
+import { StatusPill } from "@/components/sections/status-pill";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,7 +18,8 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Prose } from "@/components/ui/prose";
 import { Textarea } from "@/components/ui/textarea";
-import { getFeaturedProjects } from "@/lib/content";
+import { site } from "@/content/site";
+import { getAllProjects, getFeaturedProjects } from "@/lib/content";
 import { ICONS, type IconName } from "@/lib/icons";
 
 export const metadata: Metadata = {
@@ -187,6 +195,54 @@ export default function GalleryPage() {
           {getFeaturedProjects().map((project) => (
             <ProjectCard key={project.slug} project={project} />
           ))}
+        </div>
+      </Section>
+
+      <Section heading="Home tiles">
+        <p className="text-muted mb-6 text-sm">
+          Everything on <code>/</code> except <code>Hero</code>, which owns a page&rsquo;s{" "}
+          <code>h1</code> and would give this page two. The non-live project proves the Live marker
+          goes away; a two-item <code>StackStrip</code> proves <code>learning</code> is optional.
+        </p>
+        <div className="grid gap-4 lg:grid-cols-12">
+          <StatusPill label={site.status} className="justify-self-start lg:col-span-12" />
+          <HeroPortrait className="lg:col-span-5" />
+          <div className="grid gap-4 lg:col-span-7">
+            <StatRow stats={site.stats} />
+            <StatRow stats={site.stats.slice(0, 1)} />
+          </div>
+          {getAllProjects()
+            .filter(
+              (project, index, all) =>
+                index === all.findIndex((other) => other.status === project.status),
+            )
+            .map((project) => (
+              <LatestWork key={project.slug} project={project} className="lg:col-span-6" />
+            ))}
+          <StackStrip items={site.stack} learning="AWS" className="lg:col-span-12" />
+          <StackStrip items={site.stack.slice(0, 2)} className="lg:col-span-12" />
+        </div>
+      </Section>
+
+      <Section heading="BackgroundList">
+        <BackgroundList
+          className="max-w-md"
+          entries={[
+            { id: "current", title: "A current role", org: "Open-ended", start: "2024-08", end: null },
+            { id: "past", title: "A finished role", org: "Dated", start: "2022-08", end: "2024-06" },
+          ]}
+        />
+      </Section>
+
+      <Section heading="Cta">
+        <div className="space-y-6">
+          <Cta
+            heading="With a body and two buttons"
+            body="The fuller of the two states real pages use."
+            primary={{ label: "Primary", href: "/contact" }}
+            secondary={{ label: "Secondary", href: "/projects" }}
+          />
+          <Cta heading="Heading and one button" primary={{ label: "Primary", href: "/contact" }} />
         </div>
       </Section>
 

@@ -203,6 +203,8 @@ These are the ones that have actually cost people hours:
 - **To prove an ESLint rule fires, use `--stdin`, not a temporary file.** `printf '...' | npx eslint --stdin --stdin-filename src/components/ui/__probe.tsx` lints a path that never exists on disk — no file to create, none to forget to delete, and nothing written under `src/`.
 - **No TypeScript runner is installed** (no `tsx`, `ts-node` or `esbuild`). To execute repo TS outside Next, compile it with `tsc -p` against a scratchpad config, rewrite the `@/` imports to relative, and run the JS under node.
 - **`components/ui/` must not import from `content/`.** Enforced by ESLint. Domain-aware components go in `components/sections/`.
+- **A new `--text-*` token must also go in the list in `src/lib/utils.ts`.** `twMerge` cannot read the stylesheet, so an unlisted `text-badge` counts as a colour and the next real colour deletes it. `Badge`, the header name and two other elements sat at 16px/400 from the day they were built, through every audit, because the class was right in the source and missing only from the output. Measure computed `font-size`, not the className.
+- **Git Bash rewrites arguments that start with `/`.** `node script.mjs /projects` receives a Windows path, the script reaches nothing, and a grep for failures comes back empty and reads as a pass. Prefix `MSYS_NO_PATHCONV=1`, and count successes rather than searching for failures.
 - **Check [ui-registry.md](ai-context/context/ui-registry.md) before building any component** — match what exists rather than inventing a near-duplicate.
 - **Every list needs a designed empty state**, and every optional content field needs a rendering branch.
 - **Breakpoints are 1000 / 760 / 460**, set by the design — not Tailwind's defaults.
