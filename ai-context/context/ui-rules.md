@@ -142,10 +142,6 @@ Tailwind v4 configures in CSS, not `tailwind.config.js`. Two blocks, and the spl
   --container-shell: 1120px;
   --container-measure: 680px;
 
-  /* max-w-figure — a screenshot inside a page, not a hero band. Added
-     2026-09-20 when /projects/[slug] started carrying real captures. */
-  --container-figure: 800px;
-
   /* px-gut, gap-gut, ... */
   --spacing-gut: var(--gut);
 

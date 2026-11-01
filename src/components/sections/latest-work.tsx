@@ -6,20 +6,43 @@ import { Card } from "@/components/ui/card";
 import type { Project } from "@/content/types";
 import { cn } from "@/lib/utils";
 
+type Variant = "tile" | "banner";
+
 type LatestWorkProps = {
   project: Project;
+  /**
+   * "tile" sits in a row on `/`, so the text sets its height and the screenshot
+   * crops to fit. "banner" leads `/projects` at full width, so the screenshot
+   * keeps its own box and is eager-loaded: there it is the page's LCP element.
+   */
+  variant?: Variant;
   className?: string;
 };
 
+const TITLE: Record<Variant, string> = {
+  tile: "text-h-sm",
+  banner: "text-h-lg",
+};
+
+const IMAGE_BOX: Record<Variant, string> = {
+  tile: "md:aspect-auto md:flex-1",
+  banner: "md:aspect-video",
+};
+
+const IMAGE_SIZES: Record<Variant, string> = {
+  tile: "(min-width: 760px) 360px, 100vw",
+  banner: "(min-width: 1000px) 540px, (min-width: 760px) 50vw, 100vw",
+};
+
 /**
- * One project on `/`, shown in a small browser window. Like ProjectCard, the
- * whole tile is a single <Link> with no aria-label, and the screenshot is
- * decorative here so its alt text does not lead the link's accessible name.
+ * One project, shown in a small browser window. Like ProjectCard, the whole
+ * tile is a single <Link> with no aria-label, and the screenshot is decorative
+ * here so its alt text does not lead the link's accessible name.
  *
  * The "Live" marker only appears for a live project: an archived one has
  * nothing to point at, and the tile must not claim otherwise.
  */
-export function LatestWork({ project, className }: LatestWorkProps) {
+export function LatestWork({ project, variant = "tile", className }: LatestWorkProps) {
   return (
     <Link
       href={`/projects/${project.slug}`}
@@ -40,7 +63,7 @@ export function LatestWork({ project, className }: LatestWorkProps) {
               </p>
             ) : null}
           </div>
-          <h2 className="text-h-sm text-ink mt-auto">{project.title}</h2>
+          <h2 className={cn("text-ink mt-auto", TITLE[variant])}>{project.title}</h2>
           <p className="text-muted mt-1 text-sm">{project.summary}</p>
           <p className="text-fern mt-2 inline-flex items-center gap-1 text-sm font-medium">
             View project
@@ -55,13 +78,14 @@ export function LatestWork({ project, className }: LatestWorkProps) {
               <span className="bg-border-strong size-1.5 rounded-full" />
               <span className="bg-border-strong size-1.5 rounded-full" />
             </div>
-            <div className="aspect-thumbnail relative md:aspect-auto md:flex-1">
+            <div className={cn("aspect-thumbnail relative", IMAGE_BOX[variant])}>
               <Image
                 src={project.thumbnail.src}
                 alt=""
                 aria-hidden
                 fill
-                sizes="(min-width: 760px) 360px, 100vw"
+                sizes={IMAGE_SIZES[variant]}
+                priority={variant === "banner"}
                 className="object-cover object-top-left"
               />
             </div>

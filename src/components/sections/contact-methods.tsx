@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 
+import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { site } from "@/content/site";
 import type { SocialLink } from "@/content/types";
@@ -37,7 +38,7 @@ export function ContactMethods({ className }: Props) {
   const socials = site.socials.filter((social) => social.platform !== "email");
 
   return (
-    <div className={cn("space-y-8", className)}>
+    <Card padded className={cn("shadow-card space-y-8", className)}>
       <div>
         <h2 className="text-h-sm text-ink">Or reach me directly</h2>
         <p className="text-muted mt-2 text-sm">
@@ -95,6 +96,6 @@ export function ContactMethods({ className }: Props) {
           </ul>
         </div>
       ) : null}
-    </div>
+    </Card>
   );
 }

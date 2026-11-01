@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Section } from "@/components/layout/section";
 import { CaseStudy } from "@/components/sections/case-study";
+import { ProjectFacts } from "@/components/sections/project-facts";
 import { ProjectGallery } from "@/components/sections/project-gallery";
 import { ProjectHeader } from "@/components/sections/project-header";
 import { ProjectNav } from "@/components/sections/project-nav";
@@ -114,12 +115,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       </Section>
 
       <Section spacing="tight">
-        <CaseStudy
-          problem={project.problem}
-          approach={project.approach}
-          outcome={project.outcome}
-          highlights={project.highlights}
-        />
+        {/* ProjectFacts comes first in the DOM so a phone meets the links right
+            under the cover; `lg:order-last` moves it beside the case study. */}
+        <div className="grid gap-x-12 gap-y-10 lg:grid-cols-3">
+          <ProjectFacts
+            project={project}
+            className="lg:sticky lg:top-22 lg:order-last lg:self-start"
+          />
+          <CaseStudy
+            problem={project.problem}
+            approach={project.approach}
+            outcome={project.outcome}
+            highlights={project.highlights}
+            className="lg:col-span-2"
+          />
+        </div>
       </Section>
 
       {/* The Section is skipped too, not just the gallery — a Section wrapped

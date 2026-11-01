@@ -13,9 +13,7 @@ export const metadata = buildPageMetadata({
  * /contact — the form and the direct alternatives, side by side at lg.
  *
  * The page is a Server Component; only <ContactForm> is client
- * (code-standards.md §4). Submitting does nothing yet, and that is correct for
- * PORT-036 — the Server Action behind it is PORT-041. That split is deliberate:
- * you cannot debug a submission against a form that does not exist.
+ * (code-standards.md §4).
  *
  * ONE Section, not two. The first build put the intro in its own
  * `spacing="tight"` band above the grid, which measured clean but left a
@@ -41,7 +39,8 @@ export default function ContactPage() {
           <ContactForm className="mt-12" />
         </div>
 
-        <div className="lg:col-span-2 lg:pt-2">
+        {/* Sticky, so the alternatives stay in view for the length of the form. */}
+        <div className="lg:sticky lg:top-22 lg:col-span-2 lg:self-start">
           <ContactMethods />
         </div>
       </div>

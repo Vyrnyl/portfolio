@@ -7,6 +7,7 @@ import { Cta } from "@/components/sections/cta";
 import { HeroPortrait } from "@/components/sections/hero-portrait";
 import { LatestWork } from "@/components/sections/latest-work";
 import { ProjectCard } from "@/components/sections/project-card";
+import { ProjectFacts } from "@/components/sections/project-facts";
 import { StackStrip } from "@/components/sections/stack-strip";
 import { StatRow } from "@/components/sections/stat-row";
 import { StatusPill } from "@/components/sections/status-pill";
@@ -221,6 +222,34 @@ export default function GalleryPage() {
             ))}
           <StackStrip items={site.stack} learning="AWS" className="lg:col-span-12" />
           <StackStrip items={site.stack.slice(0, 2)} className="lg:col-span-12" />
+        </div>
+      </Section>
+
+      <Section heading="Project tiles">
+        <p className="text-muted mb-6 text-sm">
+          The <code>banner</code> variant of <code>LatestWork</code>, then{" "}
+          <code>ProjectFacts</code> with real links, with pending links, and with the{" "}
+          <code>role</code> and <code>duration</code> fields no project sets today.
+        </p>
+        <div className="space-y-4">
+          {getAllProjects()
+            .slice(0, 1)
+            .map((project) => (
+              <LatestWork key={project.slug} project={project} variant="banner" />
+            ))}
+          <div className="grid gap-4 lg:grid-cols-3">
+            {getAllProjects().map((project) => (
+              <ProjectFacts key={project.slug} project={project} />
+            ))}
+            {getAllProjects()
+              .slice(0, 1)
+              .map((project) => (
+                <ProjectFacts
+                  key={project.slug}
+                  project={{ ...project, role: "Solo developer", duration: "Six months" }}
+                />
+              ))}
+          </div>
         </div>
       </Section>
 

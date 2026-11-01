@@ -21,9 +21,9 @@ type ProjectGridProps = {
 };
 
 /**
- * The project card grid, shared by / (featured) and /projects (all,
- * filtered). Renders cards or the empty state — filtering, sorting and
- * "which projects" are entirely the caller's decision.
+ * The project card grid on /projects, under the banner. Renders cards or the
+ * empty state; sorting and "which projects" are entirely the caller's decision.
+ * Three-up from `md`, because two columns strand a third card on its own row.
  */
 export function ProjectGrid({
   projects,
@@ -37,7 +37,7 @@ export function ProjectGrid({
   }
 
   return (
-    <div className={cn("grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3", className)}>
+    <div className={cn("grid grid-cols-1 gap-4 md:grid-cols-3", className)}>
       {projects.map((project, index) => (
         <ProjectCard
           key={project.slug}

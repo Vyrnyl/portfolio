@@ -1,4 +1,5 @@
 import { Section } from "@/components/layout/section";
+import { LatestWork } from "@/components/sections/latest-work";
 import { ProjectGrid } from "@/components/sections/project-grid";
 import { getAllProjects } from "@/lib/content";
 import { buildPageMetadata } from "@/lib/seo";
@@ -26,24 +27,29 @@ export const metadata = buildPageMetadata({
  * rebuilding a designed primitive.
  */
 export default function ProjectsPage() {
-  const projects = getAllProjects();
+  const [newest, ...rest] = getAllProjects();
 
   const emptyState = (
     <p className="text-muted py-16 text-center">Projects are on the way — check back soon.</p>
   );
 
   return (
-    <Section>
+    <Section spacing="tight">
       <h1 className="text-h-lg text-ink">Projects</h1>
       <p className="text-muted max-w-measure mt-4">{description}</p>
 
-      <ProjectGrid
-        projects={projects}
-        emptyState={emptyState}
-        cardHeadingLevel="h2"
-        priorityCount={3}
-        className="mt-10"
-      />
+      {newest ? <LatestWork project={newest} variant="banner" className="mt-8" /> : null}
+
+      {/* The grid's empty state is for "no projects at all". With exactly one
+          project, the banner is the whole page and the grid has nothing to say. */}
+      {rest.length > 0 || !newest ? (
+        <ProjectGrid
+          projects={rest}
+          emptyState={emptyState}
+          cardHeadingLevel="h2"
+          className="mt-4"
+        />
+      ) : null}
     </Section>
   );
 }

@@ -56,14 +56,14 @@ export function ProjectCard({
     <Link
       href={`/projects/${project.slug}`}
       className={cn(
-        "group block rounded-lg",
+        "group block h-full rounded-lg",
         "focus-visible:ring-ring focus-visible:ring-offset-ground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
         className,
       )}
     >
       <Card
         className={cn(
-          "overflow-hidden p-0 transition-all duration-200",
+          "flex h-full flex-col overflow-hidden p-0 transition-all duration-200",
           "group-hover:border-fern group-hover:shadow-card-lift",
           "group-focus-visible:border-fern group-focus-visible:shadow-card-lift",
         )}
@@ -74,12 +74,12 @@ export function ProjectCard({
             alt=""
             aria-hidden
             fill
-            sizes="(min-width: 1000px) 33vw, (min-width: 760px) 50vw, 100vw"
+            sizes="(min-width: 760px) 33vw, 100vw"
             priority={priority}
             className="object-cover"
           />
         </div>
-        <div className="space-y-3 p-6">
+        <div className="flex flex-1 flex-col gap-3 p-5">
           <div className="flex items-start justify-between gap-3">
             <Heading className="text-h-sm text-ink">{project.title}</Heading>
             <span className="text-badge text-faint shrink-0 font-mono">
@@ -88,7 +88,7 @@ export function ProjectCard({
           </div>
           <p className="text-muted text-sm">{project.summary}</p>
           {project.tags.length > 0 && (
-            <ul className="flex flex-wrap gap-1.5">
+            <ul className="mt-auto flex flex-wrap gap-1.5">
               {project.tags.map((tag) => (
                 <li key={tag}>
                   <Badge>{tag}</Badge>
