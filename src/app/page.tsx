@@ -6,7 +6,7 @@ import { LatestWork } from "@/components/sections/latest-work";
 import { StackStrip } from "@/components/sections/stack-strip";
 import { StatRow } from "@/components/sections/stat-row";
 import { site } from "@/content/site";
-import { getFeaturedProjects, getSkillGroups } from "@/lib/content";
+import { getFeaturedProjects } from "@/lib/content";
 import { buildPageMetadata, DEFAULT_OG_IMAGE, OG_IMAGE_SIZE } from "@/lib/seo";
 
 /**
@@ -52,7 +52,6 @@ export const metadata = {
 
 export default function HomePage() {
   const [latestProject] = getFeaturedProjects(1);
-  const learning = getSkillGroups().find((group) => group.tier === "learning")?.items[0];
 
   return (
     <Section spacing="tight" className="pt-7">
@@ -68,7 +67,7 @@ export default function HomePage() {
         />
         {latestProject ? <LatestWork project={latestProject} className="lg:col-span-7" /> : null}
 
-        <StackStrip items={site.stack} learning={learning} className="lg:col-span-12" />
+        <StackStrip items={site.stack} className="lg:col-span-12" />
 
         <Cta
           heading="Have a project in mind?"
