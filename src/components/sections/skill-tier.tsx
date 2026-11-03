@@ -80,7 +80,9 @@ export function SkillTier({ group, className }: Props) {
         <ul className="mt-5 flex flex-wrap gap-2">
           {group.items.map((item) => (
             <li key={item}>
-              <Badge>{item}</Badge>
+              {/* Larger than the site's default chip: here the chips are the
+                  content, not a label on something else. */}
+              <Badge className="px-3 py-1 text-sm">{item}</Badge>
             </li>
           ))}
         </ul>
